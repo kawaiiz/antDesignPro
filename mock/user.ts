@@ -83,7 +83,7 @@ export default {
       res.send({
         status: 'ok',
         type,
-        currentAuthority: 'admin',
+        currentAuthority: 'systemAdmin',
       });
       return;
     }

@@ -5,7 +5,7 @@ import { stringify } from 'querystring';
 
 import { fakeAccountLogin, getFakeCaptcha } from '@/services/login';
 import { setAuthority } from '@/utils/authority';
-import { getPageQuery } from '@/utils/utils';
+import { getPageQuery, setToken } from '@/utils/utils';
 
 import { reloadAuthorized } from '@/utils/Authorized'
 
@@ -35,6 +35,7 @@ const Model: LoginModelType = {
     status: undefined,
   },
 
+
   effects: {
     *login({ payload }, { call, put }) {
       const response = yield call(fakeAccountLogin, payload);
@@ -43,7 +44,7 @@ const Model: LoginModelType = {
         payload: response,
       });
       // Login successfully
-      if (response.status === 'ok') {
+      if (response.status === 1) {
         const urlParams = new URL(window.location.href);
         const params = getPageQuery();
         let { redirect } = params as { redirect: string };
@@ -74,10 +75,7 @@ const Model: LoginModelType = {
         reloadAuthorized()
         yield put(
           routerRedux.replace({
-            pathname: '/user/login',
-            search: stringify({
-              redirect: window.location.href,
-            }),
+            pathname: '/user/login'
           }),
         );
       }
@@ -86,12 +84,15 @@ const Model: LoginModelType = {
 
   reducers: {
     changeLoginStatus(state, { payload }) {
-      setAuthority(payload.currentAuthority);
+      // 设置用户身份 localstorage
+      setAuthority(payload.data.currentAuthority);
+      // 设置token cookie
+      setToken(payload.data.token)
       reloadAuthorized()
       return {
         ...state,
         status: payload.status,
-        type: payload.type,
+        type: payload.data.type,
       };
     },
   },

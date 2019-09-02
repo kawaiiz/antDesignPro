@@ -15,6 +15,7 @@ export interface CurrentUser {
   }[];
   userid?: string;
   unreadCount?: number;
+  userAuth?: []
 }
 
 export interface UserModelState {
@@ -31,6 +32,7 @@ export interface UserModelType {
   reducers: {
     saveCurrentUser: Reducer<UserModelState>;
     changeNotifyCount: Reducer<UserModelState>;
+    // saveAuth: Reducer<UserModelState>;
   };
 }
 
@@ -59,10 +61,16 @@ const UserModel: UserModelType = {
   },
 
   reducers: {
+    // saveAuth(state, action) {
+    //   return {
+    //     ...state,
+    //     userAuth: action.payload.data || []
+    //   }
+    // },
     saveCurrentUser(state, action) {
       return {
         ...state,
-        currentUser: action.payload || {},
+        currentUser: action.payload.data || {},
       };
     },
     changeNotifyCount(

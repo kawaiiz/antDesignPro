@@ -2,8 +2,9 @@ import { Reducer } from 'redux';
 import { Subscription, Effect } from 'dva';
 
 import { NoticeIconData } from '@/components/NoticeIcon';
-import { queryNotices } from '@/services/user';
+import { queryNotices, queryAuth } from '@/services/user';
 import { ConnectState } from './connect.d';
+import { setRoute } from '../../config/config.router'
 
 export interface NoticeItem extends NoticeIconData {
   id: string;
@@ -12,19 +13,23 @@ export interface NoticeItem extends NoticeIconData {
 }
 
 export interface GlobalModelState {
-  collapsed: boolean;
-  notices: NoticeItem[];
+  collapsed?: boolean;
+  notices?: NoticeItem[];
+  authList?: []
 }
 
 export interface GlobalModelType {
   namespace: 'global';
   state: GlobalModelState;
   effects: {
+    fetchAuth: Effect;
     fetchNotices: Effect;
     clearNotices: Effect;
     changeNoticeReadState: Effect;
+    getAuthList: Effect;
   };
   reducers: {
+    setQueryAuth: Reducer<GlobalModelState>
     changeLayoutCollapsed: Reducer<GlobalModelState>;
     saveNotices: Reducer<GlobalModelState>;
     saveClearedNotices: Reducer<GlobalModelState>;
@@ -38,25 +43,63 @@ const GlobalModel: GlobalModelType = {
   state: {
     collapsed: false,
     notices: [],
+    authList: []
   },
 
   effects: {
+    *getAuthList(_, { call, put, select }) {
+      let authList = yield call(queryAuth)
+      setRoute(authList.data)
+      yield put({
+        type: 'setQueryAuth',
+        payload: authList.data
+      })
+    },
+    *fetchAuth(_, { call, put, select }) {
+      try {
+        let data
+        const res = yield call(queryNotices);
+        data = res.data
+        yield put({
+          type: 'saveNotices',
+          payload: data,
+        });
+        const unreadCount: number = yield select(
+          (state: ConnectState) => state.global.notices.filter(item => !item.read).length,
+        );
+        yield put({
+          type: 'user/changeNotifyCount',
+          payload: {
+            totalCount: data.length,
+            unreadCount,
+          },
+        });
+      } catch (e) {
+        console.log(e)
+      }
+    },
     *fetchNotices(_, { call, put, select }) {
-      const data = yield call(queryNotices);
-      yield put({
-        type: 'saveNotices',
-        payload: data,
-      });
-      const unreadCount: number = yield select(
-        (state: ConnectState) => state.global.notices.filter(item => !item.read).length,
-      );
-      yield put({
-        type: 'user/changeNotifyCount',
-        payload: {
-          totalCount: data.length,
-          unreadCount,
-        },
-      });
+      try {
+        let data
+        const res = yield call(queryNotices);
+        data = res.data
+        yield put({
+          type: 'saveNotices',
+          payload: data,
+        });
+        const unreadCount: number = yield select(
+          (state: ConnectState) => state.global.notices.filter(item => !item.read).length,
+        );
+        yield put({
+          type: 'user/changeNotifyCount',
+          payload: {
+            totalCount: data.length,
+            unreadCount,
+          },
+        });
+      } catch (e) {
+        console.log(e)
+      }
     },
     *clearNotices({ payload }, { put, select }) {
       yield put({
@@ -102,6 +145,12 @@ const GlobalModel: GlobalModelType = {
   },
 
   reducers: {
+    setQueryAuth(state, { payload }): GlobalModelState {
+      return {
+        ...state,
+        authList: payload,
+      };
+    },
     changeLayoutCollapsed(state = { notices: [], collapsed: true }, { payload }): GlobalModelState {
       return {
         ...state,

@@ -10,7 +10,7 @@ import ProLayout, {
   Settings,
   SettingDrawer,
 } from '@ant-design/pro-layout';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'umi/link';
 import { Dispatch } from 'redux';
 import { connect } from 'dva';
@@ -31,7 +31,9 @@ export interface BasicLayoutProps extends ProLayoutProps {
   };
   settings: Settings;
   dispatch: Dispatch;
+  authList: [];
 }
+
 export type BasicLayoutContext = { [K in 'location']: BasicLayoutProps[K] } & {
   breadcrumbNameMap: {
     [path: string]: MenuDataItem;
@@ -41,6 +43,7 @@ export type BasicLayoutContext = { [K in 'location']: BasicLayoutProps[K] } & {
 /**
  * use Authorized check all menu item
  */
+
 const menuDataRender = (menuList: MenuDataItem[]): MenuDataItem[] => {
   return menuList.map(item => {
     const localItem = {
@@ -57,21 +60,28 @@ const footerRender: BasicLayoutProps['footerRender'] = (_, defaultDom) => {
 }
 
 const BasicLayout: React.FC<BasicLayoutProps> = props => {
-  const { dispatch, children, settings } = props;
+  const { dispatch, children, settings, authList } = props;
+
   /**
    * constructor
    */
 
   useEffect(() => {
     if (dispatch) {
+      // dispatch({
+      //   type: 'user/fetchCurrent',
+      // });
+      // 获取登录者的权限列表
       dispatch({
-        type: 'user/fetchCurrent',
+        type: 'global/getAuthList',
       });
       dispatch({
         type: 'settings/getSetting',
       });
     }
+
   }, []);
+
 
   /**
    * init variables
@@ -84,6 +94,21 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
       });
     }
   };
+
+  // 自定义菜单的全球化函数 替代  原有的menuDataRender
+  const setIi8Menu = (authList: MenuDataItem[]): MenuDataItem[] => {
+    return authList.map(item => {
+      const loaclItem = {
+        ...item,
+        routes: item.routes ? setIi8Menu(item.routes) : []
+      }
+      loaclItem.name = formatMessage({
+        id: `menu.${item.name}`,
+        defaultMessage: item.name
+      })
+      return Authorized.check(item.authority, loaclItem, null) as MenuDataItem
+    })
+  }
 
   return (
     <>
@@ -115,7 +140,8 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
             );
         }}
         footerRender={footerRender}
-        menuDataRender={menuDataRender}
+        menuDataRender={() => setIi8Menu(authList)}
+        // menuDataRender={menuDataRender}
         formatMessage={formatMessage}
         rightContentRender={rightProps => <RightContent {...rightProps} />}
         {...props}
@@ -136,7 +162,8 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
   );
 };
 
-export default connect(({ global, settings }: ConnectState) => ({
+export default connect(({ global, settings, loading }: ConnectState) => ({
   collapsed: global.collapsed,
   settings,
+  authList: global.authList,
 }))(BasicLayout);

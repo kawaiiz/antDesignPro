@@ -1,4 +1,6 @@
 export default {
+  'menu.authority':'authority',
+  'menu.route': 'routes',
   'menu.welcome': 'Welcome',
   'menu.more-blocks': 'More Blocks',
   'menu.home': 'Home',

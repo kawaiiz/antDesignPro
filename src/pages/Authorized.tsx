@@ -11,9 +11,13 @@ interface AuthComponentProps extends ConnectProps {
 
 const getRouteAuthority = (path: string, routeData: Route[]) => {
   let authorities: string[] | string | undefined;
+  console.log(routeData)
   routeData.forEach(route => {
     // match prefix
     if (pathToRegexp(`${route.path}(.*)`).test(path)) {
+      if (route.authority) {
+        authorities = route.authority
+      }
       // exact match
       if (route.path === path) {
         authorities = route.authority || authorities;

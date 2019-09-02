@@ -1,4 +1,4 @@
-import request from 'umi-request';
+import axios from '@/utils/api.request';
 
 export interface LoginParamsType {
   userName: string;
@@ -7,13 +7,22 @@ export interface LoginParamsType {
   captcha: string;
 }
 
-export async function fakeAccountLogin(params: LoginParamsType) {
-  return request('/api/login/account', {
+export async function fakeAccountLogin(params: LoginParamsType): Promise<any>  {
+  return axios.request({
+    url: '/api/login/account',
     method: 'POST',
     data: params,
   });
 }
 
-export async function getFakeCaptcha(mobile: string) {
-  return request(`/api/login/captcha?mobile=${mobile}`);
+interface mobile {
+  mobile: string
+}
+
+export async function getFakeCaptcha(params: mobile): Promise<any>  {
+  return axios.request({
+    url: '/api/login/captcha',
+    method: 'GET',
+    params,
+  });
 }

@@ -1,5 +1,5 @@
 import { parse } from 'querystring';
-
+import Cookies from 'js-cookie'
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
 
@@ -22,3 +22,23 @@ export const isAntDesignProOrDev = (): boolean => {
 };
 
 export const getPageQuery = () => parse(window.location.href.split('?')[1]);
+
+
+import { MyConfig } from '../../config/config'
+
+export const TOKEN_KEY = MyConfig.token
+
+export const setToken = (token: string): void => {
+  Cookies.set(TOKEN_KEY, token, { expires: MyConfig.cookieExpires || 1 })
+}
+
+export const getToken = (): string => {
+  const token = Cookies.get(TOKEN_KEY)
+  if (token) return token
+  else return ''
+}
+
+export const delToken = () => {
+  Cookies.remove(TOKEN_KEY);
+}
+

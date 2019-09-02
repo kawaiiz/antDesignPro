@@ -1,6 +1,6 @@
 import { IConfig, IPlugin } from 'umi-types';
 import defaultSettings from './defaultSettings'; // https://umijs.org/config/
-
+import routes from './config.router'
 import slash from 'slash2';
 import webpackPlugin from './plugin.config';
 const { pwa, primaryColor } = defaultSettings; // preview.pro.ant.design only do not use in your production ;
@@ -56,16 +56,23 @@ const plugins: IPlugin[] = [
 ]; // 针对 preview.pro.ant.design 的 GA 统计代码
 
 export const MyConfig = {
+  // 请求的域名
   baseUrl: {
-    // dev: 'http://192.168.1.74:3001',
-    dev: '',
+    dev: 'http://192.168.1.74:3001',
+    // dev: '',
     pro: 'http://192.168.1.74:3001',
   },
+  // 底部的文字
   footerContent: {
     links: [],
     copyright: '南京途酷科技有限公司',
   },
+  // cookie过期时间（天）
+  cookieExpires: 7,
+  // token 名称
+  token: 'token'
 };
+
 export default {
   base: '/',
   publicPath: '/',
@@ -81,94 +88,10 @@ export default {
   },
   devtool: isAntDesignProPreview ? 'source-map' : false,
   // umi routes: https://umijs.org/zh/guide/router.html
-  history: 'hash',
   // 默认是 browser
-  routes: [
-    {
-      path: '/user',
-      component: '../layouts/UserLayout',
-      routes: [
-        {
-          name: 'login',
-          path: '/user/login',
-          component: './user/login',
-          hideInMenu: true,
-        },
-        {
-          name: 'register',
-          path: '/user/register',
-          component: './user/register',
-          hideInMenu: true,
-        },
-        {
-          name: 'register-result',
-          path: '/user/register-result',
-          component: './user/register-result',
-          hideInMenu: true,
-        },
-        {
-          name: 'reset-password',
-          path: '/user/reset-password',
-          component: './user/reset-password',
-          hideInMenu: true,
-        },
-      ],
-    },
-    {
-      path: '/',
-      component: '../layouts/SecurityLayout',
-      Routes: ['src/pages/Authorized'],
-      authority: ['admin', 'user'],
-      routes: [
-        {
-          path: '/',
-          component: '../layouts/BasicLayout',
-          Routes: ['src/pages/Authorized'],
-          authority: ['admin', 'user'],
-          routes: [
-            {
-              path: '/',
-              redirect: '/home',
-            },
-            {
-              path: '/home',
-              name: 'home',
-              icon: 'smile',
-              authority: ['admin', 'user'],
-              component: './content/first/first',
-            },
-            {
-              name: '404',
-              path: '/error-page/404',
-              component: './error-page/404/index',
-              hideInMenu: true,
-            },
-            {
-              name: '403',
-              path: '/error-page/403',
-              component: './error-page/403/index',
-              hideInMenu: true,
-            },
-            {
-              name: '500',
-              path: '/error-page/500',
-              component: './error-page/500/index',
-              hideInMenu: true,
-            }
-          ],
-        },
-        {
-          component: './error-page/404/index',
-        },
-      ],
-    },
-    {
-      component: './error-page/403/index',
-    },
-    {
-      component: './error-page/404/index',
-    },
-  ],
+  history: 'hash',
+  // 路由
+  routes,
   // Theme for antd: https://ant.design/docs/react/customize-theme-cn
   theme: {
     'primary-color': primaryColor,
