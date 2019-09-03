@@ -12,6 +12,7 @@ import ProLayout, {
 } from '@ant-design/pro-layout';
 import React, { useEffect, useState } from 'react';
 import Link from 'umi/link';
+import router from 'umi/router'
 import { Dispatch } from 'redux';
 import { connect } from 'dva';
 import { formatMessage } from 'umi-plugin-react/locale';
@@ -21,6 +22,7 @@ import RightContent from '@/components/GlobalHeader/RightContent';
 import { ConnectState } from '@/models/connect';
 
 import { MyConfig } from '../../config/config'
+import lodash from 'lodash'
 
 // import logo from '../assets/logo.svg';
 import logo from '../assets/logo.png';
@@ -60,27 +62,48 @@ const footerRender: BasicLayoutProps['footerRender'] = (_, defaultDom) => {
 }
 
 const BasicLayout: React.FC<BasicLayoutProps> = props => {
-  const { dispatch, children, settings, authList } = props;
+  const { dispatch, children, settings, authList, route } = props;
+  const [components, setComponents] = useState<Map<string, any>>();// react hook
+  function addRoute(menuItem: MenuDataItem) {
+    let newMenuItem = lodash.cloneDeep(menuItem)
+    if (menuItem.children && menuItem.children.length > 0) {
+      newMenuItem.children.forEach(t => addRoute(t));
+    } else if (route && route.routes && components) {
+      newMenuItem.component = typeof menuItem.name === 'string' ? components.get(menuItem.name) : undefined
+      newMenuItem.exact = true
+      route.routes.unshift(newMenuItem);
+    }
+  }
 
-  /**
-   * constructor
-   */
-
-  useEffect(() => {
+  useState(() => {
     if (dispatch) {
-      // dispatch({
-      //   type: 'user/fetchCurrent',
-      // });
-      // 获取登录者的权限列表
       dispatch({
         type: 'global/getAuthList',
       });
       dispatch({
         type: 'settings/getSetting',
       });
+      // 因为在SecurityLayout里已经请求过一次这里就隐藏了
+      // dispatch({
+      //   type: 'user/fetchCurrent',
+      // });
     }
-
-  }, []);
+    // 将组件传到component变量里 只是react hook
+    if (route && route.routes) {
+      const map = new Map<string, any>();
+      route.routes.filter(t => t.name).forEach(t => map.set(t.name!, t.component));
+      setComponents(map);
+    }
+  });
+  /**
+   * constructor
+   */
+  useEffect(() => {
+    if (route && route.routes && components && authList) {
+      authList.forEach(addRoute);
+      router.push(window.location.pathname);
+    }
+  }, [components, authList]);
 
 
   /**
@@ -99,6 +122,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
   const setIi8Menu = (authList: MenuDataItem[]): MenuDataItem[] => {
     return authList.map(item => {
       const loaclItem = {
+        name: item.name,
         ...item,
         routes: item.routes ? setIi8Menu(item.routes) : []
       }
@@ -109,7 +133,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
       return Authorized.check(item.authority, loaclItem, null) as MenuDataItem
     })
   }
-
+  
   return (
     <>
       <ProLayout

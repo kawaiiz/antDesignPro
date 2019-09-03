@@ -21,9 +21,9 @@ export async function queryNotices(): Promise<any> {
   });
 }
 
-export async function queryAuth(): Promise<any> {
+export async function getRouteTree(): Promise<any> {
   return await axios.request({
-    url: '/api/getUserAuth',
+    url: '/api/getRouteTree',
     method: 'post',
   });
 }

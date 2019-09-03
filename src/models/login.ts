@@ -10,9 +10,8 @@ import { getPageQuery, setToken } from '@/utils/utils';
 import { reloadAuthorized } from '@/utils/Authorized'
 
 export interface StateType {
-  status?: 'ok' | 'error';
-  type?: string;
-  currentAuthority?: 'user' | 'guest' | 'admin';
+  status?: 1 | 0; // 是否登录
+  type?: string; // 登录类型
 }
 
 export interface LoginModelType {
@@ -34,8 +33,6 @@ const Model: LoginModelType = {
   state: {
     status: undefined,
   },
-
-
   effects: {
     *login({ payload }, { call, put }) {
       const response = yield call(fakeAccountLogin, payload);
@@ -43,8 +40,17 @@ const Model: LoginModelType = {
         type: 'changeLoginStatus',
         payload: response,
       });
+
       // Login successfully
       if (response.status === 1) {
+
+        // 设置用户身份 localstorage
+        setAuthority(response.data.currentAuthority);
+        // 设置token cookie
+        setToken(response.data.token)
+        // 更新权限
+        reloadAuthorized()
+
         const urlParams = new URL(window.location.href);
         const params = getPageQuery();
         let { redirect } = params as { redirect: string };
@@ -69,26 +75,42 @@ const Model: LoginModelType = {
     },
     *logout(_, { put }) {
       const { redirect } = getPageQuery();
+
+
+
       // redirect
       if (window.location.pathname !== '/user/login' && !redirect) {
-        setAuthority('');
-        reloadAuthorized()
         yield put(
           routerRedux.replace({
             pathname: '/user/login'
           }),
         );
+        // 清空state里的数据
+        let response = {
+          status: 0,
+          data: {
+            type: ''
+          }
+        }
+        yield put({
+          type: 'changeLoginStatus',
+          payload: response,
+        });
       }
+
+      // 设置用户身份 localstorage
+      setAuthority('');
+      // 设置token cookie
+      setToken('')
+      // 更新权限
+      reloadAuthorized()
+
     },
   },
 
   reducers: {
     changeLoginStatus(state, { payload }) {
-      // 设置用户身份 localstorage
-      setAuthority(payload.data.currentAuthority);
-      // 设置token cookie
-      setToken(payload.data.token)
-      reloadAuthorized()
+
       return {
         ...state,
         status: payload.status,

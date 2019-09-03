@@ -1,45 +1,16 @@
+/* 
+  对这里的代码做下解释
+  为实现后台传入路由的权限
+  根据下面这个例子
+  从而写出了这个乱七八糟的代码
+  https://github.com/ant-design/ant-design-pro/issues/4286
+  第一 所有的路由要先在代码里定义好（因为路由的component需要在开始的时候初始化），可以不带权限字段
+  第二 在src/models/global里请求权限列表(函数getRouteTree)：interface IRoute[],这里请求的路由是完整的带权限的路由，
+  第三 那获得的完整路由去src/layouts/basicLayout 找到basicLayout函数构造，开始的addroute ,useState ,useEffect 是 注入新路由的
+  第四 src/layouts/basicLayout 里的 setIi8Menu 是控制全球化文字的函数，动态列表貌似不支持全球化，只能通过函数插入
+*/
+
 import { IRoute } from 'umi-types/config'
-
-let _publicRoute: IRoute[] = [
-  {
-    name: '404',
-    path: '/error-page/404',
-    component: './error-page/404/index',
-    hideInMenu: true,
-  },
-  {
-    name: '403',
-    path: '/error-page/403',
-    component: './error-page/403/index',
-    hideInMenu: true,
-  },
-  {
-    name: '500',
-    path: '/error-page/500',
-    component: './error-page/500/index',
-    hideInMenu: true,
-  }
-]
-
-let _contentRoute: IRoute[] = [
-  {
-    path: '/',
-    redirect: '/home',
-  }, {
-    path: '/home',
-    name: 'home',
-    icon: 'smile',
-    component: './content/home/index',
-    Routes: ['src/pages/Authorized'],
-    // authority: ['admin', 'user', 'systemAdmin'],
-  },
-  {
-    path: '/authority',
-    name: 'authority',
-    component: './authority/authority-tree/index',
-    Routes: ['src/pages/Authorized'],
-    // authority: ['systemAdmin'],
-  }]
 
 const routes: IRoute[] = [
   {
@@ -75,13 +46,47 @@ const routes: IRoute[] = [
   {
     path: '/',
     component: '../layouts/SecurityLayout',
+    Routes: ['src/pages/Authorized'],
     routes: [
       {
         path: '/',
         component: '../layouts/BasicLayout',
-        Routes: ['src/pages/Authorized'],
-        authority: ['admin', 'user', 'systemAdmin'],
-        routes: [],
+        routes: [{
+          path: '/',
+          redirect: '/authority',
+        },
+        {
+          path: '/home',
+          name: 'home',
+          icon: 'smile',
+          component: './content/home/index',
+        },
+        {
+          path: '/authority',
+          name: 'authority',
+          icon: '',
+          component: './authority/authority-tree/index',
+          // authority: ['systemAdmin'],
+        },
+        {
+          name: '404',
+          path: '/error-page/404',
+          component: './error-page/404/index',
+          hideInMenu: true,
+        },
+        {
+          name: '403',
+          path: '/error-page/403',
+          component: './error-page/403/index',
+          hideInMenu: true,
+        },
+        {
+          name: '500',
+          path: '/error-page/500',
+          component: './error-page/500/index',
+          hideInMenu: true,
+        },
+        ],
       },
       {
         component: './error-page/404/index',
@@ -99,47 +104,7 @@ const routes: IRoute[] = [
   },
 ]
 
-// 获取最新的路由树
-// const getRoute = async () => {
-//   try {
-//     if (_contentRoute.length === 1) {
-//       let res = await getRouteTree()
-//       _contentRoute = _contentRoute.concat(res.data)
-//     }
-//     return _contentRoute
-//   } catch (e) {
-//     console.log(e)
-//     return _contentRoute
-//   }
-// }
-
-// 内部更新路由树
-const _setRoute = () => {
-  // routes[1].routes[0].routes = routes[1].routes[0].routes.concat(await getRoute())
-  routes[1].routes[0].routes = _publicRoute.concat(_contentRoute)
-  console.log(routes[1].routes[0])
-}
-//初始化一下
-_setRoute()
-
-const setRoute = (newContentRoute: IRoute[]) => {
-  console.log(newContentRoute)
-  let contentRoute: IRoute[] = [{
-    path: '/',
-    redirect: '/home',
-  }]
-  contentRoute = contentRoute.concat(newContentRoute)
-  _contentRoute = contentRoute
-  console.log(_contentRoute)
-  //初始化一下
-  _setRoute()
-}
-
 export default routes
-export {
-  setRoute
-}
-
 
 
 

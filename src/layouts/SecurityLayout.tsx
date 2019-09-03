@@ -4,6 +4,9 @@ import { Redirect } from 'umi';
 import { ConnectState, ConnectProps } from '@/models/connect';
 import { CurrentUser } from '@/models/user';
 import PageLoading from '@/components/PageLoading';
+import { notification } from 'antd';
+import { getToken } from '@/utils/utils'
+import router from 'umi/router';
 
 interface SecurityLayoutProps extends ConnectProps {
   loading: boolean;
@@ -25,9 +28,20 @@ class SecurityLayout extends React.Component<SecurityLayoutProps, SecurityLayout
     });
     const { dispatch } = this.props;
     if (dispatch) {
-      dispatch({
-        type: 'user/fetchCurrent',
-      });
+      // 判断一下是否有token 没有token直接跳到登录页
+      if (getToken()) {
+        dispatch({
+          type: 'user/fetchCurrent',
+        });
+      } else {
+        notification.error({
+          description: '您的登录已失效，请重新登录',
+          message: '登录失效',
+        });
+        router.push({
+          pathname: 'login',
+        });
+      }
     }
   }
 

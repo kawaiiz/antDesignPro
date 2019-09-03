@@ -1,7 +1,5 @@
 import { AnyAction, Reducer } from 'redux';
-
 import { EffectsCommandMap } from 'dva';
-import { getRouteTree } from './service';
 
 export interface StateType {
   status?: 'ok' | 'error';

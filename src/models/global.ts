@@ -2,20 +2,20 @@ import { Reducer } from 'redux';
 import { Subscription, Effect } from 'dva';
 
 import { NoticeIconData } from '@/components/NoticeIcon';
-import { queryNotices, queryAuth } from '@/services/user';
+import { queryNotices, getRouteTree } from '@/services/user';
 import { ConnectState } from './connect.d';
-import { setRoute } from '../../config/config.router'
 
 export interface NoticeItem extends NoticeIconData {
   id: string;
   type: string;
   status: string;
 }
-
+ 
 export interface GlobalModelState {
   collapsed?: boolean;
   notices?: NoticeItem[];
-  authList?: []
+  authList?: [] // 权限数组
+  isAddauth?: boolean // 是否已经添加了权限数组
 }
 
 export interface GlobalModelType {
@@ -47,9 +47,8 @@ const GlobalModel: GlobalModelType = {
   },
 
   effects: {
-    *getAuthList(_, { call, put, select }) {
-      let authList = yield call(queryAuth)
-      setRoute(authList.data)
+    *getAuthList(_, { call, put }) {
+      let authList = yield call(getRouteTree) // 整体权限列表
       yield put({
         type: 'setQueryAuth',
         payload: authList.data
