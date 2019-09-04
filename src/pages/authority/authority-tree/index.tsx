@@ -84,11 +84,20 @@ class AuthorityTree extends Component<Authprops, AuthState> {
       actionTag: {
         name: '',
         path: '',
+        hideInMenu: true,
         icon: '',
         component: '',
       },
       actionType: null,
       drawerVisible: false,
+    })
+  }
+
+  //点击新增按钮
+  handleBtnClickAdd = () => {
+    this.setState({
+      actionType: 'add',
+      drawerVisible: true
     })
   }
 
@@ -115,7 +124,6 @@ class AuthorityTree extends Component<Authprops, AuthState> {
         }
       })
     }
-
     try {
       // 先比对，找到是哪一条数据 将state 里存着的点击actionTag 和列表比
       const { actionTag, authList } = this.state
@@ -134,12 +142,6 @@ class AuthorityTree extends Component<Authprops, AuthState> {
       });
       console.log(e)
     }
-
-    // dispatch返回正确的操作时执行这里的代码
-    // 。。。。
-
-    // dispatch返回错误的操作时执行这里的代码
-    // 。。。。
   }
 
   // 新增提交
@@ -183,7 +185,7 @@ class AuthorityTree extends Component<Authprops, AuthState> {
       <Card loading={getAuthListLoading}>
         <Alert className={styles['authority-tree-warning']} message={formatMessage({ id: 'authority-tree.warning' })} type="warning" />
         <div className={styles['authority-add-button']}>
-          <Button size="large" type="primary" style={{ float: 'right' }} onClick={}>
+          <Button size="large" type="primary" style={{ float: 'right' }} onClick={this.handleBtnClickAdd}>
             <FormattedMessage id='component.add'></FormattedMessage>
           </Button>
         </div>
