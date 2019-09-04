@@ -21,11 +21,5 @@ export async function queryNotices(): Promise<any> {
   });
 }
 
-export async function getRouteTree(): Promise<any> {
-  return await axios.request({
-    url: '/api/getRouteTree',
-    method: 'post',
-  });
-}
 
 

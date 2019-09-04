@@ -26,6 +26,7 @@ import lodash from 'lodash'
 
 // import logo from '../assets/logo.svg';
 import logo from '../assets/logo.png';
+import { IRoute } from 'umi-types';
 
 export interface BasicLayoutProps extends ProLayoutProps {
   breadcrumbNameMap: {
@@ -88,10 +89,21 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
       //   type: 'user/fetchCurrent',
       // });
     }
-    // 将组件传到component变量里 只是react hook
+    // 将组件传到component变量里 react hook  重复的变量路由 
+    function _mapRoute(routes: IRoute[], map: Map<string, any>) {
+      routes.filter(t => t.name).forEach((t: IRoute) => {
+        map.set(t.name!, t.component)
+        if (t.routes && t.routes.length > 0) {
+          _mapRoute(t.routes, map)
+        }
+      })
+    }
     if (route && route.routes) {
       const map = new Map<string, any>();
-      route.routes.filter(t => t.name).forEach(t => map.set(t.name!, t.component));
+      _mapRoute(route.routes, map)
+      // route.routes.filter(t => t.name).forEach(t => {
+      //   map.set(t.name!, t.component)
+      // });
       setComponents(map);
     }
   });
@@ -124,7 +136,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
       const loaclItem = {
         name: item.name,
         ...item,
-        routes: item.routes ? setIi8Menu(item.routes) : []
+        children: item.children ? setIi8Menu(item.children) : []
       }
       loaclItem.name = formatMessage({
         id: `menu.${item.name}`,
@@ -133,7 +145,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
       return Authorized.check(item.authority, loaclItem, null) as MenuDataItem
     })
   }
-  
+
   return (
     <>
       <ProLayout

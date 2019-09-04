@@ -15,11 +15,11 @@ interface Res {
 const errRouter = (errorInfo: Res) => {
   if (errorInfo.status === 404 || errorInfo.status === 500 || errorInfo.status === 403) {
     router.push({
-      pathname: errorInfo.status.toString()
+      pathname: `/error-page/${errorInfo.status.toString()}`
     })
   } else {
     router.push({
-      pathname: '500'
+      pathname: `/error-page/500`
     })
   }
 }

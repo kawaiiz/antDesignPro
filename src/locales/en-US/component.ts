@@ -3,5 +3,9 @@ export default {
   'component.tagSelect.collapse': 'Collapse',
   'component.tagSelect.all': 'All',
   'component.confirm': 'confirm',
-  'component.cancel': 'cancel'
+  'component.cancel': 'cancel',
+  'component.error': 'error',
+  'component.success': 'success',
+  'component.add': 'add',
+  'component.detele': 'detele'
 };

@@ -1,6 +1,7 @@
 export default {
-  'menu.authority':'权限',
-  'menu.route':'路由',
+  'menu.authority-page': '頁面权限',
+  'menu.authority': '权限',
+  'menu.route': '路由',
   'menu.welcome': '歡迎',
   'menu.more-blocks': '更多區塊',
   'menu.home': '首頁',

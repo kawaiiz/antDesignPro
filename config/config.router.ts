@@ -47,13 +47,14 @@ const routes: IRoute[] = [
     path: '/',
     component: '../layouts/SecurityLayout',
     Routes: ['src/pages/Authorized'],
+    // authority: ['systemAdmin'],
     routes: [
       {
         path: '/',
         component: '../layouts/BasicLayout',
         routes: [{
           path: '/',
-          redirect: '/authority',
+          redirect: '/authority/page',
         },
         {
           path: '/home',
@@ -64,9 +65,15 @@ const routes: IRoute[] = [
         {
           path: '/authority',
           name: 'authority',
-          icon: '',
-          component: './authority/authority-tree/index',
-          // authority: ['systemAdmin'],
+          icon: ' ',
+          // component: './authority/authority-tree/index',
+          routes: [{
+            path: '/authority/page',
+            name: 'authority-page',
+            icon: ' ',
+            component: './authority/authority-tree/index',
+          }],
+
         },
         {
           name: '404',

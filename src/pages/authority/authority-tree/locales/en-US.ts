@@ -1,12 +1,13 @@
 export default {
   'authority-tree.header.description': 'The privilege tree of the system.',
-  'authority-trre.warning': 'Non-administrator cannot manipulate the table',
-  'authority-trre.table.name': 'Name',
-  'authority-trre.table.path': 'Access Path',
-  'authority-trre.table.icon': 'Icon',
-  'authority-trre.table.operation': 'operation',
-  'authority-trre.table.add': 'add',
-  'authority-trre.table.edit': 'edit',
-  'authority-trre.table.delete': 'delete',
-
+  'authority-tree.warning': 'Non-administrator cannot manipulate the table',
+  'authority-tree.table.name': 'Name',
+  'authority-tree.table.path': 'Access Path',
+  'authority-tree.table.icon': 'Icon',
+  'authority-tree.table.operation': 'operation',
+  'authority-tree.table.add': 'add',
+  'authority-tree.table.edit': 'edit',
+  'authority-tree.table.delete': 'delete',
+  'authority-tree.form.show': 'show',
+  'authority-tree.form.hide': 'hide',
 };
