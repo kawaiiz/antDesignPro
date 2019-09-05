@@ -18,7 +18,7 @@ export interface AuthModelType {
     setAuth: Effect;
   };
   reducers: {
-    setAuth: Reducer<AuthModelState>
+    setAuthList: Reducer<AuthModelState>
   };
 }
 
@@ -50,7 +50,7 @@ const AuthModel: AuthModelType = {
         const res = yield call(getRouteTree) // 整体权限列表
         const authList = toTree(res.data)
         yield put({
-          type: 'setAuth',
+          type: 'setAuthList',
           payload: { originalAuthList: res.data, authList }
         })
         return Promise.resolve()
@@ -71,11 +71,12 @@ const AuthModel: AuthModelType = {
         const res = yield call(setAuthEventType[payload.type], payload.data) // 整体权限列表更新后返回全部的权限列表
         const authList = toTree(res.data)
         yield put({
-          type: 'setAuth',
+          type: 'setAuthList',
           payload: { originalAuthList: res.data, authList }
         })
         return Promise.resolve()
       } catch (e) {
+        console.log(e)
         notification.error({
           description: e.message,
           message: formatMessage({ id: 'component.error' }),
@@ -85,7 +86,7 @@ const AuthModel: AuthModelType = {
 
   },
   reducers: {
-    setAuth(state, { payload }): AuthModelState {
+    setAuthList(state, { payload }): AuthModelState {
       return {
         ...state,
         authList: payload.authList,

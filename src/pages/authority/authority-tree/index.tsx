@@ -42,13 +42,14 @@ class AuthorityTree extends Component<Authprops, AuthState> {
   state: AuthState = {
     authority: '',
     actionTag: {
+      id: '',
+      parentId: '',
       name: '',
       path: '',
       hideInMenu: true,
       icon: '',
       component: '',
       authority: null,
-      index: []
     }, // 当前表单内容
     drawerVisible: false, // 是否打开表单
     actionType: null // 点击按钮操作的类型
@@ -60,18 +61,18 @@ class AuthorityTree extends Component<Authprops, AuthState> {
     this.state.authority = typeof authority === 'string' ? authority : authority[0]
   }
 
-
   // 每次关闭的时候 清空活跃项
   initActionTag = () => {
     this.setState({
       actionTag: {
+        id: '',
+        parentId: '',
         name: '',
         path: '',
         hideInMenu: true,
         icon: '',
         component: '',
         authority: null,
-        index: [],
       },
       actionType: null,
       drawerVisible: false,
@@ -97,36 +98,22 @@ class AuthorityTree extends Component<Authprops, AuthState> {
 
   // 点击删除浮窗的确认按钮
   handleBtnClickDeleteUpData = (row: IRoute) => {
-    const { dispatch, authList } = this.props;
-    let newAuthList = lodash.cloneDeep(authList)
-    this.seek(newAuthList, row, 0)
-    newAuthList = this.createAuthListIndex(newAuthList, [])
+    const { dispatch } = this.props;
     dispatch({
       type: 'auth/setAuth',
-      payload: { data: newAuthList, type: 'del' }
+      payload: { data: row, type: 'del' }
     });
   }
 
-  // 表单提交事件 修改比新增多一个删除原来的自己的操作 其他的
+  // 表单提交事件
   handleFormSubmit = async (form: IRoute, parentIndex: number[]) => {
     try {
       // 先比对，找到是哪一条数据  删除原数据  再通过新的父节点添加新数据
       const { actionTag } = this.state
-      const { dispatch, authList } = this.props;
-      let newAuthList = lodash.cloneDeep(authList)
-      if (this.state.actionType === 'edit') {
-        form.children = lodash.cloneDeep(actionTag.children)
-        this.seek(newAuthList, actionTag, 0)
-      }
-      if (parentIndex.length === 0) {
-        newAuthList.push(form)
-      } else {
-        newAuthList = this.addAuth(newAuthList, form, parentIndex)
-      }
-      newAuthList = this.createAuthListIndex(newAuthList, [])
+      const { dispatch } = this.props;
       dispatch({
         type: 'auth/setAuth',
-        payload: { data: newAuthList, type: 'edit' }
+        payload: { data: form, type: actionTag.id ? 'edit' : 'add' }
       });
       this.initActionTag()
     } catch (e) {
@@ -135,40 +122,6 @@ class AuthorityTree extends Component<Authprops, AuthState> {
         message: formatMessage({ id: 'component.error' }),
       });
     }
-  }
-
-  // createIndex 生成操作更新后的序号  parentIndex:父节点的序号
-  createAuthListIndex(authList: IRoute[], parentIndex: number[]) {
-    return authList.map((item, index) => {
-      item.index = [...parentIndex, index]
-      if (item.children && item.children.length > 0) {
-        item.children = this.createAuthListIndex(item.children, item.index)
-      }
-      return item
-    })
-  }
-
-  // 找到节点并删除
-  seek = (authList: IRoute[], row: IRoute, level: number) => {
-    level++
-    if (row.index.length === level) {
-      authList.splice(row.index[level - 1], 1)
-    } else {
-      this.seek(authList[row.index[level - 1]].children, row, level)
-    }
-  }
-
-  // 传入列表与编辑的表单内容与最新的父节点的index,生成最新的权限组合
-  addAuth = (authList: IRoute[], form: IRoute, parentIndex: number[]) => {
-    return authList.map((item, index) => {
-      if (JSON.stringify(item.index) === JSON.stringify(parentIndex)) {
-        item.children.push(form)
-      }
-      if (item.children && item.children.length > 0) {
-        item.children = this.addAuth(item.children, form, parentIndex)
-      }
-      return item
-    });
   }
 
   render() {

@@ -1,4 +1,4 @@
-import React, { Component, Children } from 'react'
+import React, { Component } from 'react'
 import { IRoute } from 'umi-types/config'
 import { FormComponentProps } from 'antd/es/form';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
@@ -14,15 +14,14 @@ import {
 interface TreeFormState {
   loading: boolean,
   actionTag: IRoute,
-  tree?: TreeCreate[],
-  parentIndex?: number[]
+  tree?: TreeCreate[], // 下拉框内数据
 }
 
 interface TreeFormProp extends FormComponentProps {
   actionTag: IRoute,
   authList: IRoute[],
   onClose: () => void,
-  onSubmit: (from: IRoute, parentIndex: number[]) => void
+  onSubmit: (from: IRoute) => void
 }
 
 interface TreeCreate {
@@ -36,20 +35,21 @@ class TreeForm extends Component<TreeFormProp> {
   state: TreeFormState = {
     loading: false,
     actionTag: {
+      id: '',
+      parentId: '',
       name: '',
       path: '',
       component: '',
       icon: ' ',
       authority: [],
       hideInMenu: false
-    }
+    },
   }
 
   constructor(props: TreeFormProp) {
     super(props)
     const { actionTag } = this.state
     this.state.actionTag = Object.assign(actionTag, props.actionTag)
-    this.state.parentIndex = actionTag.index.length > 0 ? actionTag.index.slice(0, actionTag.index.length - 1) : []
     this.createTree()
   }
 
@@ -59,37 +59,36 @@ class TreeForm extends Component<TreeFormProp> {
     function _create(authList: IRoute[], disabled: boolean): TreeCreate[] {
       return authList.map((item, index) => {
         const newItem = {
-          title: item.path,
-          value: item.index,
-          key: item.index,
-          children: item.children && item.children.length > 0 ? _create(item.children, item.index === actionTag.index) : null,
-          disabled: disabled || item.index === actionTag.index
+          title: formatMessage({ id: `menu.${item.name}` }),
+          value: item.id,
+          key: item.id,
+          children: item.children && item.children.length > 0 ? _create(item.children, item.id === actionTag.parentId) : null,
+          disabled: disabled || item.id === actionTag.parentId
         }
         return newItem
       })
     }
-
     this.state.tree = _create(authList, false)
   }
 
   handleSubmit = () => {
-    const { form, onSubmit } = this.props;
-    const { parentIndex } = this.state;
+    const { form, onSubmit, actionTag } = this.props;
     form.validateFields(err => {
       if (!err) {
-        onSubmit(form.getFieldsValue(), parentIndex as number[])
+        onSubmit({ ...form.getFieldsValue(), id: actionTag.id })
       }
     })
   }
 
   handleChangeParentIndex = (val: any) => {
-    this.setState({
-      parentIndex: val
-    })
+    // this.setState({
+    //   actionTag: Object.assign({}, this.state.)
+    // })
+    console.log(val)
   }
 
   render() {
-    const { loading, actionTag, tree, parentIndex } = this.state
+    const { loading, actionTag, tree } = this.state
     const { form, onClose } = this.props;
     const { getFieldDecorator } = form;
 
@@ -107,17 +106,20 @@ class TreeForm extends Component<TreeFormProp> {
             rules: [{ required: true, message: 'Please input the name of collection!' }],
           })(<Input />)}
         </Form.Item>
-        <Form.Item label="parentNode">
-          <TreeSelect
-            style={{ width: 300 }}
-            allowClear={true}
-            value={parentIndex}
-            dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-            treeData={tree as unknown as TreeCreate[]}
-            placeholder="Please select"
-            treeDefaultExpandAll
-            onChange={this.handleChangeParentIndex}
-          />
+        <Form.Item label="parentId">
+          {getFieldDecorator('parentId', {
+            initialValue: actionTag.parentId
+          })(
+            <TreeSelect
+              style={{ width: 300 }}
+              allowClear={true}
+              dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+              treeData={tree as unknown as TreeCreate[]}
+              placeholder="Please select"
+              treeDefaultExpandAll
+              onChange={this.handleChangeParentIndex}
+            />
+          )}
         </Form.Item>
         <Form.Item label="component">
           {getFieldDecorator('component', {
@@ -156,7 +158,7 @@ class TreeForm extends Component<TreeFormProp> {
           </Button>
           <Button
             size="large"
-            
+
             onClick={() => { onClose(); }}> <FormattedMessage id="component.cancel" /></Button>
         </Form.Item>
       </Form>
