@@ -79,7 +79,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
   useState(() => {
     if (dispatch) {
       dispatch({
-        type: 'global/getAuthList',
+        type: 'auth/getAuthList',
       });
       dispatch({
         type: 'settings/getSetting',
@@ -101,9 +101,6 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
     if (route && route.routes) {
       const map = new Map<string, any>();
       _mapRoute(route.routes, map)
-      // route.routes.filter(t => t.name).forEach(t => {
-      //   map.set(t.name!, t.component)
-      // });
       setComponents(map);
     }
   });
@@ -113,7 +110,8 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
   useEffect(() => {
     if (route && route.routes && components && authList) {
       authList.forEach(addRoute);
-      router.push(window.location.pathname);
+      // 原本这里是 router.push(location.pathName) 发现总是跳 location.pathName=/  打印了location 发现有hash值 所以 直接截取hash值放进去 
+      // router.push(location.hash.slice(1));
     }
   }, [components, authList]);
 
@@ -198,8 +196,8 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
   );
 };
 
-export default connect(({ global, settings, loading }: ConnectState) => ({
+export default connect(({ global, auth, settings, loading }: ConnectState) => ({
   collapsed: global.collapsed,
   settings,
-  authList: global.authList,
+  authList: auth.authList,
 }))(BasicLayout);

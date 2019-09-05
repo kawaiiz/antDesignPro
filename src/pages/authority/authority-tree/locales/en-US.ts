@@ -1,6 +1,6 @@
 export default {
   'authority-tree.header.description': 'The privilege tree of the system.',
-  'authority-tree.warning': 'Non-administrator cannot manipulate the table',
+  'authority-tree.warning': 'Non-programmer shall not operate the form',
   'authority-tree.table.name': 'Name',
   'authority-tree.table.path': 'Access Path',
   'authority-tree.table.icon': 'Icon',

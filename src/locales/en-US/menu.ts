@@ -1,6 +1,7 @@
 export default {
-  'menu.authority-page':'Page Authority',
-  'menu.authority':'Authority',
+  'menu.authority-role': 'Role Setting',
+  'menu.authority-page': 'Page Authority',
+  'menu.authority': 'Authority',
   'menu.route': 'Routes',
   'menu.welcome': 'Welcome',
   'menu.more-blocks': 'More Blocks',

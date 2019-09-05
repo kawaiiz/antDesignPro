@@ -1,9 +1,14 @@
 import { AnyAction, Reducer } from 'redux';
 import { EffectsCommandMap } from 'dva';
 
+export interface Role {
+  id: number | string,
+  name: string,
+  role: []
+}
+
 export interface StateType {
-  status?: 'ok' | 'error';
-  currentAuthority?: 'user' | 'guest' | 'admin';
+  roleList: Role[]
 }
 
 export type Effect = (
@@ -24,7 +29,7 @@ export interface ModelType {
 const Model: ModelType = {
   namespace: 'authorityTree',
   state: {
-    status: undefined,
+    roleList: [],
   },
 
   effects: {

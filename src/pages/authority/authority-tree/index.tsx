@@ -1,43 +1,27 @@
 
 import React, { Component } from 'react'
-import { Dispatch, AnyAction } from 'redux';
+import { Dispatch } from 'redux';
 import { connect } from 'dva';
 import { ConnectState } from '@/models/connect';
-import {
-  Card,
-  Empty,
-  Row,
-  Col,
-  Alert,
-  Drawer,
-  Badge,
-  Button,
-  DatePicker,
-  Divider,
-  Dropdown,
-  Form,
-  Icon,
-  Input,
-  InputNumber,
-  Menu,
-  message, // 信息
-} from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import { IRoute } from 'umi-types/config'
 import { getAuthority } from '@/utils/authority'
 import lodash from 'lodash'
-import { notification } from 'antd';
+import {
+  Card,
+  Empty,
+  Alert,
+  Drawer,
+  Button,
+  notification
+} from 'antd';
 
-
-import AuthTree from './components/tree'
-import AuthForm from './components/from'
+import TreeTable from './components/tree'
+import TreeForm from './components/from'
 import styles from './style.less'
-import { func } from 'prop-types';
 
 interface AuthState {
-  authList: IRoute[],
-  loading: boolean,
   authority: string,
   actionTag: IRoute,
   drawerVisible: boolean,
@@ -47,17 +31,15 @@ interface AuthState {
 interface Authprops {
   dispatch: Dispatch<any>,
   authList: IRoute[],
-  getAuthListLoading: boolean
+  loading: boolean
 }
 
-@connect(({ global, loading }: ConnectState) => ({
-  authList: global.authList,
-  getAuthListLoading: loading.effects['global/getAuthList'],
+@connect(({ auth, loading }: ConnectState) => ({
+  authList: auth.authList,
+  loading: loading.effects['auth/getAuthList'] || loading.effects['auth/upDataAuthList'],
 }))
 class AuthorityTree extends Component<Authprops, AuthState> {
   state: AuthState = {
-    authList: [],
-    loading: false,
     authority: '',
     actionTag: {
       name: '',
@@ -65,6 +47,8 @@ class AuthorityTree extends Component<Authprops, AuthState> {
       hideInMenu: true,
       icon: '',
       component: '',
+      authority: null,
+      index: []
     }, // 当前表单内容
     drawerVisible: false, // 是否打开表单
     actionType: null // 点击按钮操作的类型
@@ -72,13 +56,12 @@ class AuthorityTree extends Component<Authprops, AuthState> {
 
   constructor(props: Authprops) {
     super(props)
-    const { authList } = props
     const authority = getAuthority()
-    this.state.authList = [...authList]
     this.state.authority = typeof authority === 'string' ? authority : authority[0]
   }
 
-  // 每次关闭的时候 清空表单 
+
+  // 每次关闭的时候 清空活跃项
   initActionTag = () => {
     this.setState({
       actionTag: {
@@ -87,6 +70,8 @@ class AuthorityTree extends Component<Authprops, AuthState> {
         hideInMenu: true,
         icon: '',
         component: '',
+        authority: null,
+        index: [],
       },
       actionType: null,
       drawerVisible: false,
@@ -110,79 +95,87 @@ class AuthorityTree extends Component<Authprops, AuthState> {
     })
   }
 
-  // 修改提交
-  handleBtnClickEditUpData = async (from: IRoute) => {
-    function _seek(authList: IRoute[], actionTag: IRoute): IRoute[] {
-      return authList.map(item => {
-        if (item.children && item.children.length > 0) {
-          item.children = _seek(item.children, actionTag)
-        }
-        if (item.name === actionTag.name) {
-          return Object.assign(item, from)
-        } else {
-          return item
-        }
-      })
-    }
+  // 点击删除浮窗的确认按钮
+  handleBtnClickDeleteUpData = (row: IRoute) => {
+    const { dispatch, authList } = this.props;
+    let newAuthList = lodash.cloneDeep(authList)
+    this.seek(newAuthList, row, 0)
+    newAuthList = this.createAuthListIndex(newAuthList, [])
+    dispatch({
+      type: 'auth/setAuth',
+      payload: { data: newAuthList, type: 'del' }
+    });
+  }
+
+  // 表单提交事件 修改比新增多一个删除原来的自己的操作 其他的
+  handleFormSubmit = async (form: IRoute, parentIndex: number[]) => {
     try {
-      // 先比对，找到是哪一条数据 将state 里存着的点击actionTag 和列表比
-      const { actionTag, authList } = this.state
-      const { dispatch } = this.props;
-      const newAuthList = _seek(authList, actionTag)
-      await dispatch({
-        type: 'global/upDataAuthList',
-        payload: { authList: newAuthList }
+      // 先比对，找到是哪一条数据  删除原数据  再通过新的父节点添加新数据
+      const { actionTag } = this.state
+      const { dispatch, authList } = this.props;
+      let newAuthList = lodash.cloneDeep(authList)
+      if (this.state.actionType === 'edit') {
+        form.children = lodash.cloneDeep(actionTag.children)
+        this.seek(newAuthList, actionTag, 0)
+      }
+      if (parentIndex.length === 0) {
+        newAuthList.push(form)
+      } else {
+        newAuthList = this.addAuth(newAuthList, form, parentIndex)
+      }
+      newAuthList = this.createAuthListIndex(newAuthList, [])
+      dispatch({
+        type: 'auth/setAuth',
+        payload: { data: newAuthList, type: 'edit' }
       });
-      // 本来这里应该执行初始化弹窗，但是由于更新了权限数组，整个页面都重绘了 所以不需要了
-      // this.initActionTag()
+      this.initActionTag()
     } catch (e) {
       notification.error({
         description: e.message,
         message: formatMessage({ id: 'component.error' }),
       });
-      console.log(e)
     }
   }
 
-  // 新增提交
-  handleBtnClickAddUpData = (from: IRoute) => {
-
+  // createIndex 生成操作更新后的序号  parentIndex:父节点的序号
+  createAuthListIndex(authList: IRoute[], parentIndex: number[]) {
+    return authList.map((item, index) => {
+      item.index = [...parentIndex, index]
+      if (item.children && item.children.length > 0) {
+        item.children = this.createAuthListIndex(item.children, item.index)
+      }
+      return item
+    })
   }
 
-  // 表单提交事件 
-  handleFormSubmit = (form: IRoute) => {
-    if (this.state.actionType === 'add') this.handleBtnClickAddUpData(form);
-    else if (this.state.actionType === 'edit') this.handleBtnClickEditUpData(form);
-  }
-
-  // 点击删除浮窗的确认按钮
-  handleBtnClickDeleteUpData = (row: IRoute) => {
-    function _seek(authList: IRoute[], actionTag: IRoute) {
-      authList.forEach((item, index) => {
-        if (item.name === actionTag.name) {
-          authList.splice(index, 1)
-        } else {
-          if (item.children && item.children.length > 0) {
-            item.children = _seek(item.children, actionTag)
-          }
-        }
-      })
+  // 找到节点并删除
+  seek = (authList: IRoute[], row: IRoute, level: number) => {
+    level++
+    if (row.index.length === level) {
+      authList.splice(row.index[level - 1], 1)
+    } else {
+      this.seek(authList[row.index[level - 1]].children, row, level)
     }
-    const { authList } = this.state
-    const { dispatch } = this.props;
-    let newAuthList = lodash.cloneDeep(authList)
-    _seek(newAuthList, row)
-    dispatch({
-      type: 'global/upDataAuthList',
-      payload: { authList: newAuthList }
+  }
+
+  // 传入列表与编辑的表单内容与最新的父节点的index,生成最新的权限组合
+  addAuth = (authList: IRoute[], form: IRoute, parentIndex: number[]) => {
+    return authList.map((item, index) => {
+      if (JSON.stringify(item.index) === JSON.stringify(parentIndex)) {
+        item.children.push(form)
+      }
+      if (item.children && item.children.length > 0) {
+        item.children = this.addAuth(item.children, form, parentIndex)
+      }
+      return item
     });
   }
 
   render() {
-    const { authList, authority, drawerVisible, actionTag, actionType } = this.state
-    const { getAuthListLoading } = this.props
+    const { authority, drawerVisible, actionTag, actionType } = this.state
+    const { authList, loading } = this.props
     return (<PageHeaderWrapper content={<FormattedMessage id="authority-tree.header.description" />}>
-      <Card loading={getAuthListLoading}>
+      <Card loading={loading}>
         <Alert className={styles['authority-tree-warning']} message={formatMessage({ id: 'authority-tree.warning' })} type="warning" />
         <div className={styles['authority-add-button']}>
           <Button size="large" type="primary" style={{ float: 'right' }} onClick={this.handleBtnClickAdd}>
@@ -190,14 +183,14 @@ class AuthorityTree extends Component<Authprops, AuthState> {
           </Button>
         </div>
         {
-          authList.length > 0 ? (<Row>
-            <AuthTree
+          authList.length > 0 ? (<div>
+            <TreeTable
               authority={authority}
               authList={authList}
               handleBtnClickEdit={this.handleBtnClickEdit}
               handleBtnClickDeleteUpData={this.handleBtnClickDeleteUpData}
             />
-          </Row>) : <Empty description={false} />
+          </div>) : <Empty description={false} />
         }
       </Card>
       <Drawer
@@ -209,7 +202,7 @@ class AuthorityTree extends Component<Authprops, AuthState> {
         onClose={this.initActionTag}
         visible={drawerVisible}
       >
-        {drawerVisible ? <AuthForm actionTag={actionTag} onClose={this.initActionTag} onSubmit={this.handleFormSubmit} /> : null}
+        {drawerVisible ? <TreeForm actionTag={actionTag} authList={authList} onClose={this.initActionTag} onSubmit={this.handleFormSubmit} /> : null}
       </Drawer>
     </PageHeaderWrapper >);
   }

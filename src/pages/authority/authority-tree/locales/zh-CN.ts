@@ -1,6 +1,6 @@
 export default {
   'authority-tree.header.description': '该系统的权限树。',
-  'authority-tree.warning': '非管理员不能操作该表格',
+  'authority-tree.warning': '非程序编写者不能操作该表格',
   'authority-tree.table.name': '名称',
   'authority-tree.table.path': '访问路径',
   'authority-tree.table.icon': '图标',

@@ -9,16 +9,18 @@ import {
 const ButtonGroup = Button.Group;
 import { formatMessage } from 'umi-plugin-react/locale';
 
-
-interface AuthTreeProp {
+interface TreeTableProp {
   authList: IRoute[],
   authority: string,
   handleBtnClickEdit: (auth: IRoute) => void,
   handleBtnClickDeleteUpData: (auth: IRoute) => void,
 }
 
-class AuthTree extends Component<AuthTreeProp> {
+interface TreeTableState {
+  authority: string,
+}
 
+class TreeTable extends Component<TreeTableProp, TreeTableState> {
   state = {
     authority: '',
     columns: [
@@ -26,6 +28,9 @@ class AuthTree extends Component<AuthTreeProp> {
         title: formatMessage({ id: 'authority-tree.table.name' }),
         dataIndex: 'name',
         key: 'name',
+        render: (text: IRoute, record: IRoute, index: number) => {
+          return formatMessage({ id: `menu.${record.name}` })
+        }
       },
       {
         title: formatMessage({ id: 'authority-tree.table.path' }),
@@ -51,14 +56,14 @@ class AuthTree extends Component<AuthTreeProp> {
           const { handleBtnClickDeleteUpData, handleBtnClickEdit } = this.props
           return (
             <ButtonGroup>
-              <Button onClick={() => handleBtnClickEdit(text)}>
+              <Button onClick={() => handleBtnClickEdit(record)}>
                 {formatMessage({ id: 'authority-tree.table.edit' })}
               </Button>
               <Popconfirm
                 title={`${formatMessage({ id: 'authority-tree.table.delete' })} ${record.name}?`}
                 okText={formatMessage({ id: 'component.confirm' })}
                 cancelText={formatMessage({ id: 'component.cancel' })}
-                onConfirm={() => handleBtnClickDeleteUpData(text)}>
+                onConfirm={() => handleBtnClickDeleteUpData(record)}>
                 <Button type="danger">{formatMessage({ id: 'authority-tree.table.delete' })}</Button>
               </Popconfirm>
             </ButtonGroup >
@@ -67,6 +72,7 @@ class AuthTree extends Component<AuthTreeProp> {
       }
     ],
   }
+
   render() {
     const { columns } = this.state
     const { authList } = this.props
@@ -79,4 +85,4 @@ class AuthTree extends Component<AuthTreeProp> {
   }
 }
 
-export default AuthTree
+export default TreeTable

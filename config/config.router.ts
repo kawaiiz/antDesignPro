@@ -12,6 +12,35 @@
 
 import { IRoute } from 'umi-types/config'
 
+export const contentRoutes: IRoute[] = [{
+  path: '/home',
+  name: 'home',
+  icon: 'smile',
+  component: './content/home/index',
+},
+{
+  path: '/authority',
+  name: 'authority',
+  icon: ' ',
+  routes: [
+    {
+      path: '/authority',
+      redirect: '/authority/role',
+    },
+    {
+      path: '/authority/page',
+      name: 'authority-page',
+      icon: ' ',
+      component: './authority/authority-tree/index',
+    }, {
+      path: '/authority/role',
+      name: 'authority-role',
+      icon: ' ',
+      component: './authority/authority-role/index',
+    }],
+},
+]
+
 const routes: IRoute[] = [
   {
     path: '/user',
@@ -46,36 +75,15 @@ const routes: IRoute[] = [
   {
     path: '/',
     component: '../layouts/SecurityLayout',
-    Routes: ['src/pages/Authorized'],
-    // authority: ['systemAdmin'],
     routes: [
       {
         path: '/',
         component: '../layouts/BasicLayout',
+        Routes: ['src/pages/Authorized'],
         routes: [{
           path: '/',
-          redirect: '/authority/page',
-        },
-        {
-          path: '/home',
-          name: 'home',
-          icon: 'smile',
-          component: './content/home/index',
-        },
-        {
-          path: '/authority',
-          name: 'authority',
-          icon: ' ',
-          // component: './authority/authority-tree/index',
-          routes: [{
-            path: '/authority/page',
-            name: 'authority-page',
-            icon: ' ',
-            component: './authority/authority-tree/index',
-          }],
-
-        },
-        {
+          redirect: '/home',
+        }, {
           name: '404',
           path: '/error-page/404',
           component: './error-page/404/index',
@@ -110,6 +118,8 @@ const routes: IRoute[] = [
     component: './error-page/404/index',
   },
 ]
+
+routes[1].routes[0].routes = routes[1].routes[0].routes.concat(contentRoutes)
 
 export default routes
 

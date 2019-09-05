@@ -2,10 +2,8 @@ import { Reducer } from 'redux';
 import { Subscription, Effect } from 'dva';
 import { NoticeIconData } from '@/components/NoticeIcon';
 import { queryNotices } from '@/services/user';
-import { upDataAuthList, getRouteTree } from '@/services/globle';
 import { ConnectState } from './connect.d';
 import { formatMessage } from 'umi-plugin-react/locale';
-import { IRoute } from 'umi-types/config'
 
 import { notification } from 'antd';
 
@@ -18,8 +16,6 @@ export interface NoticeItem extends NoticeIconData {
 export interface GlobalModelState {
   collapsed?: boolean;
   notices?: NoticeItem[];
-  authList?: [] // 权限数组
-  isAddauth?: boolean // 是否已经添加了权限数组
 }
 
 export interface GlobalModelType {
@@ -30,11 +26,8 @@ export interface GlobalModelType {
     fetchNotices: Effect;
     clearNotices: Effect;
     changeNoticeReadState: Effect;
-    getAuthList: Effect;
-    upDataAuthList: Effect;
   };
   reducers: {
-    setQueryAuth: Reducer<GlobalModelState>
     changeLayoutCollapsed: Reducer<GlobalModelState>;
     saveNotices: Reducer<GlobalModelState>;
     saveClearedNotices: Reducer<GlobalModelState>;
@@ -48,37 +41,9 @@ const GlobalModel: GlobalModelType = {
   state: {
     collapsed: false,
     notices: [],
-    authList: []
   },
 
   effects: {
-    *getAuthList(_, { call, put }) {
-      try {
-        let authList = yield call(getRouteTree) // 整体权限列表
-        yield put({
-          type: 'setQueryAuth',
-          payload: authList.data
-        })
-        return Promise.resolve()
-      } catch (e) {
-        notification.error({
-          description: e.message,
-          message: formatMessage({ id: 'component.error' }),
-        });
-      }
-    },
-    *upDataAuthList({ payload }, { call, put }) {
-      try {
-        yield call(upDataAuthList, payload) // 整体权限列表
-        yield put({
-          type: 'setQueryAuth',
-          payload: payload.authList
-        })
-        return Promise.resolve()
-      } catch (e) {
-        return Promise.reject(e)
-      }
-    },
     *fetchAuth(_, { call, put, select }) {
       try {
         let data
@@ -172,12 +137,6 @@ const GlobalModel: GlobalModelType = {
   },
 
   reducers: {
-    setQueryAuth(state, { payload }): GlobalModelState {
-      return {
-        ...state,
-        authList: payload,
-      };
-    },
     changeLayoutCollapsed(state = { notices: [], collapsed: true }, { payload }): GlobalModelState {
       return {
         ...state,
