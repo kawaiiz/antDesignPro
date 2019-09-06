@@ -1,35 +1,20 @@
 import axios from '@/utils/api.request';
 import { IRoute } from 'umi-types/config'
 
+import { Method } from 'axios'
 
-
-export async function addAuth(data: { authList: IRoute[] }): Promise<any> {
+export async function setAuth(data: { data: IRoute[], method: Method }): Promise<any> {
+  console.log(data)
   return await axios.request({
     url: '/api/setAuth',
-    method: 'post',
-    data
-  });
-}
-
-export async function delAuth(data: { authList: IRoute[] }): Promise<any> {
-  return await axios.request({
-    url: '/api/setAuth',
-    method: 'post',
-    data
-  });
-}
-
-export async function editAuth(data: { authList: IRoute[] }): Promise<any> {
-  return await axios.request({
-    url: '/api/setAuth',
-    method: 'post',
-    data
+    method: data.method,
+    data: data.data
   });
 }
 
 export async function getRouteTree(): Promise<any> {
   return await axios.request({
     url: '/api/getRouteTree',
-    method: 'post'
+    method: 'get'
   });
 }

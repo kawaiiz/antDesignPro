@@ -1,14 +1,40 @@
-import axios from 'axios'
-import { AxiosRequestConfig, AxiosResponse } from 'axios'
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
+import createAuthRefreshInterceptor from 'axios-auth-refresh';
 import router from 'umi/router';
 import { getToken, delToken } from '@/utils/utils'
 import { notification } from 'antd';
+import { MyConfig } from '../../config/config'
 
+const baseUrl = process.env.NODE_ENV !== 'production' ? MyConfig.baseUrl.dev : MyConfig.baseUrl.pro
+
+
+const refreshAuthLogic = (failedRequest: any) => axios.post(`${baseUrl}/api/public/web/refresh-token`).then(tokenRefreshResponse => {
+  localStorage.setItem('token', tokenRefreshResponse.data.token);
+  failedRequest.response.config.headers['Authentication'] = 'Bearer ' + tokenRefreshResponse.data.token;
+  return Promise.resolve();
+}).catch(err => {
+  notification.error({
+    description: '您的登录已失效，请重新登录',
+    message: '登录失效',
+  });
+  delToken()
+  router.push({
+    pathname: 'login',
+  });
+})
+createAuthRefreshInterceptor(axios, refreshAuthLogic);
 
 interface Res {
   status: number,
   data: object,
   message: string
+}
+
+export enum SetMethod {
+  add = 'put',
+  edit = 'post',
+  delete = 'delete',
+  del = 'delete'
 }
 
 // 处理错误请求的跳转
@@ -27,7 +53,7 @@ const errRouter = (errorInfo: Res) => {
 class HttpRequest {
   baseUrl: string
   queue: object
-  constructor(baseUrl: string) {
+  constructor() {
     this.baseUrl = baseUrl
     this.queue = {}
   }

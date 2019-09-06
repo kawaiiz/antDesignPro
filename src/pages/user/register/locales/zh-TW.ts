@@ -1,5 +1,5 @@
 export default {
-  'user-register.login.userName': '賬戶',
+  'user-register.login.username': '賬戶',
   'user-register.login.password': '密碼',
   'user-register.login.message-invalid-credentials': '賬戶或密碼錯誤',
   'user-register.login.message-invalid-verification-code': '驗證碼錯誤',
@@ -20,7 +20,7 @@ export default {
   'user-register.register-result.view-mailbox': '查看郵箱',
   'user-register.email.required': '請輸入郵箱地址！',
   'user-register.email.wrong-format': '郵箱地址格式錯誤！',
-  'user-register.userName.required': '請輸入賬戶!',
+  'user-register.username.required': '請輸入賬戶!',
   'user-register.password.required': '請輸入密碼！',
   'user-register.password.twice': '兩次輸入的密碼不匹配!',
   'user-register.strength.msg': '請至少輸入 6 個字符。請不要使用容易被猜到的密碼。',

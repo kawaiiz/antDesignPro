@@ -25,7 +25,7 @@ const RegisterResult: React.FC<RouteChildrenProps> = ({ location }) => {
         <div className={styles.title}>
           <FormattedMessage
             id="user-register-result.register-result.msg"
-            values={{ userName: location.state ? location.state.account : '您的账户名' }}
+            values={{ username: location.state ? location.state.account : '您的账户名' }}
           />
         </div>
       }

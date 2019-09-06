@@ -1,12 +1,14 @@
 import { Reducer } from 'redux';
 import { Effect } from 'dva';
-import { getRouteTree, addAuth, editAuth, delAuth } from '@/services/auth';
+import { getRouteTree, setAuth } from '@/services/auth';
 import { formatMessage } from 'umi-plugin-react/locale';
 import { IRoute } from 'umi-types/config'
 import { notification } from 'antd';
+import { SetMethod } from '@/utils/axios'
 
 export interface AuthModelState {
-  authList?: IRoute[], // 多维权限数组
+  allAuthList: [], // 多维 页面+接口 权限数组
+  authList?: IRoute[], // 多维 页面权限 数组
   originalAuthList?: IRoute[], // 一维权限数组
 }
 
@@ -23,7 +25,7 @@ export interface AuthModelType {
 }
 
 // 将扁平的一维数组 转成多维 
-const toTree = (arr: IRoute[]) => {
+export const toTree = (arr: IRoute[]) => {
   const ids = arr.map(a => a.id)
   const arrNotParent = arr.filter(
     ({ parentId }) => parentId && !ids.includes(parentId),
@@ -38,20 +40,24 @@ const toTree = (arr: IRoute[]) => {
   return _(arr, null).concat(arrNotParent)
 }
 
+// 筛出页面
 const AuthModel: AuthModelType = {
   namespace: 'auth',
   state: {
+    allAuthList: [], //  // 多维 页面+接口 权限数组
+    authList: [], // 二维 页面权限 数组
     originalAuthList: [],// 一维的权限数组
-    authList: [], // 权限数组
   },
   effects: {
     *getAuthList(_, { call, put }) {
       try {
         const res = yield call(getRouteTree) // 整体权限列表
-        const authList = toTree(res.data)
+        const pageAuthList = res.data.filter(({ type }: { type: string }) => type && type === 'page')
+        const authList = toTree(pageAuthList)
+        const allAuthList = toTree(res.data)
         yield put({
           type: 'setAuthList',
-          payload: { originalAuthList: res.data, authList }
+          payload: { originalAuthList: res.data, authList, allAuthList }
         })
         return Promise.resolve()
       } catch (e) {
@@ -63,16 +69,13 @@ const AuthModel: AuthModelType = {
     },
     *setAuth({ payload }, { call, put }) {
       try {
-        const setAuthEventType = {
-          add: addAuth,
-          edit: editAuth,
-          del: delAuth
-        }
-        const res = yield call(setAuthEventType[payload.type], payload.data) // 整体权限列表更新后返回全部的权限列表
-        const authList = toTree(res.data)
+        const res = yield call(setAuth, { data: payload.data, method: SetMethod[payload.type] }) // 整体权限列表更新后返回全部的权限列表
+        const pageAuthList = res.data.filter(({ type }: { type: string }) => type && type === 'page')
+        const authList = toTree(pageAuthList)
+        const allAuthList = toTree(res.data)
         yield put({
           type: 'setAuthList',
-          payload: { originalAuthList: res.data, authList }
+          payload: { originalAuthList: res.data, authList, allAuthList }
         })
         return Promise.resolve()
       } catch (e) {
@@ -89,6 +92,7 @@ const AuthModel: AuthModelType = {
     setAuthList(state, { payload }): AuthModelState {
       return {
         ...state,
+        allAuthList: payload.allAuthList,
         authList: payload.authList,
         originalAuthList: payload.originalAuthList,
       };

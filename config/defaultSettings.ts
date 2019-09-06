@@ -47,19 +47,23 @@ export interface DefaultSettings {
 }
 
 export default {
-  desc: '这是一家互联网公司',
-  navTheme: 'dark',
-  primaryColor: '#1890FF',
-  layout: 'sidemenu',
-  contentWidth: 'Fluid',
-  fixedHeader: false,
-  autoHideHeader: false,
-  fixSiderbar: false,
-  colorWeak: false,
-  menu: {
-    locale: true,
+  "desc": "这是一家互联网公司",
+  "navTheme": "dark",
+  "primaryColor": "#1890FF",
+  "layout": "sidemenu",
+  "contentWidth": "Fluid",
+  "fixedHeader": false,
+  "autoHideHeader": false,
+  "fixSiderbar": true,
+  "menu": {
+    "locale": true
   },
-  title: 'tklvyou',
-  pwa: false,
-  iconfontUrl: '',
+  "title": "tklvyou",
+  "pwa": false,
+  "iconfontUrl": "",
+  "collapse": true,
+  "language": "zh-CN",
+  "colorWeak": false,
 } as DefaultSettings;
+
+

@@ -7,6 +7,7 @@ export default {
   'authority-role.table.operation': '操作',
   'authority-role.table.add': '新增',
   'authority-role.table.edit': '編輯',
+  'authority-role.table.id': '編號',
   'authority-role.table.delete': '删除',
   'authority-role.form.show': '顯示',
   'authority-role.form.hide': '隱藏',

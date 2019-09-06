@@ -58,7 +58,7 @@ const plugins: IPlugin[] = [
 export const MyConfig = {
   // 请求的域名
   baseUrl: {
-    dev: 'http://192.168.1.74:3001',
+    dev: 'http://192.168.1.222:8080',
     // dev: '',
     pro: 'http://192.168.1.74:3001',
   },

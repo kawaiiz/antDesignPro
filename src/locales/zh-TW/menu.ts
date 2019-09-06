@@ -1,6 +1,6 @@
 export default {
   'menu.authority-role': '角色設定',
-  'menu.authority-page': '頁面权',
+  'menu.authority-page': '權限資源',
   'menu.authority': '权限',
   'menu.route': '路由',
   'menu.welcome': '歡迎',

@@ -30,11 +30,13 @@ interface AuthState {
 
 interface Authprops {
   dispatch: Dispatch<any>,
+  originalAuthList: IRoute[],
   authList: IRoute[],
   loading: boolean
 }
 
 @connect(({ auth, loading }: ConnectState) => ({
+  originalAuthList: auth.originalAuthList,
   authList: auth.authList,
   loading: loading.effects['auth/getAuthList'] || loading.effects['auth/upDataAuthList'],
 }))
@@ -101,12 +103,12 @@ class AuthorityTree extends Component<Authprops, AuthState> {
     const { dispatch } = this.props;
     dispatch({
       type: 'auth/setAuth',
-      payload: { data: row, type: 'del' }
+      payload: { data: row, type: 'delete' }
     });
   }
 
   // 表单提交事件
-  handleFormSubmit = async (form: IRoute, parentIndex: number[]) => {
+  handleFormSubmit = async (form: IRoute) => {
     try {
       // 先比对，找到是哪一条数据  删除原数据  再通过新的父节点添加新数据
       const { actionTag } = this.state
@@ -126,7 +128,7 @@ class AuthorityTree extends Component<Authprops, AuthState> {
 
   render() {
     const { authority, drawerVisible, actionTag, actionType } = this.state
-    const { authList, loading } = this.props
+    const { originalAuthList, authList, loading } = this.props
     return (<PageHeaderWrapper content={<FormattedMessage id="authority-tree.header.description" />}>
       <Card loading={loading}>
         <Alert className={styles['authority-tree-warning']} message={formatMessage({ id: 'authority-tree.warning' })} type="warning" />
@@ -136,10 +138,10 @@ class AuthorityTree extends Component<Authprops, AuthState> {
           </Button>
         </div>
         {
-          authList.length > 0 ? (<div>
+          originalAuthList.length > 0 ? (<div>
             <TreeTable
               authority={authority}
-              authList={authList}
+              originalAuthList={originalAuthList}
               handleBtnClickEdit={this.handleBtnClickEdit}
               handleBtnClickDeleteUpData={this.handleBtnClickDeleteUpData}
             />

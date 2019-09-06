@@ -6,7 +6,7 @@ export default {
   UserName: {
     props: {
       size: 'large',
-      id: 'userName',
+      id: 'username',
       prefix: <Icon type="user" className={styles.prefixIcon} />,
       placeholder: 'admin',
     },
@@ -23,7 +23,7 @@ export default {
       prefix: <Icon type="lock" className={styles.prefixIcon} />,
       type: 'password',
       id: 'password',
-      placeholder: '888888',
+      placeholder: 'Please enter Password',
     },
     rules: [
       {

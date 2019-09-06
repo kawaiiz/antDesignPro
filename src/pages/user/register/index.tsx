@@ -56,7 +56,7 @@ interface RegisterState {
 }
 
 export interface UserRegisterParams {
-  userName: string;
+  username: string;
   password: string;
   confirm: string;
   mobile: string;
@@ -97,7 +97,7 @@ RegisterState
   componentDidUpdate() {
     console.log(this.props)
     const { userRegister, form } = this.props;
-    const account = form.getFieldValue('userName');
+    const account = form.getFieldValue('username');
     if (userRegister.status === 'ok') {
       message.success('注册成功！');
       router.push({
@@ -230,17 +230,17 @@ RegisterState
         </h3>
         <Form onSubmit={this.handleSubmit}>
           <FormItem>
-            {getFieldDecorator('userName', {
+            {getFieldDecorator('username', {
               rules: [
                 {
                   required: true,
-                  message: formatMessage({ id: 'user-register.userName.required' }),
+                  message: formatMessage({ id: 'user-register.username.required' }),
                 }
               ],
             })(
               <Input
                 size="large"
-                placeholder={formatMessage({ id: 'user-register.login.userName' })}
+                placeholder={formatMessage({ id: 'user-register.login.username' })}
               />,
             )}
           </FormItem>

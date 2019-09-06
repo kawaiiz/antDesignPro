@@ -7,6 +7,7 @@ export default {
   'authority-role.table.operation': 'operation',
   'authority-role.table.add': 'add',
   'authority-role.table.edit': 'edit',
+  'authority-role.table.id': 'id',
   'authority-role.table.delete': 'delete',
   'authority-role.form.show': 'show',
   'authority-role.form.hide': 'hide',

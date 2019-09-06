@@ -56,7 +56,7 @@ interface ResetPasswordState {
 }
 
 export interface UserResetPasswordParams {
-  userName: string;
+  username: string;
   password: string;
   confirm: string;
   mobile: string;
@@ -227,17 +227,17 @@ ResetPasswordState
         </h3>
         <Form onSubmit={this.handleSubmit}>
           <FormItem>
-            {getFieldDecorator('userName', {
+            {getFieldDecorator('username', {
               rules: [
                 {
                   required: true,
-                  message: formatMessage({ id: 'reset-password.userName.required' }),
+                  message: formatMessage({ id: 'reset-password.username.required' }),
                 }
               ],
             })(
               <Input
                 size="large"
-                placeholder={formatMessage({ id: 'reset-password.userName.placeholder' })}
+                placeholder={formatMessage({ id: 'reset-password.username.placeholder' })}
               />,
             )}
           </FormItem>

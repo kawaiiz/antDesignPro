@@ -1,5 +1,5 @@
 export default {
-  'reset-password.login.userName': 'userName',
+  'reset-password.login.username': 'username',
   'reset-password.login.password': 'password',
   'reset-password.login.message-invalid-credentials':
     'Invalid username or password',
@@ -22,7 +22,7 @@ export default {
   'reset-password.register-result.view-mailbox': 'View mailbox',
   'reset-password.email.required': 'Please enter your email!',
   'reset-password.email.wrong-format': 'The email address is in the wrong format!',
-  'reset-password.userName.required': 'Please enter your userName!',
+  'reset-password.username.required': 'Please enter your username!',
   'reset-password.password.required': 'Please enter your password!',
   'reset-password.password.twice': 'The passwords entered twice do not match!',
   'reset-password.strength.msg':
@@ -48,7 +48,7 @@ export default {
   'reset-password.confirm-password.placeholder': 'Confirm password',
   'reset-password.phone-number.placeholder': 'Phone number',
   'reset-password.verification-code.placeholder': 'Verification code',
-  'reset-password.userName.placeholder': 'username',
+  'reset-password.username.placeholder': 'username',
   'reset-password.title.label': 'Title',
   'reset-password.title.placeholder': 'Give the target a name',
   'reset-password.date.label': 'Start and end date',

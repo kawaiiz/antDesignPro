@@ -9,27 +9,37 @@ import {
 const ButtonGroup = Button.Group;
 import { formatMessage } from 'umi-plugin-react/locale';
 
+import { toTree } from '@/models/auth'
+
 interface TreeTableProp {
-  authList: IRoute[],
+  originalAuthList: IRoute[],
   authority: string,
   handleBtnClickEdit: (auth: IRoute) => void,
   handleBtnClickDeleteUpData: (auth: IRoute) => void,
 }
 
 interface TreeTableState {
-  authority: string,
+
 }
 
 class TreeTable extends Component<TreeTableProp, TreeTableState> {
   state = {
-    authority: '',
     columns: [
       {
         title: formatMessage({ id: 'authority-tree.table.name' }),
         dataIndex: 'name',
         key: 'name',
+        // render: (text: IRoute, record: IRoute, index: number) => {
+        //   return formatMessage({ id: `menu.${record.name}` })
+        // }
+      },
+      {
+        title: formatMessage({ id: 'authority-tree.table.type' }),
+        dataIndex: 'type',
+        key: 'type',
+        width: '15%',
         render: (text: IRoute, record: IRoute, index: number) => {
-          return formatMessage({ id: `menu.${record.name}` })
+          return formatMessage({ id: `authority-tree.table.${record.type}` })
         }
       },
       {
@@ -75,13 +85,14 @@ class TreeTable extends Component<TreeTableProp, TreeTableState> {
 
   render() {
     const { columns } = this.state
-    const { authList } = this.props
+    const { originalAuthList } = this.props
+
     return <Table
       rowKey={record => `${record.path}rowKey`}
       pagination={false}
       defaultExpandAllRows={true}
       columns={columns}
-      dataSource={authList} />
+      dataSource={toTree(originalAuthList)} />
   }
 }
 

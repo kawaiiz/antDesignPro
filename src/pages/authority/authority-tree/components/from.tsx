@@ -11,17 +11,11 @@ import {
   TreeSelect,
 } from 'antd'
 
+
 interface TreeFormState {
   loading: boolean,
   actionTag: IRoute,
   tree?: TreeCreate[], // 下拉框内数据
-}
-
-interface TreeFormProp extends FormComponentProps {
-  actionTag: IRoute,
-  authList: IRoute[],
-  onClose: () => void,
-  onSubmit: (from: IRoute) => void
 }
 
 interface TreeCreate {
@@ -31,7 +25,16 @@ interface TreeCreate {
   Children?: TreeCreate[] | null
 }
 
-class TreeForm extends Component<TreeFormProp> {
+interface TreeFormProp extends FormComponentProps {
+  actionTag: IRoute,
+  authList: IRoute[],
+  onClose: () => void,
+  onSubmit: (from: IRoute) => void
+}
+
+
+
+class TreeForm extends Component<TreeFormProp, TreeFormState> {
   state: TreeFormState = {
     loading: false,
     actionTag: {
@@ -57,16 +60,13 @@ class TreeForm extends Component<TreeFormProp> {
     const { authList } = this.props;
     const { actionTag } = this.state;
     function _create(authList: IRoute[], disabled: boolean): TreeCreate[] {
-      return authList.map((item, index) => {
-        const newItem = {
-          title: formatMessage({ id: `menu.${item.name}` }),
-          value: item.id,
-          key: item.id,
-          children: item.children && item.children.length > 0 ? _create(item.children, item.id === actionTag.parentId) : null,
-          disabled: disabled || item.id === actionTag.parentId
-        }
-        return newItem
-      })
+      return authList.map((item, index) => ({
+        title: item.name,
+        value: item.id,
+        key: item.id,
+        children: item.children && item.children.length > 0 ? _create(item.children, item.id === actionTag.parentId) : null,
+        disabled: disabled || item.id === actionTag.parentId
+      }))
     }
     this.state.tree = _create(authList, false)
   }
@@ -78,13 +78,6 @@ class TreeForm extends Component<TreeFormProp> {
         onSubmit({ ...form.getFieldsValue(), id: actionTag.id })
       }
     })
-  }
-
-  handleChangeParentIndex = (val: any) => {
-    // this.setState({
-    //   actionTag: Object.assign({}, this.state.)
-    // })
-    console.log(val)
   }
 
   render() {
@@ -117,7 +110,6 @@ class TreeForm extends Component<TreeFormProp> {
               treeData={tree as unknown as TreeCreate[]}
               placeholder="Please select"
               treeDefaultExpandAll
-              onChange={this.handleChangeParentIndex}
             />
           )}
         </Form.Item>
@@ -131,11 +123,16 @@ class TreeForm extends Component<TreeFormProp> {
             initialValue: actionTag.icon,
           })(<Input />)}
         </Form.Item>
-        {/* <Form.Item label="authority">
-          {getFieldDecorator('authority', {
-            initialValue: actionTag.authority,
-          })(<Input />)}
-        </Form.Item> */}
+        <Form.Item label="type">
+          {getFieldDecorator('type', {
+            initialValue: actionTag.type || false,
+          })(
+            <Radio.Group>
+              <Radio value={'page'}><FormattedMessage id="authority-tree.form.page" /></Radio>
+              <Radio value={'api'}><FormattedMessage id="authority-tree.form.api" /></Radio>
+            </Radio.Group>,
+          )}
+        </Form.Item>
         <Form.Item label="hideInMenu">
           {getFieldDecorator('hideInMenu', {
             initialValue: actionTag.hideInMenu || false,
