@@ -12,6 +12,10 @@ import LoginComponents from './components/Login';
 import styles from './style.less';
 import { LoginParamsType } from '@/services/login';
 import { ConnectState } from '@/models/connect';
+import { delToken } from '@/utils/utils'
+import { MyConfig } from '../../../../config/config'
+
+const REFRESH_TOKEN = MyConfig.refreshToken
 
 const { Tab, UserName, Password, Mobile, Captcha, Submit } = LoginComponents;
 
@@ -36,6 +40,12 @@ class Login extends Component<LoginProps, LoginState> {
     type: 'account',
     autoLogin: true,
   };
+
+  constructor(props: any) {
+    super(props)
+    delToken()
+    delToken(REFRESH_TOKEN)
+  }
 
   changeAutoLogin = (e: CheckboxChangeEvent) => {
     this.setState({

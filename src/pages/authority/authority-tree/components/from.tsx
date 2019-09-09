@@ -45,7 +45,7 @@ class TreeForm extends Component<TreeFormProp, TreeFormState> {
       component: '',
       icon: ' ',
       authority: [],
-      hideInMenu: false
+      hideInMenu: null
     },
   }
 
@@ -56,6 +56,7 @@ class TreeForm extends Component<TreeFormProp, TreeFormState> {
     this.createTree()
   }
 
+  // 构建表单下拉框里禁止点击的树型数据
   createTree = () => {
     const { authList } = this.props;
     const { actionTag } = this.state;
@@ -135,7 +136,7 @@ class TreeForm extends Component<TreeFormProp, TreeFormState> {
         </Form.Item>
         <Form.Item label="hideInMenu">
           {getFieldDecorator('hideInMenu', {
-            initialValue: actionTag.hideInMenu || false,
+            initialValue: actionTag.hideInMenu,
           })(
             <Radio.Group>
               <Radio value={true}><FormattedMessage id="authority-tree.form.hide" /></Radio>

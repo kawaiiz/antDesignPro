@@ -9,7 +9,7 @@ export async function query(): Promise<any> {
 
 export async function queryCurrent(): Promise<any> {
   return axios.request({
-    url: '/api/currentUser',
+    url: '/api/web/user',
     method: 'GET',
   });
 }

@@ -14,7 +14,7 @@ export async function setAuth(data: { data: IRoute[], method: Method }): Promise
 
 export async function getRouteTree(): Promise<any> {
   return await axios.request({
-    url: '/api/getRouteTree',
+    url: '/api/setAuth',
     method: 'get'
   });
 }

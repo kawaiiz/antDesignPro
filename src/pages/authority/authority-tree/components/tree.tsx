@@ -88,7 +88,7 @@ class TreeTable extends Component<TreeTableProp, TreeTableState> {
     const { originalAuthList } = this.props
 
     return <Table
-      rowKey={record => `${record.path}rowKey`}
+      rowKey={record => `${record.id}rowKey`}
       pagination={false}
       defaultExpandAllRows={true}
       columns={columns}

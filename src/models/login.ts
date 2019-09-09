@@ -1,13 +1,16 @@
 import { Reducer } from 'redux';
 import { routerRedux } from 'dva/router';
 import { Effect } from 'dva';
-import { stringify } from 'querystring';
-
 import { fakeAccountLogin, getFakeCaptcha } from '@/services/login';
 import { setAuthority } from '@/utils/authority';
 import { getPageQuery, setToken } from '@/utils/utils';
 
 import { reloadAuthorized } from '@/utils/Authorized'
+
+import { MyConfig } from '../../config/config'
+
+const REFRESH_TOKEN = MyConfig.refreshToken
+
 
 export interface StateType {
   status?: 1 | 0; // 是否登录
@@ -35,39 +38,35 @@ const Model: LoginModelType = {
   },
   effects: {
     *login({ payload }, { call, put }) {
-      const response = yield call(fakeAccountLogin, payload);
+      const res = yield call(fakeAccountLogin, payload);
       yield put({
         type: 'changeLoginStatus',
-        payload: response,
+        payload: res,
       });
-
       // Login successfully
-      if (response.status === 1) {
-
-        // 设置用户身份 localstorage
-        setAuthority(response.data.currentAuthority);
-        // 设置token cookie
-        setToken(response.data.token)
-        // 更新权限
-        reloadAuthorized()
-
-        const urlParams = new URL(window.location.href);
-        const params = getPageQuery();
-        let { redirect } = params as { redirect: string };
-        if (redirect) {
-          const redirectUrlParams = new URL(redirect);
-          if (redirectUrlParams.origin === urlParams.origin) {
-            redirect = redirect.substr(urlParams.origin.length);
-            if (redirect.match(/^\/.*#/)) {
-              redirect = redirect.substr(redirect.indexOf('#') + 1);
-            }
-          } else {
-            window.location.href = redirect;
-            return;
+      // 设置用户身份 localstorage
+      setAuthority(res.data.currentAuthority);
+      // 设置 请求token和 刷新token
+      setToken(`${res.data.accessToken.token_type} ${res.data.accessToken.access_token}`)
+      setToken(`${res.data.accessToken.refresh_token}`, REFRESH_TOKEN)
+      // 更新权限
+      reloadAuthorized()
+      const urlParams = new URL(window.location.href);
+      const params = getPageQuery();
+      let { redirect } = params as { redirect: string };
+      if (redirect) {
+        const redirectUrlParams = new URL(redirect);
+        if (redirectUrlParams.origin === urlParams.origin) {
+          redirect = redirect.substr(urlParams.origin.length);
+          if (redirect.match(/^\/.*#/)) {
+            redirect = redirect.substr(redirect.indexOf('#') + 1);
           }
+        } else {
+          window.location.href = redirect;
+          return;
         }
-        yield put(routerRedux.replace(redirect || '/'));
       }
+      yield put(routerRedux.replace(redirect || '/'));
     },
 
     *getCaptcha({ payload }, { call }) {
@@ -86,7 +85,7 @@ const Model: LoginModelType = {
           }),
         );
         // 清空state里的数据
-        let response = {
+        let res = {
           status: 0,
           data: {
             type: ''
@@ -94,7 +93,7 @@ const Model: LoginModelType = {
         }
         yield put({
           type: 'changeLoginStatus',
-          payload: response,
+          payload: res,
         });
       }
 

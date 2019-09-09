@@ -63,7 +63,7 @@ const GlobalHeaderRight: React.SFC<GlobalHeaderRightProps> = props => {
           <Icon type="question-circle-o" />
         </a>
       </Tooltip>
-      <NoticeIconView />
+      {/* <NoticeIconView /> */}
       <Avatar />
       <SelectLang className={styles.action} />
     </div>

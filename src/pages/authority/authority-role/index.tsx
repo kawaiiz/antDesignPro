@@ -105,7 +105,6 @@ class AuthorityRole extends Component<RoleProps, RoleState> {
       // 先比对，找到是哪一条数据  删除原数据  再通过新的父节点添加新数据
       const { actionTag } = this.state
       const { dispatch } = this.props;
-      console.log(1)
       dispatch({
         type: 'role/setRole',
         payload: { data: form, type: actionTag.id ? 'edit' : 'add' }

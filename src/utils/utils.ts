@@ -28,17 +28,20 @@ import { MyConfig } from '../../config/config'
 
 export const TOKEN_KEY = MyConfig.token
 
-export const setToken = (token: string): void => {
+export const setToken = (token: string, tokanName?: string): void => {
+  localStorage.setItem(tokanName ? tokanName : TOKEN_KEY, token);
   Cookies.set(TOKEN_KEY, token, { expires: MyConfig.cookieExpires || 1 })
 }
 
-export const getToken = (): string => {
-  const token = Cookies.get(TOKEN_KEY)
+export const getToken = (tokanName?: string): string => {
+  // const token = Cookies.get(TOKEN_KEY)
+  const token = localStorage.getItem(tokanName ? tokanName : TOKEN_KEY);
   if (token) return token
   else return ''
 }
 
-export const delToken = () => {
-  Cookies.remove(TOKEN_KEY);
+export const delToken = (tokanName?: string) => {
+  // Cookies.remove(tokanName ? tokanName : TOKEN_KEY);
+  localStorage.removeItem(tokanName ? tokanName : TOKEN_KEY);
 }
 

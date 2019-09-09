@@ -28,8 +28,8 @@ export const contentRoutes: IRoute[] = [{
       redirect: '/authority/role',
     },
     {
-      path: '/authority/page',
-      name: 'authority-page',
+      path: '/authority/tree',
+      name: 'authority-tree',
       icon: ' ',
       component: './authority/authority-tree/index',
     }, {

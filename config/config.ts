@@ -59,6 +59,7 @@ export const MyConfig = {
   // 请求的域名
   baseUrl: {
     dev: 'http://192.168.1.222:8080',
+    // dev: 'http://192.168.1.74:3001',
     // dev: '',
     pro: 'http://192.168.1.74:3001',
   },
@@ -70,7 +71,8 @@ export const MyConfig = {
   // cookie过期时间（天）
   cookieExpires: 7,
   // token 名称
-  token: 'token'
+  token: 'token',
+  refreshToken: 'refreshToken'
 };
 
 export default {
@@ -140,13 +142,7 @@ export default {
     basePath: '/',
   },
   chainWebpack: webpackPlugin,
-  /*   proxy: {
-      '/api': {
-        target: '',
-        changeOrigin: true,
-        pathRewrite: {
-          '^/123456': '',
-        },
-      },
-    }, */
+  // proxy: {
+  //   '/api': 'http://192.168.1.222:8080'
+  // }
 } as IConfig;

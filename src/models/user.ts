@@ -9,22 +9,17 @@ import { reloadAuthorized } from '@/utils/Authorized'
 
 
 export interface CurrentUser {
-  avatar?: string;
-  name?: string;
-  title?: string;
-  group?: string;
-  signature?: string;
-  tags?: {
-    key: string;
-    label: string;
-  }[];
-  userid?: string;
-  unreadCount?: number;
-  userAuth?: []
+  iconUrl?: string,
+  id?: number,
+  phoneNumber?: string,
+  roles?: string[],
+  username?: string
 }
 
 export interface UserModelState {
   currentUser?: CurrentUser;
+  notifyCount?: number;
+  unreadCount?: number;
 }
 
 export interface UserModelType {
@@ -46,6 +41,8 @@ const UserModel: UserModelType = {
 
   state: {
     currentUser: {},
+    notifyCount: 0,
+    unreadCount: 0
   },
 
   effects: {
@@ -57,31 +54,24 @@ const UserModel: UserModelType = {
       });
     },
     *fetchCurrent(_, { call, put }) {
-      const response = yield call(queryCurrent);
+      const res: any = yield call(queryCurrent);
+      const currentData: CurrentUser = res.data
       // 设置用户身份 localstorage
-      setAuthority(response.data.currentAuthority);
-      // 设置token cookie
-      setToken(response.data.token)
+      setAuthority(currentData.roles![0]);
       // 更新权限
       reloadAuthorized()
       yield put({
         type: 'saveCurrentUser',
-        payload: response,
+        payload: currentData,
       });
     },
   },
 
   reducers: {
-    // saveAuth(state, action) {
-    //   return {
-    //     ...state,
-    //     userAuth: action.payload.data || []
-    //   }
-    // },
     saveCurrentUser(state, action) {
       return {
         ...state,
-        currentUser: action.payload.data || {},
+        currentUser: action.payload || {},
       };
     },
     changeNotifyCount(
@@ -92,11 +82,8 @@ const UserModel: UserModelType = {
     ) {
       return {
         ...state,
-        currentUser: {
-          ...state.currentUser,
-          notifyCount: action.payload.totalCount,
-          unreadCount: action.payload.unreadCount,
-        },
+        notifyCount: action.payload.totalCount,
+        unreadCount: action.payload.unreadCount,
       };
     },
   },

@@ -29,6 +29,9 @@ const checkPermissions = <T, K>(
   if (!authority) {
     return target;
   }
+  if (currentAuthority === 'SUPER_ADMIN') {
+    return target
+  }
   // 数组处理
   if (Array.isArray(authority)) {
     if (Array.isArray(currentAuthority)) {
