@@ -67,11 +67,9 @@ const footerRender: BasicLayoutProps['footerRender'] = (_, defaultDom) => {
 const BasicLayout: React.FC<BasicLayoutProps> = props => {
   const { dispatch, children, settings, authList, route, initialRoutes } = props;
   const newInitialRoutes = lodash.cloneDeep(initialRoutes); // 防止每次请求到权限资源信息都添加到route.router，导致很多重复并且很长，所以先储存最开始的，然后每请求一次就注入route.router里
-  let Routes: any = null
   const [components, setComponents] = useState<Map<string, any>>();// react hook
   function addRoute(menuItem: MenuDataItem) {
     let newMenuItem = lodash.cloneDeep(menuItem)
-    newMenuItem.Routes = Routes
     if (menuItem.children && menuItem.children.length > 0) {
       newMenuItem.children.forEach(t => addRoute(t));
     } else if (route && route.routes && components) {
@@ -95,12 +93,10 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
     // 将组件传到component变量里 react hook  重复的变量路由 
     function _mapRoute(routes: IRoute[], map: Map<string, any>) {
       routes.filter(t => t.name).forEach((t: IRoute) => {
-        console.log(t)
         map.set(t.name!, t.component)
         if (t.routes && t.routes.length > 0) {
           _mapRoute(t.routes, map)
         }
-        Routes = t.Routes
       })
     }
     if (route && route.routes) {
