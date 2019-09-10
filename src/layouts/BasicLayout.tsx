@@ -13,6 +13,7 @@ import ProLayout, {
 import React, { useEffect, useState } from 'react';
 import Link from 'umi/link';
 import router from 'umi/router'
+import { Route } from '@ant-design/pro-layout/lib/typings'
 import { Dispatch } from 'redux';
 import { connect } from 'dva';
 import { formatMessage } from 'umi-plugin-react/locale';
@@ -35,6 +36,7 @@ export interface BasicLayoutProps extends ProLayoutProps {
   settings: Settings;
   dispatch: Dispatch;
   authList: [];
+  initialRoutes: Route[]
 }
 
 export type BasicLayoutContext = { [K in 'location']: BasicLayoutProps[K] } & {
@@ -63,24 +65,25 @@ const footerRender: BasicLayoutProps['footerRender'] = (_, defaultDom) => {
 }
 
 const BasicLayout: React.FC<BasicLayoutProps> = props => {
-  const { dispatch, children, settings, authList, route } = props;
+  const { dispatch, children, settings, authList, route, initialRoutes } = props;
+  const newInitialRoutes = lodash.cloneDeep(initialRoutes); // 防止每次请求到权限资源信息都添加到route.router，导致很多重复并且很长，所以先储存最开始的，然后每请求一次就注入route.router里
+  let Routes: any = null
   const [components, setComponents] = useState<Map<string, any>>();// react hook
   function addRoute(menuItem: MenuDataItem) {
     let newMenuItem = lodash.cloneDeep(menuItem)
+    newMenuItem.Routes = Routes
     if (menuItem.children && menuItem.children.length > 0) {
       newMenuItem.children.forEach(t => addRoute(t));
     } else if (route && route.routes && components) {
       newMenuItem.component = typeof menuItem.name === 'string' ? components.get(menuItem.name) : undefined
       newMenuItem.exact = true
-      route.routes.unshift(newMenuItem);
+      // route.routes.unshift(newMenuItem);
+      newInitialRoutes.unshift(newMenuItem);
     }
   }
 
   useState(() => {
     if (dispatch) {
-      dispatch({
-        type: 'auth/getAuthList',
-      });
       dispatch({
         type: 'settings/getSetting',
       });
@@ -92,13 +95,21 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
     // 将组件传到component变量里 react hook  重复的变量路由 
     function _mapRoute(routes: IRoute[], map: Map<string, any>) {
       routes.filter(t => t.name).forEach((t: IRoute) => {
+        console.log(t)
         map.set(t.name!, t.component)
         if (t.routes && t.routes.length > 0) {
           _mapRoute(t.routes, map)
         }
+        Routes = t.Routes
       })
     }
     if (route && route.routes) {
+      if (initialRoutes.length === 0) {
+        dispatch({
+          type: 'auth/setRoutes',
+          payload: lodash.cloneDeep(route.routes)
+        })
+      }
       const map = new Map<string, any>();
       _mapRoute(route.routes, map)
       setComponents(map);
@@ -112,6 +123,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
       authList.forEach(addRoute);
       // 原本这里是 router.push(location.pathName) 发现总是跳 location.pathName=/  打印了location 发现有hash值 所以 直接截取hash值放进去 
       // router.push(location.hash.slice(1));
+      route.routes = newInitialRoutes
     }
   }, [components, authList]);
 
@@ -200,4 +212,5 @@ export default connect(({ global, auth, settings, loading }: ConnectState) => ({
   collapsed: global.collapsed,
   settings,
   authList: auth.authList,
+  initialRoutes: auth.routes
 }))(BasicLayout);

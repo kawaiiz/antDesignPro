@@ -57,7 +57,7 @@ const UserModel: UserModelType = {
       const res: any = yield call(queryCurrent);
       const currentData: CurrentUser = res.data
       // 设置用户身份 localstorage
-      setAuthority(currentData.roles![0]);
+      setAuthority(currentData.roles!);
       // 更新权限
       reloadAuthorized()
       yield put({

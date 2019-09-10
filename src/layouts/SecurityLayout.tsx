@@ -1,16 +1,21 @@
 import React from 'react';
 import { connect } from 'dva';
 import { Redirect } from 'umi';
+import { Dispatch } from 'redux';
+import router from 'umi/router'
 import { ConnectState, ConnectProps } from '@/models/connect';
 import { CurrentUser } from '@/models/user';
 import PageLoading from '@/components/PageLoading';
 import { notification } from 'antd';
 import { getToken } from '@/utils/utils'
-import router from 'umi/router';
+import { Route } from '@ant-design/pro-layout/lib/typings'
+import lodash from 'lodash'
 
 interface SecurityLayoutProps extends ConnectProps {
   loading: boolean;
   currentUser: CurrentUser;
+  initialRoutes: Route[],
+  dispatch: Dispatch;
 }
 
 interface SecurityLayoutState {
@@ -19,19 +24,30 @@ interface SecurityLayoutState {
 
 class SecurityLayout extends React.Component<SecurityLayoutProps, SecurityLayoutState> {
   state: SecurityLayoutState = {
-    isReady: false,
+    isReady: false
   };
 
-  componentDidMount() {
-    this.setState({
-      isReady: true,
-    });
-    const { dispatch } = this.props;
+  constructor(props: SecurityLayoutProps) {
+    super(props)
+    const { route, initialRoutes, dispatch } = this.props
     if (dispatch) {
+      if (route && route.routes) {
+        if (initialRoutes.length === 0) {
+          dispatch({
+            type: 'auth/setRoutes',
+            payload: lodash.cloneDeep(route.routes[0].routes)
+          })
+        }
+      }
       // 判断一下是否有token 没有token直接跳到登录页
       if (getToken()) {
+        // 获取用户信息
         dispatch({
           type: 'user/fetchCurrent',
+        });
+        // 获取权限列表
+        dispatch({
+          type: 'auth/getAuthList',
         });
       } else {
         notification.error({
@@ -43,6 +59,16 @@ class SecurityLayout extends React.Component<SecurityLayoutProps, SecurityLayout
         });
       }
     }
+  }
+
+  componentWillMount() {
+
+  }
+
+  componentDidMount() {
+    this.setState({
+      isReady: true,
+    });
   }
 
   render() {
@@ -59,7 +85,8 @@ class SecurityLayout extends React.Component<SecurityLayoutProps, SecurityLayout
   }
 }
 
-export default connect(({ user, loading }: ConnectState) => ({
+export default connect(({ user, loading, auth }: ConnectState) => ({
   currentUser: user.currentUser,
   loading: loading.models.user,
+  initialRoutes: auth.routes
 }))(SecurityLayout);

@@ -27,16 +27,25 @@ class RoleTable extends Component<RoleTableProp, RoleTableState> {
     columns: [
       {
         title: formatMessage({ id: 'authority-role.table.id' }),
-        dataIndex: 'id',
-        key: 'id',
+        dataIndex: 'roleId',
+        key: 'roleId',
         // render: (text: IRoute, record: IRoute, index: number) => {
         //   return formatMessage({ id: `menu.${record.name}` })
         // }
       },
       {
         title: formatMessage({ id: 'authority-role.table.name' }),
-        dataIndex: 'name',
-        key: 'name',
+        dataIndex: 'roleName',
+        key: 'roleName',
+        // width: '15%',
+        // render: (text: Role, record: Role, index: number) => {
+        //   return formatMessage({ id: `authority-role.table.${record.name}` })
+        // }
+      },
+      {
+        title: formatMessage({ id: 'authority-role.table.desc' }),
+        dataIndex: 'roleDescription',
+        key: 'roleDescription',
         // width: '15%',
         // render: (text: Role, record: Role, index: number) => {
         //   return formatMessage({ id: `authority-role.table.${record.name}` })

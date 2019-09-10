@@ -19,8 +19,9 @@ export interface Res {
 
 // 设置请求类型
 export enum SetMethod {
-  add = 'put',
-  edit = 'post',
+  get = 'get',
+  add = 'POST',
+  edit = 'put',
   delete = 'delete',
   del = 'delete'
 }
@@ -31,8 +32,12 @@ const refreshAuthLogic = (failedRequest: any) => axios({
   method: 'get',
   params: { refreshToken: getToken(REFRESH_TOKEN) }
 }).then(tokenRefreshResponse => {
-  setToken(tokenRefreshResponse.data);
-  failedRequest.response.config.headers['Authentication'] = `${tokenRefreshResponse.data.token_type} ${tokenRefreshResponse.data}`;
+  if (tokenRefreshResponse.status === 1007) {
+    return Promise.reject();
+  }
+  setToken(`${tokenRefreshResponse.data.data.token_type} ${tokenRefreshResponse.data.data.access_token}`);
+  setToken(tokenRefreshResponse.data.data.refresh_token, REFRESH_TOKEN);
+  failedRequest.response.config.headers['Authorization'] = `${tokenRefreshResponse.data.data.token_type} ${tokenRefreshResponse.data.data.access_token}`;
   return Promise.resolve();
 }).catch(err => {
   delToken(REFRESH_TOKEN)
@@ -42,8 +47,9 @@ const refreshAuthLogic = (failedRequest: any) => axios({
     message: '登录失效',
   });
   router.push({
-    pathname: 'login',
+    pathname: '/user/login',
   });
+  return Promise.reject();
 })
 
 // 处理错误请求的跳转
@@ -78,9 +84,10 @@ class HttpRequest {
     const config = {
       baseURL: this.baseUrl,
       headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        'Access-Control-Allow-Origin': 'http://192.168.1.74:8000',
-        'Authorization': getToken() || ''
+        // 'X-Requested-With': 'XMLHttpRequest',
+        // 'Access-Control-Allow-Origin': 'http://192.168.1.74:8000',
+        'Authorization': getToken() || '',
+        'Content-Type': 'application/json;charset=UTF-8'
       }
     }
     return config
@@ -94,9 +101,8 @@ class HttpRequest {
     }, (error: any) => {
       return Promise.reject(error)
     })
-
+    // 响应拦截
     instance.interceptors.response.use((res: any) => res, (error: any) => {
-      console.log(error)
       let errorInfo = error.response
       if (!errorInfo) {
         const { request: { statusText, status }, config } = JSON.parse(JSON.stringify(error))
@@ -106,9 +112,7 @@ class HttpRequest {
           request: { responseURL: config.url }
         }
       }
-
       // Reject promise if the error status is not in options.ports or defaults.ports
-      console.log(1)
       const statusCodes: number[] = [401, 403]
       if (!errorInfo || (errorInfo.status && statusCodes.indexOf(+errorInfo.status) === -1)) {
         errRouter(errorInfo)
@@ -117,9 +121,6 @@ class HttpRequest {
         }
         return Promise.reject(errMsg)
       }
-
-      console.log(2)
-
       const refreshCall = refreshAuthLogic(error);
 
       // Create interceptor that will bind all the others requests
@@ -131,12 +132,8 @@ class HttpRequest {
       // When response code is 401 (Unauthorized), try to refresh the token.
       return refreshCall.then(() => {
         // axios.interceptors.request.eject(requestQueueInterceptorId);
-        console.log(3)
-
         return axios(error.response.config);
       }).catch(error => {
-        console.log(4)
-
         // axios.interceptors.request.eject(requestQueueInterceptorId);
         return Promise.reject(error)
       })
@@ -147,12 +144,8 @@ class HttpRequest {
   request(options: AxiosRequestConfig) {
     // 创建一个axios实例
     const instance = axios.create()
-    // config.headers['Content-Type'] =config.headers['Content-Type']?config.headers['Content-Type']:'application/json;charset=UTF-8'
-    // 
-
     // 将默认配置与请求配置混合
     options = Object.assign(this.getInsideConfig(), options)
-    console.log(options)
     // 添加拦截器
     this.interceptors(instance)
 
@@ -168,7 +161,6 @@ class HttpRequest {
     }
 
     return instance(options).then((res: AxiosResponse) => {
-
       const statusCode = [200]
       if (statusCode.indexOf(res.data.status) !== -1 || !res.data.hasOwnProperty(status)) {
         return Promise.resolve(res.data)

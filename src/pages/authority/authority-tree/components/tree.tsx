@@ -34,25 +34,31 @@ class TreeTable extends Component<TreeTableProp, TreeTableState> {
         // }
       },
       {
-        title: formatMessage({ id: 'authority-tree.table.type' }),
-        dataIndex: 'type',
-        key: 'type',
-        width: '15%',
-        render: (text: IRoute, record: IRoute, index: number) => {
-          return formatMessage({ id: `authority-tree.table.${record.type}` })
-        }
-      },
-      {
         title: formatMessage({ id: 'authority-tree.table.path' }),
         dataIndex: 'path',
         key: 'path',
-        width: '15%',
+        width: '20%',
+      },
+      {
+        title: formatMessage({ id: 'authority-tree.table.type' }),
+        dataIndex: 'type',
+        key: 'type',
+        width: '10%',
+        // render: (text: IRoute, record: IRoute, index: number) => {
+        //   return formatMessage({ id: `authority-tree.table.${record.type}` })
+        // }
+      },
+      {
+        title: formatMessage({ id: 'authority-tree.table.operation' }),
+        dataIndex: 'operation',
+        key: 'operation',
+        width: '10%',
       },
       {
         title: formatMessage({ id: 'authority-tree.table.icon' }),
         dataIndex: 'icon',
         key: 'icon',
-        width: '15%',
+        width: '10%',
         render: (icon: string = ' ') => {
           icon = icon.length > 0 ? icon : ' '
           return <Icon type={icon} />
@@ -61,7 +67,7 @@ class TreeTable extends Component<TreeTableProp, TreeTableState> {
       {
         title: formatMessage({ id: 'authority-tree.table.operation' }),
         key: 'action',
-        width: '20%',
+        width: '15%',
         render: (text: IRoute, record: IRoute, index: number) => {
           const { handleBtnClickDeleteUpData, handleBtnClickEdit } = this.props
           return (

@@ -48,7 +48,7 @@ class AuthorityTree extends Component<Authprops, AuthState> {
       parentId: '',
       name: '',
       path: '',
-      hideInMenu: true,
+      hideInMenu: null,
       icon: '',
       component: '',
       authority: null,
@@ -71,7 +71,7 @@ class AuthorityTree extends Component<Authprops, AuthState> {
         parentId: '',
         name: '',
         path: '',
-        hideInMenu: true,
+        hideInMenu: null,
         icon: '',
         component: '',
         authority: null,
@@ -103,7 +103,7 @@ class AuthorityTree extends Component<Authprops, AuthState> {
     const { dispatch } = this.props;
     dispatch({
       type: 'auth/setAuth',
-      payload: { data: row, type: 'delete' }
+      payload: { data: { resourceId: row.id }, type: 'delete' }
     });
   }
 

@@ -3,7 +3,7 @@ import { routerRedux } from 'dva/router';
 import { Effect } from 'dva';
 import { fakeAccountLogin, getFakeCaptcha } from '@/services/login';
 import { setAuthority } from '@/utils/authority';
-import { getPageQuery, setToken } from '@/utils/utils';
+import { getPageQuery, setToken, delToken } from '@/utils/utils';
 
 import { reloadAuthorized } from '@/utils/Authorized'
 
@@ -43,9 +43,8 @@ const Model: LoginModelType = {
         type: 'changeLoginStatus',
         payload: res,
       });
-      // Login successfully
       // 设置用户身份 localstorage
-      setAuthority(res.data.currentAuthority);
+      setAuthority(res.data.roles);
       // 设置 请求token和 刷新token
       setToken(`${res.data.accessToken.token_type} ${res.data.accessToken.access_token}`)
       setToken(`${res.data.accessToken.refresh_token}`, REFRESH_TOKEN)
@@ -74,11 +73,9 @@ const Model: LoginModelType = {
     },
     *logout(_, { put }) {
       const { redirect } = getPageQuery();
-
-
-
       // redirect
       if (window.location.pathname !== '/user/login' && !redirect) {
+        // 跳到登录页
         yield put(
           routerRedux.replace({
             pathname: '/user/login'
@@ -91,9 +88,18 @@ const Model: LoginModelType = {
             type: ''
           }
         }
+        // 删除token
+        delToken()
+        delToken(REFRESH_TOKEN)
+        // 重置login的status
         yield put({
           type: 'changeLoginStatus',
           payload: res,
+        });
+        // 清除上个人的数据
+        yield put({
+          type: 'user/saveCurrentUser',
+          payload: {},
         });
       }
 

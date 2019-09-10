@@ -16,12 +16,14 @@ export const contentRoutes: IRoute[] = [{
   path: '/home',
   name: 'home',
   icon: 'smile',
+  Routes: ['src/pages/Authorized'],
   component: './content/home/index',
 },
 {
   path: '/authority',
   name: 'authority',
   icon: ' ',
+  Routes: ['src/pages/Authorized'],
   routes: [
     {
       path: '/authority',
@@ -31,11 +33,13 @@ export const contentRoutes: IRoute[] = [{
       path: '/authority/tree',
       name: 'authority-tree',
       icon: ' ',
+      Routes: ['src/pages/Authorized'],
       component: './authority/authority-tree/index',
     }, {
       path: '/authority/role',
       name: 'authority-role',
       icon: ' ',
+      Routes: ['src/pages/Authorized'],
       component: './authority/authority-role/index',
     }],
 },
@@ -79,7 +83,7 @@ const routes: IRoute[] = [
       {
         path: '/',
         component: '../layouts/BasicLayout',
-        Routes: ['src/pages/Authorized'],
+
         routes: [{
           path: '/',
           redirect: '/home',

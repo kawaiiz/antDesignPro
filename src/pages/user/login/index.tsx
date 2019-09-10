@@ -45,6 +45,7 @@ class Login extends Component<LoginProps, LoginState> {
     super(props)
     delToken()
     delToken(REFRESH_TOKEN)
+
   }
 
   changeAutoLogin = (e: CheckboxChangeEvent) => {

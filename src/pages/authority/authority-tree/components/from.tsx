@@ -9,9 +9,10 @@ import {
   Radio,
   Button,
   TreeSelect,
+  Select,
 } from 'antd'
 
-
+const { Option } = Select;
 interface TreeFormState {
   loading: boolean,
   actionTag: IRoute,
@@ -76,7 +77,7 @@ class TreeForm extends Component<TreeFormProp, TreeFormState> {
     const { form, onSubmit, actionTag } = this.props;
     form.validateFields(err => {
       if (!err) {
-        onSubmit({ ...form.getFieldsValue(), id: actionTag.id })
+        onSubmit({ ...form.getFieldsValue(), resourceId: actionTag.id })
       }
     })
   }
@@ -88,24 +89,37 @@ class TreeForm extends Component<TreeFormProp, TreeFormState> {
 
     return (
       <Form layout="vertical" onSubmit={this.handleSubmit}>
-        <Form.Item label="name">
-          {getFieldDecorator('name', {
+        <Form.Item label={formatMessage({ id: 'authority-tree.table.name' })}>
+          {getFieldDecorator('resourceName', {
             initialValue: actionTag.name,
             rules: [{ required: true, message: 'Please input the name of collection!' }],
           })(<Input />)}
         </Form.Item>
-        <Form.Item label="path">
-          {getFieldDecorator('path', {
+        <Form.Item label={formatMessage({ id: 'authority-tree.table.path' })}>
+          {getFieldDecorator('resourceUrl', {
             initialValue: actionTag.path,
             rules: [{ required: true, message: 'Please input the name of collection!' }],
           })(<Input />)}
         </Form.Item>
-        <Form.Item label="parentId">
-          {getFieldDecorator('parentId', {
+        <Form.Item label={formatMessage({ id: 'authority-tree.table.operation' })}>
+          {getFieldDecorator('operation', {
+            initialValue: actionTag.operation,
+            rules: [{ required: true, message: 'Please select RequestType!' }],
+          })(
+            <Select placeholder="Please select a country">
+              <Option value="GET">GET</Option>
+              <Option value="POST">POST</Option>
+              <Option value="PUT">PUT</Option>
+              <Option value="DELETE">DELETE</Option>
+            </Select>,
+          )}
+        </Form.Item>
+        <Form.Item label={formatMessage({ id: 'authority-tree.table.parentId' })}>
+          {getFieldDecorator('pid', {
             initialValue: actionTag.parentId
           })(
             <TreeSelect
-              style={{ width: 300 }}
+              // style={{ width: 300 }}
               allowClear={true}
               dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
               treeData={tree as unknown as TreeCreate[]}
@@ -114,27 +128,27 @@ class TreeForm extends Component<TreeFormProp, TreeFormState> {
             />
           )}
         </Form.Item>
-        <Form.Item label="component">
+        <Form.Item label={formatMessage({ id: 'authority-tree.table.component' })}>
           {getFieldDecorator('component', {
             initialValue: actionTag.component,
           })(<Input type="component" />)}
         </Form.Item>
-        <Form.Item label="icon">
+        <Form.Item label={formatMessage({ id: 'authority-tree.table.icon' })}>
           {getFieldDecorator('icon', {
             initialValue: actionTag.icon,
           })(<Input />)}
         </Form.Item>
-        <Form.Item label="type">
-          {getFieldDecorator('type', {
-            initialValue: actionTag.type || false,
+        <Form.Item label={formatMessage({ id: 'authority-tree.table.type' })}>
+          {getFieldDecorator('resourceType', {
+            initialValue: actionTag.type,
           })(
             <Radio.Group>
-              <Radio value={'page'}><FormattedMessage id="authority-tree.form.page" /></Radio>
-              <Radio value={'api'}><FormattedMessage id="authority-tree.form.api" /></Radio>
+              <Radio value="PAGE"><FormattedMessage id="authority-tree.form.page" /></Radio>
+              <Radio value="INTERFACE"><FormattedMessage id="authority-tree.form.api" /></Radio>
             </Radio.Group>,
           )}
         </Form.Item>
-        <Form.Item label="hideInMenu">
+        <Form.Item label={formatMessage({ id: 'authority-tree.table.hideInMenu' })}>
           {getFieldDecorator('hideInMenu', {
             initialValue: actionTag.hideInMenu,
           })(
