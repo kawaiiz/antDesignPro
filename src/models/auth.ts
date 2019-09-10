@@ -71,13 +71,13 @@ const processingData = (resources: requestRoute[]) => {
       component: item.component,
       authority: item.own ? roles : [],
       type: item.resourceType,
-      operation: item.operation
+      operation: item.operation,
+      own: item.own
     }
   })
   const pageAuthList = IRouteFormatRes.filter(({ type }) => type && type === 'PAGE')
   const authList = toTree(pageAuthList)
   const allAuthList = toTree(IRouteFormatRes)
-  console.log(1)
   return { originalAuthList: IRouteFormatRes, authList, allAuthList }
 }
 

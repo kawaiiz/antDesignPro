@@ -101,6 +101,11 @@ const Model: LoginModelType = {
           type: 'user/saveCurrentUser',
           payload: {},
         });
+        // 清除 权限数组
+        yield put({
+          type: 'auth/setAuthList',
+          payload: { originalAuthList: [], authList: [], allAuthList: [], resources: [] }
+        });
       }
 
       // 设置用户身份 localstorage
