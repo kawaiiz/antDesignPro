@@ -18,7 +18,6 @@ export interface GlobalHeaderRightProps extends ConnectProps {
 class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
   onMenuClick = (event: ClickParam) => {
     const { key } = event;
-
     if (key === 'logout') {
       const { dispatch } = this.props;
       if (dispatch) {
@@ -26,7 +25,6 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
           type: 'login/logout',
         });
       }
-
       return;
     }
     router.push(`/account/${key}`);

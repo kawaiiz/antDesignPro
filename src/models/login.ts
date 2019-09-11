@@ -4,7 +4,8 @@ import { Effect } from 'dva';
 import { fakeAccountLogin, getFakeCaptcha } from '@/services/login';
 import { setAuthority } from '@/utils/authority';
 import { getPageQuery, setToken, delToken } from '@/utils/utils';
-
+import { formatMessage } from 'umi-plugin-react/locale';
+import { notification } from 'antd';
 import { reloadAuthorized } from '@/utils/Authorized'
 
 import { MyConfig } from '../../config/config'
@@ -26,7 +27,7 @@ export interface LoginModelType {
     logout: Effect;
   };
   reducers: {
-    changeLoginStatus: Reducer<StateType>;
+    changeLoginStatusReducers: Reducer<StateType>;
   };
 }
 
@@ -38,34 +39,42 @@ const Model: LoginModelType = {
   },
   effects: {
     *login({ payload }, { call, put }) {
-      const res = yield call(fakeAccountLogin, payload);
-      yield put({
-        type: 'changeLoginStatus',
-        payload: res,
-      });
-      // 设置用户身份 localstorage
-      setAuthority(res.data.roles);
-      // 设置 请求token和 刷新token
-      setToken(`${res.data.accessToken.token_type} ${res.data.accessToken.access_token}`)
-      setToken(`${res.data.accessToken.refresh_token}`, REFRESH_TOKEN)
-      // 更新权限
-      reloadAuthorized()
-      const urlParams = new URL(window.location.href);
-      const params = getPageQuery();
-      let { redirect } = params as { redirect: string };
-      if (redirect) {
-        const redirectUrlParams = new URL(redirect);
-        if (redirectUrlParams.origin === urlParams.origin) {
-          redirect = redirect.substr(urlParams.origin.length);
-          if (redirect.match(/^\/.*#/)) {
-            redirect = redirect.substr(redirect.indexOf('#') + 1);
+      try {
+        const res = yield call(fakeAccountLogin, payload);
+        yield put({
+          type: 'changeLoginStatusReducers',
+          payload: res,
+        });
+        // 设置用户身份 localstorage
+        setAuthority(res.data.roles);
+        // 设置 请求token和 刷新token
+        setToken(`${res.data.accessToken.token_type} ${res.data.accessToken.access_token}`)
+        setToken(`${res.data.accessToken.refresh_token}`, REFRESH_TOKEN)
+        // 更新权限
+        reloadAuthorized()
+        const urlParams = new URL(window.location.href);
+        const params = getPageQuery();
+        let { redirect } = params as { redirect: string };
+        if (redirect) {
+          const redirectUrlParams = new URL(redirect);
+          if (redirectUrlParams.origin === urlParams.origin) {
+            redirect = redirect.substr(urlParams.origin.length);
+            if (redirect.match(/^\/.*#/)) {
+              redirect = redirect.substr(redirect.indexOf('#') + 1);
+            }
+          } else {
+            window.location.href = redirect;
+            return;
           }
-        } else {
-          window.location.href = redirect;
-          return;
         }
+        yield put(routerRedux.replace(redirect || '/'));
+      } catch (e) {
+        notification.error({
+          description: e.errorMsg,
+          message: formatMessage({ id: 'component.error' }),
+        });
+        return Promise.reject(e)
       }
-      yield put(routerRedux.replace(redirect || '/'));
     },
 
     *getCaptcha({ payload }, { call }) {
@@ -93,17 +102,17 @@ const Model: LoginModelType = {
         delToken(REFRESH_TOKEN)
         // 重置login的status
         yield put({
-          type: 'changeLoginStatus',
+          type: 'changeLoginStatusReducers',
           payload: res,
         });
         // 清除上个人的数据
         yield put({
-          type: 'user/saveCurrentUser',
+          type: 'user/saveCurrentUserReducers',
           payload: {},
         });
         // 清除 权限数组
         yield put({
-          type: 'auth/setAuthList',
+          type: 'auth/setAuthListReducers',
           payload: { originalAuthList: [], authList: [], allAuthList: [], resources: [] }
         });
       }
@@ -119,7 +128,7 @@ const Model: LoginModelType = {
   },
 
   reducers: {
-    changeLoginStatus(state, { payload }) {
+    changeLoginStatusReducers(state, { payload }) {
 
       return {
         ...state,

@@ -12,4 +12,10 @@ export default {
   'authority-role.table.delete': '删除',
   'authority-role.form.show': '显示',
   'authority-role.form.hide': '隐藏',
+  'authority-role.form.name': '名称',
+  'authority-role.form.auth': '权限',
+  'authority-role.form.desc': '描述',
+  'authority-role.form.rule.name': '请输入名称',
+  'authority-role.form.rule.auth': '请选择权限',
+  'authority-role.form.rule.desc': '请输入权限',
 }

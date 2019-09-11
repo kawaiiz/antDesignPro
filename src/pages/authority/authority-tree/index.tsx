@@ -120,7 +120,7 @@ class AuthorityTree extends Component<Authprops, AuthState> {
       this.initActionTag()
     } catch (e) {
       notification.error({
-        description: e.message,
+        description: e.errorMsg,
         message: formatMessage({ id: 'component.error' }),
       });
     }

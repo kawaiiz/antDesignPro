@@ -1,8 +1,8 @@
 import { Reducer } from 'redux';
 import { Effect } from 'dva';
 import { setAuth } from '@/services/auth';
-import { formatMessage } from 'umi-plugin-react/locale';
 import { IRoute } from 'umi-types/config'
+import { formatMessage } from 'umi-plugin-react/locale';
 import { notification } from 'antd';
 import { SetMethod } from '@/utils/axios'
 import lodash from 'lodash'
@@ -24,8 +24,8 @@ export interface AuthModelType {
     setAuth: Effect;
   };
   reducers: {
-    setAuthList: Reducer<AuthModelState>;
-    setRoutes: Reducer<AuthModelState>;
+    setAuthListReducers: Reducer<AuthModelState>;
+    setRoutesReducers: Reducer<AuthModelState>;
   };
 }
 
@@ -97,13 +97,13 @@ const AuthModel: AuthModelType = {
         const res: { data: requestRoute[] } = yield call(setAuth, { data: null, method: SetMethod['get'] }) // 整体权限列表
         const { originalAuthList, authList, allAuthList } = processingData(res.data)
         yield put({
-          type: 'setAuthList',
+          type: 'setAuthListReducers',
           payload: { originalAuthList, authList, allAuthList, resources: res.data }
         })
         return Promise.resolve()
       } catch (e) {
         notification.error({
-          description: e.message,
+          description: e.errorMsg,
           message: formatMessage({ id: 'component.error' }),
         });
         return Promise.reject()
@@ -137,13 +137,13 @@ const AuthModel: AuthModelType = {
         }
         const { originalAuthList, authList, allAuthList } = processingData(newResoutces)
         yield put({
-          type: 'setAuthList',
+          type: 'setAuthListReducers',
           payload: { originalAuthList, authList, allAuthList, resources: newResoutces }
         })
         return Promise.resolve()
       } catch (e) {
         notification.error({
-          description: e.message,
+          description: e.errorMsg,
           message: formatMessage({ id: 'component.error' }),
         });
         return Promise.reject()
@@ -151,7 +151,7 @@ const AuthModel: AuthModelType = {
     },
   },
   reducers: {
-    setAuthList(state, { payload }): AuthModelState {
+    setAuthListReducers(state, { payload }): AuthModelState {
       return {
         ...state,
         allAuthList: payload.allAuthList,
@@ -160,7 +160,7 @@ const AuthModel: AuthModelType = {
         resources: payload.resources
       };
     },
-    setRoutes(state, { payload }): AuthModelState {
+    setRoutesReducers(state, { payload }): AuthModelState {
       return {
         ...state,
         routes: payload

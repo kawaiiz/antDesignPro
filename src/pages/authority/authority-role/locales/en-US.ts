@@ -12,4 +12,10 @@ export default {
   'authority-role.table.delete': 'delete',
   'authority-role.form.show': 'show',
   'authority-role.form.hide': 'hide',
+  'authority-role.form.name': 'name',
+  'authority-role.form.auth': 'auth',
+  'authority-role.form.desc': 'desc',
+  'authority-role.form.rule.name': 'Please enter name',
+  'authority-role.form.rule.auth': 'Please select auth',
+  'authority-role.form.rule.desc': 'Please enter desc',
 };

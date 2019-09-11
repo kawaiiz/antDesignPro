@@ -4,7 +4,6 @@ import { NoticeIconData } from '@/components/NoticeIcon';
 import { queryNotices } from '@/services/user';
 import { ConnectState } from './connect.d';
 import { formatMessage } from 'umi-plugin-react/locale';
-
 import { notification } from 'antd';
 
 export interface NoticeItem extends NoticeIconData {
@@ -28,9 +27,9 @@ export interface GlobalModelType {
     changeNoticeReadState: Effect;
   };
   reducers: {
-    changeLayoutCollapsed: Reducer<GlobalModelState>;
-    saveNotices: Reducer<GlobalModelState>;
-    saveClearedNotices: Reducer<GlobalModelState>;
+    changeLayoutCollapsedReducers: Reducer<GlobalModelState>;
+    saveNoticesReducers: Reducer<GlobalModelState>;
+    saveClearedNoticesReducers: Reducer<GlobalModelState>;
   };
   subscriptions: { setup: Subscription };
 }
@@ -50,14 +49,14 @@ const GlobalModel: GlobalModelType = {
         const res = yield call(queryNotices);
         data = res.data
         yield put({
-          type: 'saveNotices',
+          type: 'saveNoticesReducers',
           payload: data,
         });
         const unreadCount: number = yield select(
           (state: ConnectState) => state.global.notices.filter(item => !item.read).length,
         );
         yield put({
-          type: 'user/changeNotifyCount',
+          type: 'user/changeNotifyCountReducers',
           payload: {
             totalCount: data.length,
             unreadCount,
@@ -65,7 +64,7 @@ const GlobalModel: GlobalModelType = {
         });
       } catch (e) {
         notification.error({
-          description: e.message,
+          description: e.errorMsg,
           message: formatMessage({ id: 'component.error' }),
         });
       }
@@ -76,14 +75,14 @@ const GlobalModel: GlobalModelType = {
         const res = yield call(queryNotices);
         data = res.data
         yield put({
-          type: 'saveNotices',
+          type: 'saveNoticesReducers',
           payload: data,
         });
         const unreadCount: number = yield select(
           (state: ConnectState) => state.global.notices.filter(item => !item.read).length,
         );
         yield put({
-          type: 'user/changeNotifyCount',
+          type: 'user/changeNotifyCountReducers',
           payload: {
             totalCount: data.length,
             unreadCount,
@@ -95,7 +94,7 @@ const GlobalModel: GlobalModelType = {
     },
     *clearNotices({ payload }, { put, select }) {
       yield put({
-        type: 'saveClearedNotices',
+        type: 'saveClearedNoticesReducers',
         payload,
       });
       const count: number = yield select((state: ConnectState) => state.global.notices.length);
@@ -103,7 +102,7 @@ const GlobalModel: GlobalModelType = {
         (state: ConnectState) => state.global.notices.filter(item => !item.read).length,
       );
       yield put({
-        type: 'user/changeNotifyCount',
+        type: 'user/changeNotifyCountReducers',
         payload: {
           totalCount: count,
           unreadCount,
@@ -122,12 +121,12 @@ const GlobalModel: GlobalModelType = {
       );
 
       yield put({
-        type: 'saveNotices',
+        type: 'saveNoticesReducers',
         payload: notices,
       });
 
       yield put({
-        type: 'user/changeNotifyCount',
+        type: 'user/changeNotifyCountReducers',
         payload: {
           totalCount: notices.length,
           unreadCount: notices.filter(item => !item.read).length,
@@ -137,20 +136,20 @@ const GlobalModel: GlobalModelType = {
   },
 
   reducers: {
-    changeLayoutCollapsed(state = { notices: [], collapsed: true }, { payload }): GlobalModelState {
+    changeLayoutCollapsedReducers(state = { notices: [], collapsed: true }, { payload }): GlobalModelState {
       return {
         ...state,
         collapsed: payload,
       };
     },
-    saveNotices(state, { payload }): GlobalModelState {
+    saveNoticesReducers(state, { payload }): GlobalModelState {
       return {
         collapsed: false,
         ...state,
         notices: payload,
       };
     },
-    saveClearedNotices(state = { notices: [], collapsed: true }, { payload }): GlobalModelState {
+    saveClearedNoticesReducers(state = { notices: [], collapsed: true }, { payload }): GlobalModelState {
       return {
         collapsed: false,
         ...state,

@@ -36,6 +36,7 @@ interface RoleFormProp extends FormComponentProps {
 }
 
 interface NewTreeValue { label: string, value: any }
+
 interface NewActionTag extends Role {
   newAuth?: NewTreeValue[] | null
 }
@@ -44,18 +45,17 @@ class RoleForm extends Component<RoleFormProp, RoleFormState>{
   state: RoleFormState = {
     loading: false,
     actionTag: {
-      id: null,
-      name: '',
-      auth: []
+      roleId: null,
+      roleName: '',
+      roleDescription: '',
+      resourceIds: []
     },
     newActionTag: {}
   }
   constructor(props: RoleFormProp) {
     super(props)
     const { actionTag } = this.state
-    let newActionTag: NewActionTag = {
-      newAuth: null
-    }
+    let newActionTag: NewActionTag = {}
     newActionTag = Object.assign(newActionTag, actionTag, props.actionTag)
     newActionTag.newAuth = this.createTreeValue()
     this.state.newActionTag = newActionTag
@@ -65,11 +65,11 @@ class RoleForm extends Component<RoleFormProp, RoleFormState>{
   // 将要修改的auth字段的number[] 变成 {label:string,value:number}[]
   createTreeValue = () => {
     const { originalAuthList, actionTag } = this.props
-    const { auth } = actionTag
-    return auth!.map(item => {
+    const { resourceIds = [] } = actionTag
+    return resourceIds!.map(item => {
       for (let i = 0; i < originalAuthList.length; i++) {
         if (originalAuthList[i].id === item) {
-          return { label: originalAuthList[i].name, value: originalAuthList[i].id }
+          return { label: originalAuthList[i].type === 'PAGE' ? formatMessage({ id: `menu.${originalAuthList[i].name}`, defaultMessage: originalAuthList[i].name }) : originalAuthList[i].name, value: originalAuthList[i].id }
         }
       }
       return { label: null, value: null }
@@ -79,8 +79,9 @@ class RoleForm extends Component<RoleFormProp, RoleFormState>{
   createTree = () => {
     const { allAuthList } = this.props;
     function _create(allAuthList: IRoute[]): TreeCreate[] {
+      console.log(allAuthList)
       return allAuthList.map((item, index) => ({
-        title: item.name,
+        title: item.type === 'PAGE' ? formatMessage({ id: `menu.${item.name}`, defaultMessage: item.name }) : item.name,
         value: item.id,
         key: item.id,
         children: item.children && item.children.length > 0 ? _create(item.children) : null,
@@ -93,8 +94,8 @@ class RoleForm extends Component<RoleFormProp, RoleFormState>{
     const { form, onSubmit, actionTag } = this.props;
     form.validateFields(err => {
       if (!err) {
-        let formData: NewActionTag = { ...form.getFieldsValue(), id: actionTag.id, auth: [] }
-        formData.auth = (formData.newAuth as NewTreeValue[]).map(item => item.value)
+        let formData: NewActionTag = { ...form.getFieldsValue(), roleId: actionTag.roleId }
+        formData.resourceIds = (formData.newAuth as NewTreeValue[]).map(item => item.value)
         onSubmit(formData)
       }
     })
@@ -102,28 +103,32 @@ class RoleForm extends Component<RoleFormProp, RoleFormState>{
 
   render() {
     const { loading, newActionTag, tree } = this.state
-    console.log(tree)
     const { form, onClose } = this.props;
     const { getFieldDecorator } = form;
     return (
       <Form layout="vertical" onSubmit={this.handleSubmit}>
-        <Form.Item label="name">
-          {getFieldDecorator('name', {
-            initialValue: newActionTag.name,
-            rules: [{ required: true, message: 'Please input the name of collection!' }],
+        <Form.Item label={formatMessage({ id: 'authority-role.form.name' })}>
+          {getFieldDecorator('roleName', {
+            initialValue: newActionTag.roleName,
+            rules: [{ required: true, message: formatMessage({ id: 'authority-role.form.rule.name' }) }],
           })(<Input />)}
         </Form.Item>
-        <Form.Item label="newAuth">
+        <Form.Item label={formatMessage({ id: 'authority-role.form.desc' })}>
+          {getFieldDecorator('roleDescription', {
+            initialValue: newActionTag.roleDescription,
+            rules: [{ required: true, message: formatMessage({ id: 'authority-role.form.rule.desc' }) }],
+          })(<Input />)}
+        </Form.Item>
+        <Form.Item label={formatMessage({ id: 'authority-role.form.auth' })}>
           {getFieldDecorator('newAuth', {
-            initialValue: newActionTag.newAuth
+            initialValue: newActionTag.newAuth,
+            rules: [{ required: true, message: formatMessage({ id: 'authority-role.form.rule.auth' }) }],
           })(
             <TreeSelect
-              style={{ width: 300 }}
               allowClear={true}
               treeCheckable={true}
               treeCheckStrictly={true}
               showCheckedStrategy={SHOW_ALL}
-              dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
               treeData={tree as unknown as TreeCreate[]}
               placeholder="Please select"
               treeDefaultExpandAll

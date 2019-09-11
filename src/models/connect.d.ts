@@ -7,8 +7,6 @@ import { LoginModelType } from './login';
 
 import { GlobalModelState } from './global';
 import { AuthModelState } from './auth';
-import { RoleModelState } from '@/pages/authority/authority-role/model'
-
 export { GlobalModelState, SettingModelState, UserModelState };
 
 export interface Loading {
@@ -25,7 +23,6 @@ export interface Loading {
 }
 
 export interface ConnectState {
-  role: RoleModelState; // 人员
   auth: AuthModelState; // 权限
   global: GlobalModelState;
   loading: Loading;

@@ -1,4 +1,5 @@
 export default {
+  'menu.authority-person': '人員設定',
   'menu.authority-role': '角色設定',
   'menu.authority-tree': '權限資源',
   'menu.authority': '权限',

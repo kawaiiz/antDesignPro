@@ -9,6 +9,8 @@ const REFRESH_TOKEN = MyConfig.refreshToken
 
 const baseUrl = process.env.NODE_ENV !== 'production' ? MyConfig.baseUrl.dev : MyConfig.baseUrl.pro
 
+
+
 // 返回的信息格式
 export interface Res {
   status: number,
@@ -26,6 +28,13 @@ export enum SetMethod {
   del = 'delete'
 }
 
+// 为防止同时多个请求进入
+// 是否正在刷新的标记 
+let isRefreshing = false
+// 重试队列，每一项将是一个待执行的函数形式
+let requests: any[] = [] // 请求数组
+
+
 // axios 返回拦截器刷新token的函数
 const refreshAuthLogic = (failedRequest: any) => axios({
   url: `${baseUrl}/api/public/web/refresh-token`,
@@ -38,7 +47,7 @@ const refreshAuthLogic = (failedRequest: any) => axios({
   setToken(`${tokenRefreshResponse.data.data.token_type} ${tokenRefreshResponse.data.data.access_token}`);
   setToken(tokenRefreshResponse.data.data.refresh_token, REFRESH_TOKEN);
   failedRequest.response.config.headers['Authorization'] = `${tokenRefreshResponse.data.data.token_type} ${tokenRefreshResponse.data.data.access_token}`;
-  return Promise.resolve();
+  return Promise.resolve(`${tokenRefreshResponse.data.data.token_type} ${tokenRefreshResponse.data.data.access_token}`);
 }).catch(err => {
   delToken(REFRESH_TOKEN)
   delToken()
@@ -121,22 +130,36 @@ class HttpRequest {
         }
         return Promise.reject(errMsg)
       }
-      const refreshCall = refreshAuthLogic(error);
-
-      // Create interceptor that will bind all the others requests
-      // until refreshTokenCall is resolved
-      // const requestQueueInterceptorId = axios.interceptors
-      //   .request
-      //   .use(request => refreshCall.then(() => request));
-
-      // When response code is 401 (Unauthorized), try to refresh the token.
-      return refreshCall.then(() => {
-        // axios.interceptors.request.eject(requestQueueInterceptorId);
-        return axios(error.response.config);
-      }).catch(error => {
-        // axios.interceptors.request.eject(requestQueueInterceptorId);
-        return Promise.reject(error)
-      })
+      if (!isRefreshing) {
+        isRefreshing = true
+        const refreshCall = refreshAuthLogic(error);
+        // Create interceptor that will bind all the others requests
+        // until refreshTokenCall is resolved
+        // const requestQueueInterceptorId = axios.interceptors
+        //   .request
+        //   .use(request => refreshCall.then(() => request));
+        // When response code is 401 (Unauthorized), try to refresh the token.
+        return refreshCall.then((token) => {
+          // axios.interceptors.request.eject(requestQueueInterceptorId);
+          requests.forEach(cb => cb(token))
+          // 重试完了别忘了清空这个队列（掘金评论区同学指点）
+          requests = []
+          return instance(error.response.config);
+        }).catch(error => {
+          // axios.interceptors.request.eject(requestQueueInterceptorId);
+          return Promise.reject(error)
+        }).finally(() => {
+          isRefreshing = false
+        })
+      } else {
+        return new Promise((resolve) => {
+          // 将resolve放进队列，用一个函数形式来保存，等token刷新后直接执行
+          requests.push((token: string) => {
+            error.response.config.headers['Authorization'] = token;
+            resolve(instance(error.response.config))
+          })
+        })
+      }
     })
   }
 
@@ -162,7 +185,7 @@ class HttpRequest {
 
     return instance(options).then((res: AxiosResponse) => {
       const statusCode = [200]
-      if (statusCode.indexOf(res.data.status) !== -1 || !res.data.hasOwnProperty(status)) {
+      if (statusCode.indexOf(res.data.status) !== -1 || !res.data.hasOwnProperty('status')) {
         return Promise.resolve(res.data)
       } else {
         return Promise.reject(res.data)

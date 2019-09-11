@@ -1,4 +1,5 @@
 export default {
+  'menu.authority-person': 'Person Setting',
   'menu.authority-role': 'Role Setting',
   'menu.authority-tree': 'Authority Resources',
   'menu.authority': 'Authority',

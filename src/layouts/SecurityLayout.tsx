@@ -32,7 +32,7 @@ const SecurityLayoutFunc: React.FC<SecurityLayoutProps> = props => {
   if (route && route.routes) {
     if (initialRoutes.length === 0) {
       dispatch({
-        type: 'auth/setRoutes',
+        type: 'auth/setRoutesReducers',
         payload: lodash.cloneDeep(route.routes[0].routes)
       })
     }
@@ -88,7 +88,6 @@ const SecurityLayoutFunc: React.FC<SecurityLayoutProps> = props => {
   }
   // 构建 更新路由所需的 components 
   useState(() => {
-    console.log(1)
     if (route && route.routes) {
       const map = new Map<string, any>();
       mapRoute(route.routes[0].routes!, map)

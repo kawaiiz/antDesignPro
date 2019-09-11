@@ -1,7 +1,8 @@
 import { AnyAction, Reducer } from 'redux';
-
 import { EffectsCommandMap } from 'dva';
 import { fakeResetPassword } from './service';
+import { formatMessage } from 'umi-plugin-react/locale';
+import { notification } from 'antd';
 
 export interface StateType {
   status?: 'ok' | 'error';
@@ -21,8 +22,8 @@ export interface ModelType {
     initState: Effect;
   };
   reducers: {
-    resetPasswordHandle: Reducer<StateType>;
-    initState: Reducer<StateType>
+    resetPasswordHandleReducers: Reducer<StateType>;
+    initStateReducers: Reducer<StateType>
   };
 }
 
@@ -35,27 +36,32 @@ const Model: ModelType = {
 
   effects: {
     *submit({ payload }, { call, put }) {
+      try {
+        
+      } catch (e) {
+        
+      }
       const response = yield call(fakeResetPassword, payload);
       yield put({
-        type: 'resetPasswordHandle',
+        type: 'resetPasswordHandleReducers',
         payload: response,
       });
     },
     initState({ payload }, { call, put }) {
       put({
-        type: 'initState'
+        type: 'initStateReducers'
       });
     }
   },
 
   reducers: {
-    resetPasswordHandle(state, { payload }) {
+    resetPasswordHandleReducers(state, { payload }) {
       return {
         ...state,
         status: payload.status,
       };
     },
-    initState(state) {
+    initStateReducers(state) {
       const newState = { status: undefined }
       return {
         ...state, ...newState

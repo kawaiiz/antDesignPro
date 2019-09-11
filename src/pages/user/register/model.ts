@@ -1,7 +1,8 @@
 import { AnyAction, Reducer } from 'redux';
-
 import { EffectsCommandMap } from 'dva';
 import { fakeRegister } from './service';
+import { formatMessage } from 'umi-plugin-react/locale';
+import { notification } from 'antd';
 
 export interface StateType {
   status?: 'ok' | 'error';
@@ -21,8 +22,8 @@ export interface ModelType {
     initState: Effect;
   };
   reducers: {
-    registerHandle: Reducer<StateType>;
-    initState: Reducer<StateType>
+    registerHandleReducers: Reducer<StateType>;
+    initStateReducers: Reducer<StateType>
   };
 }
 
@@ -37,25 +38,25 @@ const Model: ModelType = {
     *submit({ payload }, { call, put }) {
       const response = yield call(fakeRegister, payload);
       yield put({
-        type: 'registerHandle',
+        type: 'registerHandleReducers',
         payload: response,
       });
     },
     initState({ payload }, { call, put }) {
       put({
-        type: 'initState'
+        type: 'initStateReducers'
       });
     }
   },
 
   reducers: {
-    registerHandle(state, { payload }) {
+    registerHandleReducers(state, { payload }) {
       return {
         ...state,
         status: payload.status,
       };
     },
-    initState(state) {
+    initStateReducers(state) {
       const newState = { status: undefined }
       return {
         ...state, ...newState

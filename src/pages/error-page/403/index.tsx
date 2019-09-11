@@ -27,7 +27,7 @@ const error403: React.FC = props => {
         background: 'none',
       }}
       subTitle={formatMessage({
-        id: 'error-page-.description.403',
+        id: 'error-page-403.description.403',
         defaultMessage: "Sorry, you don't have access to this page.",
       })}
       extra={
@@ -36,7 +36,7 @@ const error403: React.FC = props => {
             <div>{num}秒后返回上一页</div>
             <Link to="/">
               <Button type="primary">
-                {formatMessage({ id: 'error-page-.exception.back', defaultMessage: 'Back Home' })}
+                {formatMessage({ id: 'error-page-403.exception.back', defaultMessage: 'Back Home' })}
               </Button>
             </Link>
           </>

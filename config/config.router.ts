@@ -37,6 +37,11 @@ export const contentRoutes: IRoute[] = [{
       name: 'authority-role',
       icon: ' ',
       component: './authority/authority-role/index',
+    }, {
+      path: '/authority/person',
+      name: 'authority-person',
+      icon: ' ',
+      component: './authority/authority-person/index',
     }],
 },
 ]

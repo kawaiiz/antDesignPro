@@ -1,5 +1,4 @@
-import React, { Component } from 'react'
-import { Dispatch } from 'redux';
+import React, { PureComponent } from 'react'
 import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
@@ -16,41 +15,45 @@ import {
 
 import { ConnectState } from '@/models/connect';
 import { Role } from './data.d'
-import { IRoute } from 'umi-types/config';
+
+import { setRole, getRoleDetail } from './service';
+import { SetMethod } from '@/utils/axios'
 
 import RoleTable from './components/table'
 import RoleForm from './components/from'
 import styles from './style.less'
 
 interface RoleProps {
-  dispatch: Dispatch<any>,
-  roleList: Role[],
   allAuthList: [],
   originalAuthList: [],
   loading: boolean
 }
 
 interface RoleState {
+  roleList: Role[],
   authority: string,
   actionTag: Role,
   drawerVisible: boolean,
   actionType: 'add' | 'edit' | 'delete' | null
 }
 
-@connect(({ auth, role, loading, }: ConnectState) => ({
-  roleList: role.roleList,
+
+// 因为loading 导致每次请求后引发页面更新
+@connect(({ auth, loading, }: ConnectState) => ({
   allAuthList: auth.allAuthList,
   originalAuthList: auth.originalAuthList,
   loading: loading.effects['role/getRoleList'] || loading.effects['role/setRole'],
 }),
 )
-class AuthorityRole extends Component<RoleProps, RoleState> {
+class AuthorityRole extends PureComponent<RoleProps, RoleState> {
   state: RoleState = {
+    roleList: [],
     authority: '',
     actionTag: {}, // 当前表单内容
     drawerVisible: false, // 是否打开表单
     actionType: null // 点击按钮操作的类型
   }
+
   constructor(props: RoleProps) {
     super(props)
     const authority = getAuthority()
@@ -59,11 +62,18 @@ class AuthorityRole extends Component<RoleProps, RoleState> {
   }
 
   // 获取数组
-  getRoleList = () => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'role/getRoleList'
-    });
+  getRoleList = async () => {
+    try {
+      const res = await setRole({ data: {}, method: SetMethod['get'] })
+      this.setState({
+        roleList: res.data
+      })
+    } catch (e) {
+      notification.error({
+        description: e.errorMsg,
+        message: formatMessage({ id: 'component.error' }),
+      });
+    }
   }
 
   // 每次关闭的时候 清空活跃项
@@ -75,51 +85,86 @@ class AuthorityRole extends Component<RoleProps, RoleState> {
     })
   }
 
-
   handleBtnClickAdd = () => {
     this.setState({
       actionType: 'add',
       drawerVisible: true
     })
   }
-  handleBtnClickEdit = (row: Role) => {
-    this.setState({
-      actionTag: row,
-      actionType: 'edit',
-      drawerVisible: true
-    })
+
+  handleBtnClickEdit = async (row: Role) => {
+    try {
+      const res = await getRoleDetail({ roleId: row.roleId! })
+      this.setState({
+        actionTag: Object.assign({}, row, { resourceIds: res.data }),
+        actionType: 'edit',
+        drawerVisible: true
+      })
+    } catch (e) {
+      notification.error({
+        description: e.errorMsg,
+        message: formatMessage({ id: 'component.error' }),
+      });
+    }
   }
 
   // 点击删除浮窗的确认按钮
-  handleBtnClickDeleteUpData = (row: Role) => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'role/setRole',
-      payload: { data: row, type: 'delete' }
-    });
+  handleBtnClickDeleteUpData = async (row: Role) => {
+    const { roleList } = this.state
+    const oldRoleList = lodash.cloneDeep(roleList)
+    try {
+      const res = await setRole({ data: { roleId: row.roleId }, method: SetMethod['delete'] })
+      for (let i = 0; i < oldRoleList.length; i++) {
+        if (oldRoleList[i].roleId === res.data as number) {
+          oldRoleList.splice(i, 1)
+          break
+        }
+      }
+      this.setState({
+        roleList: oldRoleList
+      })
+    } catch (e) {
+      notification.error({
+        description: e.errorMsg,
+        message: formatMessage({ id: 'component.error' }),
+      });
+    }
   }
 
   // 表单提交事件
   handleFormSubmit = async (form: Role) => {
     try {
-      // 先比对，找到是哪一条数据  删除原数据  再通过新的父节点添加新数据
-      const { actionTag } = this.state
-      const { dispatch } = this.props;
-      dispatch({
-        type: 'role/setRole',
-        payload: { data: form, type: actionTag.id ? 'edit' : 'add' }
-      });
+      const { actionType, roleList } = this.state
+      const oldRoleList = lodash.cloneDeep(roleList)
+      let res: { data: Role | number }, newRoleList: Role[] = []
+      if (actionType === 'edit') {
+        res = await setRole({ data: form, method: SetMethod['edit'] })
+        newRoleList = oldRoleList.map(item => {
+          if (item.roleId === (res.data as Role).roleId) {
+            return Object.assign({}, item, res.data)
+          }
+          return item
+        })
+      } else if (actionType === 'add') {
+        res = await setRole({ data: form, method: SetMethod['add'] })
+        oldRoleList.push(res.data as Role)
+        newRoleList = oldRoleList
+      }
+      this.setState({
+        roleList: newRoleList
+      })
       this.initActionTag()
     } catch (e) {
       notification.error({
-        description: e.message,
+        description: e.errorMsg,
         message: formatMessage({ id: 'component.error' }),
       });
     }
   }
+
   render() {
-    const { authority, drawerVisible, actionTag, actionType } = this.state
-    const { roleList, loading, allAuthList, originalAuthList } = this.props
+    const { authority, drawerVisible, actionTag, actionType, roleList } = this.state
+    const { loading, allAuthList, originalAuthList } = this.props
     return (<PageHeaderWrapper content={<FormattedMessage id="authority-role.header.description" />}>
       <Card loading={loading}>
         <Alert className={styles['authority-role-warning']} message={formatMessage({ id: 'authority-tree.warning' })} type="warning" />
@@ -140,7 +185,7 @@ class AuthorityRole extends Component<RoleProps, RoleState> {
         }
       </Card>
       <Drawer
-        title={`${actionType ? formatMessage({ id: 'authority-role.table.' + actionType }) : ''} ${actionTag.name}`}
+        title={`${actionType ? formatMessage({ id: 'authority-role.table.' + actionType }) : ''} ${actionTag.roleName || ''}`}
         placement="right"
         width={720}
         closable={false}

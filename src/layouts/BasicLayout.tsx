@@ -74,7 +74,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
   const handleMenuCollapse = (payload: boolean): void => {
     if (dispatch) {
       dispatch({
-        type: 'global/changeLayoutCollapsed',
+        type: 'global/changeLayoutCollapsedReducers',
         payload,
       });
     }

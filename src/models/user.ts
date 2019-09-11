@@ -1,12 +1,10 @@
 import { Effect } from 'dva';
 import { Reducer } from 'redux';
-
 import { queryCurrent, query as queryUsers } from '@/services/user';
-
-import { setToken } from '@/utils/utils';
 import { setAuthority } from '@/utils/authority';
 import { reloadAuthorized } from '@/utils/Authorized'
-
+import { formatMessage } from 'umi-plugin-react/locale';
+import { notification } from 'antd';
 
 export interface CurrentUser {
   iconUrl?: string,
@@ -30,8 +28,8 @@ export interface UserModelType {
     fetchCurrent: Effect;
   };
   reducers: {
-    saveCurrentUser: Reducer<UserModelState>;
-    changeNotifyCount: Reducer<UserModelState>;
+    saveCurrentUserReducers: Reducer<UserModelState>;
+    changeNotifyCountReducers: Reducer<UserModelState>;
     // saveAuth: Reducer<UserModelState>;
   };
 }
@@ -61,20 +59,20 @@ const UserModel: UserModelType = {
       // 更新权限
       reloadAuthorized()
       yield put({
-        type: 'saveCurrentUser',
+        type: 'saveCurrentUserReducers',
         payload: currentData,
       });
     },
   },
 
   reducers: {
-    saveCurrentUser(state, action) {
+    saveCurrentUserReducers(state, action) {
       return {
         ...state,
         currentUser: action.payload || {},
       };
     },
-    changeNotifyCount(
+    changeNotifyCountReducers(
       state = {
         currentUser: {},
       },

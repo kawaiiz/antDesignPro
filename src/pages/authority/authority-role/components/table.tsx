@@ -17,11 +17,7 @@ interface RoleTableProp {
   handleBtnClickDeleteUpData: (role: Role) => void,
 }
 
-interface RoleTableState {
-
-}
-
-class RoleTable extends Component<RoleTableProp, RoleTableState> {
+class RoleTable extends Component<RoleTableProp> {
 
   state = {
     columns: [
@@ -63,7 +59,7 @@ class RoleTable extends Component<RoleTableProp, RoleTableState> {
                 {formatMessage({ id: 'authority-role.table.edit' })}
               </Button>
               <Popconfirm
-                title={`${formatMessage({ id: 'authority-role.table.delete' })} ${record.name}?`}
+                title={`${formatMessage({ id: 'authority-role.table.delete' })} ${record.roleName}?`}
                 okText={formatMessage({ id: 'component.confirm' })}
                 cancelText={formatMessage({ id: 'component.cancel' })}
                 onConfirm={() => handleBtnClickDeleteUpData(record)}>
@@ -82,7 +78,7 @@ class RoleTable extends Component<RoleTableProp, RoleTableState> {
     const { roleList } = this.props
 
     return <Table
-      rowKey={record => `${record.id}rowKey`}
+      rowKey={record => `${record.roleId}rowKey`}
       pagination={false}
       defaultExpandAllRows={true}
       columns={columns}
