@@ -88,7 +88,7 @@ const Model: LoginModelType = {
         yield put(
           routerRedux.replace({
             pathname: '/user/login'
-          }),
+          })
         );
         // 清空state里的数据
         let res = {

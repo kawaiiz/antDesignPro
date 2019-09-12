@@ -40,6 +40,8 @@ interface PersonState {
   pageIndex: number,
   pageSize: number,
   dataTotal: number,
+  getListLoading: boolean,
+  upDataLoading: boolean
 }
 
 // 因为loading 导致每次请求后引发页面更新
@@ -56,33 +58,43 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
     drawerVisible: false, // 是否打开表单
     actionType: null, // 点击按钮操作的类型
     pageIndex: 1, // 分页
-    pageSize: 10,//
+    pageSize: 8,//
     dataTotal: 0,
+    getListLoading: false,
+    upDataLoading: false
   }
 
   constructor(props: PersonProps) {
     super(props)
     const authority = getAuthority()
     this.state.authority = typeof authority === 'string' ? authority : authority[0]
-    this.getPersonList()
+
+  }
+
+  componentDidMount() {
     this.getRoleList()
+    this.getPersonList()
   }
 
   // 获取 人员数组
   getPersonList = async () => {
     try {
       const { pageIndex, pageSize } = this.state
+      this.setState({
+        getListLoading: true
+      })
       const res = await setPerson({
         data: {
           pageIndex, pageSize
         }, method: SetMethod['get']
       })
-
       this.setState({
         personList: res.data.elements,
-        dataTotal: res.data.totalElements
+        dataTotal: res.data.totalElements,
+        getListLoading: false
       })
     } catch (e) {
+      console.log(e)
       notification.error({
         description: e.errorMsg,
         message: formatMessage({ id: 'component.error' }),
@@ -98,6 +110,7 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
         roleList: res.data
       })
     } catch (e) {
+      console.log(e)
       notification.error({
         description: e.errorMsg,
         message: formatMessage({ id: 'component.error' }),
@@ -105,7 +118,7 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
     }
   }
 
-  // 每次关闭的时候 清空活跃项
+  // 每次关闭抽屉的时候 清空活跃项
   initActionTag = () => {
     this.setState({
       actionTag: {},
@@ -134,15 +147,19 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
     const { personList } = this.state
     const oldPersonList = lodash.cloneDeep(personList)
     try {
-      const res = await setPerson({ data: { userId: row.userId }, method: SetMethod['delete'] })
+      this.setState({
+        upDataLoading: true
+      })
+      const res = await setPerson({ data: { userId: row.id }, method: SetMethod['delete'] })
       for (let i = 0; i < oldPersonList.length; i++) {
-        if (oldPersonList[i].userId === res.data as number) {
+        if (oldPersonList[i].id === res.data as number) {
           oldPersonList.splice(i, 1)
           break
         }
       }
       this.setState({
-        personList: oldPersonList
+        personList: oldPersonList,
+        upDataLoading: false
       })
     } catch (e) {
       notification.error({
@@ -158,10 +175,13 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
       const { actionType, personList } = this.state
       const oldPersonList = lodash.cloneDeep(personList)
       let res: { data: Person | number }, newPersonList: Person[] = []
+      this.setState({
+        upDataLoading: true
+      })
       if (actionType === 'edit') {
         res = await setPerson({ data: form, method: SetMethod['edit'] })
         newPersonList = oldPersonList.map(item => {
-          if (item.roleId === (res.data as Person).roleId) {
+          if (item.id === (res.data as Person).id) {
             return Object.assign({}, item, res.data)
           }
           return item
@@ -172,18 +192,20 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
         newPersonList = oldPersonList
       }
       this.setState({
-        personList: newPersonList
+        personList: newPersonList,
+        upDataLoading: false
       })
       this.initActionTag()
     } catch (e) {
       notification.error({
-        description: e.errorMsg,
+        description: e.errorMsg ? e.errorMsg : '请求失败',
         message: formatMessage({ id: 'component.error' }),
       });
+      return Promise.reject()
     }
   }
 
-  handleTableOnChange = async (page: number, pageSize: number) => {
+  handleTableOnChange = async (page: number, pageSize?: number | undefined) => {
     this.setState({
       pageIndex: page
     })
@@ -191,7 +213,7 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
   }
 
   render() {
-    const { personList, roleList, pageIndex, pageSize, dataTotal, authority, actionType, actionTag, drawerVisible } = this.state
+    const { personList, roleList, pageIndex, pageSize, dataTotal, authority, actionType, actionTag, drawerVisible, upDataLoading, getListLoading } = this.state
     const { loading } = this.props
     return (
       <PageHeaderWrapper content={<FormattedMessage id="authority-person.header.description" />}>
@@ -203,15 +225,19 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
             </Button>
           </div>
           {
-            roleList.length > 0 ? (<div>
+            personList.length > 0 ? (<div>
               <PersonTable
                 dataTotal={dataTotal}
                 pageIndex={pageIndex}
                 pageSize={pageSize}
                 authority={authority}
                 personList={personList}
+                roleList={roleList}
+                upDataLoading={upDataLoading}
+                getListLoading={getListLoading}
                 handleBtnClickEdit={this.handleBtnClickEdit}
                 handleBtnClickDeleteUpData={this.handleBtnClickDeleteUpData}
+                handleTableOnChange={this.handleTableOnChange}
               />
             </div>) : <Empty description={false} />
           }
@@ -225,8 +251,7 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
           onClose={this.initActionTag}
           visible={drawerVisible}
         >
-
-          {drawerVisible ? <PersonForm actionTag={actionTag} roleList={roleList} loading={loading} onClose={this.initActionTag} onSubmit={this.handleFormSubmit} /> : null}
+          {drawerVisible ? <PersonForm actionTag={actionTag} roleList={roleList} upDataLoading={upDataLoading} onClose={this.initActionTag} onSubmit={this.handleFormSubmit} /> : null}
         </Drawer>
       </PageHeaderWrapper>
     )

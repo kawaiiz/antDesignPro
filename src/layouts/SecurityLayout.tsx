@@ -56,7 +56,7 @@ const SecurityLayoutFunc: React.FC<SecurityLayoutProps> = props => {
           message: '登录失效',
         });
         router.push({
-          pathname: 'login',
+          pathname: '/user/login',
         });
       }
     }
@@ -86,9 +86,10 @@ const SecurityLayoutFunc: React.FC<SecurityLayoutProps> = props => {
       }
     })
   }
+
   // 构建 更新路由所需的 components 
   useState(() => {
-    if (route && route.routes) {
+    if (route && route.routes && !components) {
       const map = new Map<string, any>();
       mapRoute(route.routes[0].routes!, map)
       setComponents(map);
@@ -101,8 +102,9 @@ const SecurityLayoutFunc: React.FC<SecurityLayoutProps> = props => {
       authList.forEach(addRoute);
       // 原本这里是 router.push(location.pathName) 发现总是跳 location.pathName=/  打印了location 发现有hash值 所以 直接截取hash值放进去 
       // router.push(location.hash.slice(1));
-      route.routes[0].routes = newInitialRoutes
+      // 因为在不打开调试情况下 newInitialRoutes第一次运行是空数组 
       if (newInitialRoutes.length > 0) {
+        route.routes[0].routes = newInitialRoutes
         setIsReady(true)
       }
     }

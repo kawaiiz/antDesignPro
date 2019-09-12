@@ -14,7 +14,6 @@ const { SHOW_ALL } = TreeSelect;
 import { Role } from '../data.d'
 
 interface RoleFormState {
-  loading: boolean,
   actionTag: Role,
   tree?: TreeCreate[], // 下拉框内数据
   newActionTag: NewActionTag
@@ -31,6 +30,7 @@ interface RoleFormProp extends FormComponentProps {
   actionTag: Role,
   allAuthList: [],
   originalAuthList: IRoute[],
+  upDataLoading: boolean,
   onClose: () => void,
   onSubmit: (from: Role) => void
 }
@@ -43,7 +43,6 @@ interface NewActionTag extends Role {
 
 class RoleForm extends Component<RoleFormProp, RoleFormState>{
   state: RoleFormState = {
-    loading: false,
     actionTag: {
       roleId: null,
       roleName: '',
@@ -102,8 +101,8 @@ class RoleForm extends Component<RoleFormProp, RoleFormState>{
   }
 
   render() {
-    const { loading, newActionTag, tree } = this.state
-    const { form, onClose } = this.props;
+    const { newActionTag, tree } = this.state
+    const { form, onClose, upDataLoading } = this.props;
     const { getFieldDecorator } = form;
     return (
       <Form layout="vertical" onSubmit={this.handleSubmit}>
@@ -138,7 +137,7 @@ class RoleForm extends Component<RoleFormProp, RoleFormState>{
         <Form.Item>
           <Button
             size="large"
-            loading={loading}
+            loading={upDataLoading}
             className={styles['authority-from-button']}
             type="primary"
             htmlType="submit"

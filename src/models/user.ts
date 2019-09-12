@@ -1,10 +1,13 @@
 import { Effect } from 'dva';
 import { Reducer } from 'redux';
+import { routerRedux } from 'dva/router';
+
 import { queryCurrent, query as queryUsers } from '@/services/user';
 import { setAuthority } from '@/utils/authority';
 import { reloadAuthorized } from '@/utils/Authorized'
 import { formatMessage } from 'umi-plugin-react/locale';
 import { notification } from 'antd';
+import route from 'mock/route';
 
 export interface CurrentUser {
   iconUrl?: string,
@@ -52,16 +55,22 @@ const UserModel: UserModelType = {
       });
     },
     *fetchCurrent(_, { call, put }) {
-      const res: any = yield call(queryCurrent);
-      const currentData: CurrentUser = res.data
-      // 设置用户身份 localstorage
-      setAuthority(currentData.roles!);
-      // 更新权限
-      reloadAuthorized()
-      yield put({
-        type: 'saveCurrentUserReducers',
-        payload: currentData,
-      });
+      try {
+        const res: any = yield call(queryCurrent);
+        const currentData: CurrentUser = res.data
+        // 设置用户身份 localstorage
+        setAuthority(currentData.roles!);
+        // 更新权限
+        reloadAuthorized()
+        yield put({
+          type: 'saveCurrentUserReducers',
+          payload: currentData,
+        });
+      } catch (e) {
+        routerRedux.replace({
+          pathname: '/user/login'
+        })
+      }
     },
   },
 

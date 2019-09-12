@@ -34,7 +34,8 @@ interface RoleState {
   authority: string,
   actionTag: Role,
   drawerVisible: boolean,
-  actionType: 'add' | 'edit' | 'delete' | null
+  actionType: 'add' | 'edit' | 'delete' | null,
+  upDataLoading: boolean,
 }
 
 
@@ -51,7 +52,8 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
     authority: '',
     actionTag: {}, // 当前表单内容
     drawerVisible: false, // 是否打开表单
-    actionType: null // 点击按钮操作的类型
+    actionType: null, // 点击按钮操作的类型
+    upDataLoading: false
   }
 
   constructor(props: RoleProps) {
@@ -69,6 +71,7 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
         roleList: res.data
       })
     } catch (e) {
+      console.log(e)
       notification.error({
         description: e.errorMsg,
         message: formatMessage({ id: 'component.error' }),
@@ -76,7 +79,7 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
     }
   }
 
-  // 每次关闭的时候 清空活跃项
+  // 每次关闭抽屉的时候 清空活跃项
   initActionTag = () => {
     this.setState({
       actionTag: {},
@@ -94,11 +97,15 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
 
   handleBtnClickEdit = async (row: Role) => {
     try {
+      this.setState({
+        upDataLoading: true
+      })
       const res = await getRoleDetail({ roleId: row.roleId! })
       this.setState({
         actionTag: Object.assign({}, row, { resourceIds: res.data }),
         actionType: 'edit',
-        drawerVisible: true
+        drawerVisible: true,
+        upDataLoading: false
       })
     } catch (e) {
       notification.error({
@@ -113,6 +120,9 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
     const { roleList } = this.state
     const oldRoleList = lodash.cloneDeep(roleList)
     try {
+      this.setState({
+        upDataLoading: true
+      })
       const res = await setRole({ data: { roleId: row.roleId }, method: SetMethod['delete'] })
       for (let i = 0; i < oldRoleList.length; i++) {
         if (oldRoleList[i].roleId === res.data as number) {
@@ -121,7 +131,8 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
         }
       }
       this.setState({
-        roleList: oldRoleList
+        roleList: oldRoleList,
+        upDataLoading: false
       })
     } catch (e) {
       notification.error({
@@ -137,6 +148,9 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
       const { actionType, roleList } = this.state
       const oldRoleList = lodash.cloneDeep(roleList)
       let res: { data: Role | number }, newRoleList: Role[] = []
+      this.setState({
+        upDataLoading: true
+      })
       if (actionType === 'edit') {
         res = await setRole({ data: form, method: SetMethod['edit'] })
         newRoleList = oldRoleList.map(item => {
@@ -151,7 +165,8 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
         newRoleList = oldRoleList
       }
       this.setState({
-        roleList: newRoleList
+        roleList: newRoleList,
+        upDataLoading: false
       })
       this.initActionTag()
     } catch (e) {
@@ -163,7 +178,7 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
   }
 
   render() {
-    const { authority, drawerVisible, actionTag, actionType, roleList } = this.state
+    const { authority, drawerVisible, actionTag, actionType, roleList, upDataLoading } = this.state
     const { loading, allAuthList, originalAuthList } = this.props
     return (<PageHeaderWrapper content={<FormattedMessage id="authority-role.header.description" />}>
       <Card loading={loading}>
@@ -193,7 +208,7 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
         onClose={this.initActionTag}
         visible={drawerVisible}
       >
-        {drawerVisible ? <RoleForm actionTag={actionTag} originalAuthList={originalAuthList} allAuthList={allAuthList} onClose={this.initActionTag} onSubmit={this.handleFormSubmit} /> : null}
+        {drawerVisible ? <RoleForm actionTag={actionTag} originalAuthList={originalAuthList} upDataLoading={upDataLoading} allAuthList={allAuthList} onClose={this.initActionTag} onSubmit={this.handleFormSubmit} /> : null}
       </Drawer>
     </PageHeaderWrapper>)
   }

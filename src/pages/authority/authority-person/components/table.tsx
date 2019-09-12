@@ -1,32 +1,37 @@
 import React, { Component } from 'react'
 import {
   Table,
-  Icon,
+  Avatar,
   Button,
   Popconfirm
 } from 'antd';
 const ButtonGroup = Button.Group;
 import { formatMessage } from 'umi-plugin-react/locale';
 import { Person } from '../data.d'
+import { Role } from '@/pages/authority/authority-role/data'
 
 interface PersonTableProp {
   personList: Person[],
+  roleList: Role[],
   authority: string,
   pageSize: number,
   pageIndex: number,
   dataTotal: number,
+  getListLoading: boolean,
+  upDataLoading: boolean,
   handleBtnClickEdit: (person: Person) => void,
   handleBtnClickDeleteUpData: (person: Person) => void,
+  handleTableOnChange: (page: number, pageSize?: number | undefined) => void,
 }
 
 const PersonTable: React.FC<PersonTableProp> = (props) => {
-  const { personList, pageSize, pageIndex, dataTotal } = props
+  const { personList, pageSize, pageIndex, dataTotal, getListLoading, upDataLoading, handleTableOnChange, handleBtnClickDeleteUpData, handleBtnClickEdit } = props
   const columns = [
     {
       title: formatMessage({ id: 'authority-person.table.id' }),
       dataIndex: 'id',
       key: 'id',
-      // render: (text: IRoute, record: IRoute, index: number) => {
+      // render: (text: Person, record: Person, index: number) => {
       //   return formatMessage({ id: `menu.${record.name}` })
       // }
     },
@@ -35,16 +40,25 @@ const PersonTable: React.FC<PersonTableProp> = (props) => {
       dataIndex: 'username',
       key: 'username',
       // width: '15%',
-      // render: (text: Role, record: Role, index: number) => {
+      // render: (text: Person, record: Person, index: number) => {
       //   return formatMessage({ id: `authority-role.table.${record.name}` })
       // }
+    },
+    {
+      title: formatMessage({ id: 'authority-person.table.role' }),
+      dataIndex: 'roles',
+      key: 'roles',
+      // width: '15%',
+      render: (text: Person, record: Person, index: number) => {
+        return Array.isArray(record.roles) && record.roles.length > 0 ? record.roles![0].roleName : ''
+      }
     },
     {
       title: formatMessage({ id: 'authority-person.table.phone' }),
       dataIndex: 'phoneNumber',
       key: 'phoneNumber',
       // width: '15%',
-      // render: (text: Role, record: Role, index: number) => {
+      // render: (text: Person, record: Person, index: number) => {
       //   return formatMessage({ id: `authority-role.table.${record.name}` })
       // }
     },
@@ -53,16 +67,14 @@ const PersonTable: React.FC<PersonTableProp> = (props) => {
       dataIndex: 'iconUrl',
       key: 'iconUrl',
       // width: '15%',
-      // render: (text: Role, record: Role, index: number) => {
-      //   return formatMessage({ id: `authority-role.table.${record.name}` })
-      // }
+      render: (text: Person, record: Person, index: number) => (<Avatar src={record.iconUrl} />)
     },
     {
       title: formatMessage({ id: 'authority-person.table.operation' }),
       key: 'action',
       width: '20%',
       render: (text: Person, record: Person, index: number) => {
-        const { handleBtnClickDeleteUpData, handleBtnClickEdit } = props
+
         return (
           <ButtonGroup>
             <Button onClick={() => handleBtnClickEdit(record)}>
@@ -73,7 +85,7 @@ const PersonTable: React.FC<PersonTableProp> = (props) => {
               okText={formatMessage({ id: 'component.confirm' })}
               cancelText={formatMessage({ id: 'component.cancel' })}
               onConfirm={() => handleBtnClickDeleteUpData(record)}>
-              <Button type="danger">{formatMessage({ id: 'authority-person.table.delete' })}</Button>
+              <Button type="danger" loading={upDataLoading} disabled={upDataLoading}>{formatMessage({ id: 'authority-person.table.delete' })}</Button>
             </Popconfirm>
           </ButtonGroup >
         )
@@ -81,8 +93,9 @@ const PersonTable: React.FC<PersonTableProp> = (props) => {
     }
   ]
   return <Table
-    rowKey={record => `${record.roleId}rowKey`}
-    pagination={{ current: pageIndex, pageSize: pageSize, simple: true, total: dataTotal, }}
+    loading={getListLoading}
+    rowKey={record => `${record.id}rowKey`}
+    pagination={{ current: pageIndex, pageSize: pageSize, total: dataTotal, onChange: handleTableOnChange }}
     defaultExpandAllRows={true}
     columns={columns}
     dataSource={personList} />

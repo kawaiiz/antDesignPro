@@ -63,7 +63,7 @@ class AuthorityTree extends Component<Authprops, AuthState> {
     this.state.authority = typeof authority === 'string' ? authority : authority[0]
   }
 
-  // 每次关闭的时候 清空活跃项
+  // 每次关闭抽屉的时候 清空活跃项
   initActionTag = () => {
     this.setState({
       actionTag: {

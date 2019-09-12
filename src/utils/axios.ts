@@ -63,15 +63,15 @@ const refreshAuthLogic = (failedRequest: any) => axios({
 
 // 处理错误请求的跳转
 const errRouter = (errorInfo: Res) => {
-  if (errorInfo.status === 404 || errorInfo.status === 500 || errorInfo.status === 403) {
+  if (errorInfo.status === 404 || errorInfo.status === 500) {
     router.push({
       pathname: `/error-page/${errorInfo.status.toString()}`
     })
-  } else {
+  } /* else {
     router.push({
       pathname: `/error-page/500`
     })
-  }
+  } */
 }
 
 // 初始化拦截器
@@ -122,11 +122,12 @@ class HttpRequest {
         }
       }
       // Reject promise if the error status is not in options.ports or defaults.ports
-      const statusCodes: number[] = [401, 403]
-      if (!errorInfo || (errorInfo.status && statusCodes.indexOf(+errorInfo.status) === -1)) {
+      const refreshStatusCodes: number[] = [401]
+      // 判断是不是特殊错误 没有返回信息  或 不是401 的进
+      if (!errorInfo || (errorInfo.status && refreshStatusCodes.indexOf(errorInfo.status) === -1)) {
         errRouter(errorInfo)
-        let errMsg = {
-          msg: 'Page error'
+        let errMsg = errorInfo.data || {
+          errorMsg: 'Page Error'
         }
         return Promise.reject(errMsg)
       }
