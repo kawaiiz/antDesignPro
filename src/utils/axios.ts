@@ -1,5 +1,4 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
-import createAuthRefreshInterceptor from './axios-auth-refresh';
 import router from 'umi/router';
 import { getToken, delToken, setToken } from '@/utils/utils'
 import { notification } from 'antd';
@@ -41,8 +40,9 @@ const refreshAuthLogic = (failedRequest: any) => axios({
   method: 'get',
   params: { refreshToken: getToken(REFRESH_TOKEN) }
 }).then(tokenRefreshResponse => {
+  console.log(tokenRefreshResponse)
   if (tokenRefreshResponse.status === 1007) {
-    return Promise.reject();
+    return Promise.reject(tokenRefreshResponse.data);
   }
   setToken(`${tokenRefreshResponse.data.data.token_type} ${tokenRefreshResponse.data.data.access_token}`);
   setToken(tokenRefreshResponse.data.data.refresh_token, REFRESH_TOKEN);
@@ -58,7 +58,7 @@ const refreshAuthLogic = (failedRequest: any) => axios({
   router.push({
     pathname: '/user/login',
   });
-  return Promise.reject();
+  return Promise.reject(err);
 })
 
 // 处理错误请求的跳转

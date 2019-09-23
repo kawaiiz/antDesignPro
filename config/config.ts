@@ -61,7 +61,7 @@ export const MyConfig = {
     dev: 'http://192.168.1.222:8080',
     // dev: 'http://192.168.1.74:3001',
     // dev: '',
-    pro: 'http://192.168.1.74:3001',
+    pro: 'http://192.168.1.222:8080',
   },
   // 底部的文字
   footerContent: {
@@ -72,7 +72,8 @@ export const MyConfig = {
   cookieExpires: 7,
   // token 名称
   token: 'token',
-  refreshToken: 'refreshToken'
+  refreshToken: 'refreshToken',
+  upImgFileUrl: '/api/web/file/img'
 };
 
 export default {

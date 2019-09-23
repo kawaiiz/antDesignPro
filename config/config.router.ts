@@ -89,6 +89,12 @@ const routes: IRoute[] = [
           path: '/',
           redirect: '/home',
         }, {
+          name: 'settings',
+          path: '/account/settings',
+          component: './account/settings',
+          hideInMenu: true,
+        },
+        {
           name: '404',
           path: '/error-page/404',
           component: './error-page/404/index',

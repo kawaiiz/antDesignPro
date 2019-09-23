@@ -10,6 +10,10 @@ import { CurrentUser } from '@/models/user';
 import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
 
+import { MyConfig } from '../../../config/config'
+
+const baseUrl = process.env.NODE_ENV !== 'production' ? MyConfig.baseUrl.dev : MyConfig.baseUrl.pro
+
 export interface GlobalHeaderRightProps extends ConnectProps {
   currentUser?: CurrentUser;
   menu?: boolean;
@@ -32,15 +36,14 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
 
   render(): React.ReactNode {
     const { currentUser = { iconUrl: '', username: '' }, menu } = this.props;
-
     const menuHeaderDropdown = (
       <Menu className={styles.menu} selectedKeys={[]} onClick={this.onMenuClick}>
-        {menu && (
+        {/* {menu && (
           <Menu.Item key="center">
             <Icon type="user" />
             <FormattedMessage id="menu.account.center" defaultMessage="account center" />
           </Menu.Item>
-        )}
+        )} */}
         {menu && (
           <Menu.Item key="settings">
             <Icon type="setting" />
@@ -59,7 +62,7 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
     return currentUser && currentUser.username ? (
       <HeaderDropdown overlay={menuHeaderDropdown}>
         <span className={`${styles.action} ${styles.account}`}>
-          <Avatar size="small" className={styles.avatar} src={currentUser.iconUrl} alt="avatar" />
+          <Avatar size="small" className={styles.avatar} src={baseUrl+currentUser.iconUrl} alt="avatar" />
           <span className={styles.name}>{currentUser.username}</span>
         </span>
       </HeaderDropdown>

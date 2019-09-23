@@ -8,11 +8,23 @@ import {
   Select,
   Button,
   Popover,
-  Progress
+  Progress,
+  Upload,
+  message,
+  Icon
 } from 'antd'
 import { Person } from '../data.d'
 import { Role } from '@/pages/authority/authority-role/data'
+import { notification } from 'antd';
+
 const { Option } = Select
+
+import { getToken } from '@/utils/utils'
+
+import { MyConfig } from '../../../../../config/config'
+
+const baseUrl = process.env.NODE_ENV !== 'production' ? MyConfig.baseUrl.dev : MyConfig.baseUrl.pro
+const upImgFileUrl = MyConfig.upImgFileUrl
 
 interface PersonFormProp extends FormComponentProps {
   actionTag: Person,
@@ -22,12 +34,29 @@ interface PersonFormProp extends FormComponentProps {
   onSubmit: (from: Person) => void
 }
 
+function getBase64(img: any, callback: Function) {
+  const reader = new FileReader();
+  reader.addEventListener('load', () => callback(reader.result));
+  reader.readAsDataURL(img);
+}
+
+function beforeUpload(file: any) {
+  const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+  if (!isJpgOrPng) {
+    message.error('You can only upload JPG/PNG file!');
+  }
+  const isLt2M = file.size / 1024 / 1024 < 2;
+  if (!isLt2M) {
+    message.error('Image must smaller than 2MB!');
+  }
+  return isJpgOrPng && isLt2M;
+}
+
 const PersonForm: React.FC<PersonFormProp> = (props) => {
   const { form, onClose, actionTag, onSubmit, upDataLoading, roleList } = props;
   const { getFieldDecorator } = form;
 
   const handleSubmit = () => {
-    console.log(form)
     try {
       form.validateFields((err, value) => {
         console.log(value)
@@ -101,8 +130,10 @@ const PersonForm: React.FC<PersonFormProp> = (props) => {
   };
 
   const [help, setHelp] = useState('')
+  const [loading, setLoading] = useState(false)
   const [visible, setVisible] = useState(false)
   const [confirmDirty, setConfirmDirty] = useState(false)
+  const token = getToken()
 
   const checkConfirm = (rule: any, value: string, callback: (messgae?: string) => void) => {
     const { form } = props;
@@ -126,7 +157,6 @@ const PersonForm: React.FC<PersonFormProp> = (props) => {
         callback();
       }
     } else {
-      console.log(value)
       setHelp('')
       if (!visible) {
         setVisible(!!value)
@@ -143,6 +173,33 @@ const PersonForm: React.FC<PersonFormProp> = (props) => {
     }
   };
 
+  const upFile = (e: any) => {
+    console.log('Upload event:', e);
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e && e.fileList;
+  };
+
+  const handleChange = (info: any) => {
+    if (info.file.status === 'uploading') {
+      setLoading(true)
+      return;
+    }
+    if (info.file.status === 'done') {
+      // Get this url from response in real world.
+      setLoading(false)
+      if (info.file.response.status === 200) {
+        actionTag.iconUrl = info.file.response.data[0]
+        return info.file.response.data[0]
+      } else {
+        notification.error({
+          description: info.file.response.errorMsg,
+          message: formatMessage({ id: 'component.error' }),
+        });
+      }
+    }
+  };
 
   return (
     <Form layout="vertical" onSubmit={handleSubmit}>
@@ -229,6 +286,25 @@ const PersonForm: React.FC<PersonFormProp> = (props) => {
             size="large"
             type="password"
           />,
+        )}
+      </Form.Item>
+      <Form.Item label={formatMessage({ id: 'authority-person.form.icon' })}>
+        {getFieldDecorator('iconUrl', {
+          initialValue: actionTag.iconUrl,
+          getValueFromEvent: handleChange,
+        })(
+          <Upload
+            name="iconUrl"
+            action={baseUrl + upImgFileUrl}
+            listType="picture-card"
+            accept="image/jpg,image/jpge,image/png"
+            showUploadList={false}
+            headers={{ 'Authorization': token }}
+          >
+            {actionTag.iconUrl ? <img src={baseUrl + actionTag.iconUrl} alt="avatar" style={{ width: '100%' }} /> : (<div>
+              <Icon type={loading ? 'loading' : 'plus'} />
+            </div>)}
+          </Upload>,
         )}
       </Form.Item>
       <Form.Item>

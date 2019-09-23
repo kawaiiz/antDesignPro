@@ -7,5 +7,7 @@ export default {
   'component.error': '错误',
   'component.success': '成功',
   'component.add': '新增',
-  'component.detele': '删除'
+  'component.detele': '删除',
+  'component.actionError': '操作错误',
+  'component.actionSuccess': '操作成功',
 };

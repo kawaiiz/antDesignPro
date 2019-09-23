@@ -134,6 +134,10 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
         roleList: oldRoleList,
         upDataLoading: false
       })
+      notification.success({
+        description: res.errorMsg ? res.errorMsg : formatMessage({ id: 'component.actionSuccess' }),
+        message: formatMessage({ id: 'component.success' }),
+      });
     } catch (e) {
       notification.error({
         description: e.errorMsg,
@@ -147,7 +151,7 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
     try {
       const { actionType, roleList } = this.state
       const oldRoleList = lodash.cloneDeep(roleList)
-      let res: { data: Role | number }, newRoleList: Role[] = []
+      let res: { data?: Role | number, errorMsg: string } = { errorMsg: formatMessage({ id: 'component.actionError' }) }, newRoleList: Role[] = []
       this.setState({
         upDataLoading: true
       })
@@ -168,10 +172,14 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
         roleList: newRoleList,
         upDataLoading: false
       })
+      notification.success({
+        description: res.errorMsg ? res.errorMsg : formatMessage({ id: 'component.actionSuccess' }),
+        message: formatMessage({ id: 'component.success' }),
+      });
       this.initActionTag()
     } catch (e) {
       notification.error({
-        description: e.errorMsg,
+        description: e.errorMsg ? e.errorMsg : formatMessage({ id: 'component.actionError' }),
         message: formatMessage({ id: 'component.error' }),
       });
     }

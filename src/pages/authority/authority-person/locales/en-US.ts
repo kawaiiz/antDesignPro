@@ -1,5 +1,5 @@
 export default {
-  'authority-person.header.description': 'The system person setting of the system.',
+  'authority-person.header.description': 'The system personnel settings.',
   'authority-person.warning': 'Non-administrator cannot manipulate the table',
   'authority-person.table.id': 'id',
   'authority-person.table.name': 'Name',
@@ -16,6 +16,7 @@ export default {
   'authority-person.form.hide': 'hide',
   'authority-person.form.name': 'name',
   'authority-person.form.phone': 'phone number',
+  'authority-person.form.icon': 'avater',
   'authority-person.form.desc': 'desc',
   'authority-person.form.role': 'Permission role',
   'authority-person.form.password': 'password',

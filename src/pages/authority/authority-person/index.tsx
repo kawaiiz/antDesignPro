@@ -161,6 +161,10 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
         personList: oldPersonList,
         upDataLoading: false
       })
+      notification.success({
+        description: res.errorMsg ? res.errorMsg : formatMessage({ id: 'component.actionSuccess' }),
+        message: formatMessage({ id: 'component.success' }),
+      });
     } catch (e) {
       notification.error({
         description: e.errorMsg,
@@ -174,7 +178,7 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
     try {
       const { actionType, personList } = this.state
       const oldPersonList = lodash.cloneDeep(personList)
-      let res: { data: Person | number }, newPersonList: Person[] = []
+      let res: { data?: Person | number, errorMsg: string } = { errorMsg: formatMessage({ id: 'component.actionError' }) }, newPersonList: Person[] = []
       this.setState({
         upDataLoading: true
       })
@@ -195,13 +199,16 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
         personList: newPersonList,
         upDataLoading: false
       })
+      notification.success({
+        description: res.errorMsg ? res.errorMsg : formatMessage({ id: 'component.actionSuccess' }),
+        message: formatMessage({ id: 'component.success' }),
+      });
       this.initActionTag()
     } catch (e) {
       notification.error({
-        description: e.errorMsg ? e.errorMsg : '请求失败',
+        description: e.errorMsg ? e.errorMsg : formatMessage({ id: 'component.actionError' }),
         message: formatMessage({ id: 'component.error' }),
       });
-      return Promise.reject()
     }
   }
 

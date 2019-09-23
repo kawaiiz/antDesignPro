@@ -1,5 +1,5 @@
 export default {
-  'authority-person.header.description': '該系統的系統角色設定。',
+  'authority-person.header.description': '該系統的系統人員設定。',
   'authority-person.warning': '非管理員不能操作該表格',
   'authority-person.table.id': '編號',
   'authority-person.table.desc': '描述',
@@ -16,6 +16,7 @@ export default {
   'authority-person.form.hide': '隱藏',
   'authority-person.form.name': '名稱',
   'authority-person.form.phone': '手機号码',
+  'authority-person.form.icon': '頭像',
   'authority-person.form.desc': '描述',
   'authority-person.form.role': '權限角色',
   'authority-person.form.password': '密碼',
