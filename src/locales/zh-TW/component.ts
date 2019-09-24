@@ -8,6 +8,8 @@ export default {
   'component.success': '成功',
   'component.add': '新增',
   'component.detele': '删除',
-  'component.actionError': '操作錯誤',
-  'component.actionSuccess': '操作成功',
+  'component.action-error': '操作失敗',
+  'component.action-success': '操作成功',
+  'component.captcha-get': '獲取驗證碼',
+  'component.phone-style': '檢查手機號格式',
 };

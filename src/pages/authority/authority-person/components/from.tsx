@@ -10,7 +10,6 @@ import {
   Popover,
   Progress,
   Upload,
-  message,
   Icon
 } from 'antd'
 import { Person } from '../data.d'
@@ -19,11 +18,10 @@ import { notification } from 'antd';
 
 const { Option } = Select
 
-import { getToken } from '@/utils/utils'
+import { getToken, getBaseUrl } from '@/utils/utils'
 
 import { MyConfig } from '../../../../../config/config'
 
-const baseUrl = process.env.NODE_ENV !== 'production' ? MyConfig.baseUrl.dev : MyConfig.baseUrl.pro
 const upImgFileUrl = MyConfig.upImgFileUrl
 
 interface PersonFormProp extends FormComponentProps {
@@ -32,24 +30,6 @@ interface PersonFormProp extends FormComponentProps {
   upDataLoading: boolean,
   onClose: () => void,
   onSubmit: (from: Person) => void
-}
-
-function getBase64(img: any, callback: Function) {
-  const reader = new FileReader();
-  reader.addEventListener('load', () => callback(reader.result));
-  reader.readAsDataURL(img);
-}
-
-function beforeUpload(file: any) {
-  const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-  if (!isJpgOrPng) {
-    message.error('You can only upload JPG/PNG file!');
-  }
-  const isLt2M = file.size / 1024 / 1024 < 2;
-  if (!isLt2M) {
-    message.error('Image must smaller than 2MB!');
-  }
-  return isJpgOrPng && isLt2M;
 }
 
 const PersonForm: React.FC<PersonFormProp> = (props) => {
@@ -132,7 +112,7 @@ const PersonForm: React.FC<PersonFormProp> = (props) => {
   const [help, setHelp] = useState('')
   const [loading, setLoading] = useState(false)
   const [visible, setVisible] = useState(false)
-  const [confirmDirty, setConfirmDirty] = useState(false)
+  const [confirmDirty, setConfirmDirty] = useState(false) // 不知道干嘛的 字面意思 脏检查？ 
   const token = getToken()
 
   const checkConfirm = (rule: any, value: string, callback: (messgae?: string) => void) => {
@@ -171,14 +151,6 @@ const PersonForm: React.FC<PersonFormProp> = (props) => {
         callback();
       }
     }
-  };
-
-  const upFile = (e: any) => {
-    console.log('Upload event:', e);
-    if (Array.isArray(e)) {
-      return e;
-    }
-    return e && e.fileList;
   };
 
   const handleChange = (info: any) => {
@@ -295,13 +267,13 @@ const PersonForm: React.FC<PersonFormProp> = (props) => {
         })(
           <Upload
             name="iconUrl"
-            action={baseUrl + upImgFileUrl}
+            action={getBaseUrl() + upImgFileUrl}
             listType="picture-card"
             accept="image/jpg,image/jpge,image/png"
             showUploadList={false}
             headers={{ 'Authorization': token }}
           >
-            {actionTag.iconUrl ? <img src={baseUrl + actionTag.iconUrl} alt="avatar" style={{ width: '100%' }} /> : (<div>
+            {actionTag.iconUrl ? <img src={getBaseUrl() + actionTag.iconUrl} alt="avatar" style={{ width: '100%' }} /> : (<div>
               <Icon type={loading ? 'loading' : 'plus'} />
             </div>)}
           </Upload>,

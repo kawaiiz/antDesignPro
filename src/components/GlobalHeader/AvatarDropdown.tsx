@@ -9,10 +9,7 @@ import { ConnectProps, ConnectState } from '@/models/connect';
 import { CurrentUser } from '@/models/user';
 import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
-
-import { MyConfig } from '../../../config/config'
-
-const baseUrl = process.env.NODE_ENV !== 'production' ? MyConfig.baseUrl.dev : MyConfig.baseUrl.pro
+import { getBaseUrl } from '@/utils/utils'
 
 export interface GlobalHeaderRightProps extends ConnectProps {
   currentUser?: CurrentUser;
@@ -62,7 +59,7 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
     return currentUser && currentUser.username ? (
       <HeaderDropdown overlay={menuHeaderDropdown}>
         <span className={`${styles.action} ${styles.account}`}>
-          <Avatar size="small" className={styles.avatar} src={baseUrl+currentUser.iconUrl} alt="avatar" />
+          <Avatar size="small" className={styles.avatar} src={getBaseUrl()+currentUser.iconUrl} alt="avatar" />
           <span className={styles.name}>{currentUser.username}</span>
         </span>
       </HeaderDropdown>

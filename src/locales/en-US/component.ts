@@ -8,6 +8,8 @@ export default {
   'component.success': 'success',
   'component.add': 'add',
   'component.detele': 'detele',
-  'component.actionError': 'action error',
-  'component.actionSuccess': 'action success',
+  'component.action-error': 'action fail',
+  'component.action-success': 'action success',
+  'component.captcha-get': 'get captcha',
+  'component.phone-style': 'Check mobile phone number format',
 };

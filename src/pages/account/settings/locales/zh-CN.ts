@@ -5,6 +5,7 @@ export default {
   'account-settings.menuMap.notification': '新消息通知',
   'account-settings.basic.avatar': '头像',
   'account-settings.basic.change-avatar': '更换头像',
+
   'account-settings.basic.email': '邮箱',
   'account-settings.basic.email-message': '请输入您的邮箱!',
   'account-settings.basic.nickname': '昵称',
@@ -20,6 +21,10 @@ export default {
   'account-settings.basic.address-message': '请输入您的街道地址!',
   'account-settings.basic.phone': '联系电话',
   'account-settings.basic.phone-message': '请输入您的联系电话!',
+  'account-settings.basic.phone-message2': '请注意电话格式!',
+  'account-settings.basic.captcha': '验证码',
+  'account-settings.basic.captcha-message': '请输入验证码!',
+  'account-settings.basic.captcha-get': '获取验证码',
   'account-settings.basic.update': '更新基本信息',
   'account-settings.basic.update.success': '更新基本信息成功',
   'account-settings.security.strong': '强',

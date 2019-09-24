@@ -1,14 +1,10 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 import router from 'umi/router';
-import { getToken, delToken, setToken } from '@/utils/utils'
+import { getToken, delToken, setToken,getBaseUrl } from '@/utils/utils'
 import { notification } from 'antd';
 import { MyConfig } from '../../config/config'
 
 const REFRESH_TOKEN = MyConfig.refreshToken
-
-const baseUrl = process.env.NODE_ENV !== 'production' ? MyConfig.baseUrl.dev : MyConfig.baseUrl.pro
-
-
 
 // 返回的信息格式
 export interface Res {
@@ -36,7 +32,7 @@ let requests: any[] = [] // 请求数组
 
 // axios 返回拦截器刷新token的函数
 const refreshAuthLogic = (failedRequest: any) => axios({
-  url: `${baseUrl}/api/public/web/refresh-token`,
+  url: `${getBaseUrl()}/api/public/web/refresh-token`,
   method: 'get',
   params: { refreshToken: getToken(REFRESH_TOKEN) }
 }).then(tokenRefreshResponse => {
@@ -84,7 +80,7 @@ class HttpRequest {
   baseUrl: string
   queue: object
   constructor() {
-    this.baseUrl = baseUrl
+    this.baseUrl = getBaseUrl()
     this.queue = {}
   }
 

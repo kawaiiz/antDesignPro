@@ -1,5 +1,9 @@
 import { parse } from 'querystring';
 import Cookies from 'js-cookie'
+
+import { MyConfig } from '../../config/config'
+
+
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
 
@@ -24,7 +28,6 @@ export const isAntDesignProOrDev = (): boolean => {
 export const getPageQuery = () => parse(window.location.href.split('?')[1]);
 
 
-import { MyConfig } from '../../config/config'
 
 export const TOKEN_KEY = MyConfig.token
 
@@ -45,3 +48,7 @@ export const delToken = (tokanName?: string) => {
   localStorage.removeItem(tokanName ? tokanName : TOKEN_KEY);
 }
 
+export const getBaseUrl = (): string => {
+  return process.env.NODE_ENV !== 'production' ? MyConfig.baseUrl.dev : MyConfig.baseUrl.pro
+
+}

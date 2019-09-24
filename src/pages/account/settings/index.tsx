@@ -1,25 +1,23 @@
 import React, { Component } from 'react';
-
+import { ConnectState } from '@/models/connect';
 import { Dispatch } from 'redux';
-import { FormattedMessage } from 'umi-plugin-react/locale';
-import { GridContent } from '@ant-design/pro-layout';
-import { Menu } from 'antd';
 import { connect } from 'dva';
+import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
+import { GridContent } from '@ant-design/pro-layout';
+import { Menu, notification } from 'antd';
 import BaseView from './components/base';
-import BindingView from './components/binding';
-import { CurrentUser } from './data.d';
 import NotificationView from './components/notification';
-import SecurityView from './components/security';
 import styles from './style.less';
+import { CurrentUser } from '@/models/user';
 
 const { Item } = Menu;
 
 interface SettingsProps {
-  dispatch: Dispatch<any>;
   currentUser: CurrentUser;
+  dispatch: Dispatch<any>,
 }
 
-type SettingsStateKeys = 'base' | 'security' | 'binding' | 'notification';
+type SettingsStateKeys = 'base' | 'notification';
 interface SettingsState {
   mode: 'inline' | 'horizontal';
   menuMap: {
@@ -27,31 +25,22 @@ interface SettingsState {
   };
   selectKey: SettingsStateKeys;
 }
-@connect(({ accountSettings }: { accountSettings: { currentUser: CurrentUser } }) => ({
-  currentUser: accountSettings.currentUser,
-}))
+
+@connect(
+  ({ user }: ConnectState) => ({
+    currentUser: user.currentUser,
+  })
+)
 class Settings extends Component<
-  SettingsProps,
-  SettingsState
+SettingsProps,
+SettingsState
 > {
   main: HTMLDivElement | undefined = undefined;
-
   constructor(props: SettingsProps) {
     super(props);
     const menuMap = {
       base: <FormattedMessage id="account-settings.menuMap.basic" defaultMessage="Basic Settings" />,
-      security: (
-        <FormattedMessage id="account-settings.menuMap.security" defaultMessage="Security Settings" />
-      ),
-      binding: (
-        <FormattedMessage id="account-settings.menuMap.binding" defaultMessage="Account Binding" />
-      ),
-      notification: (
-        <FormattedMessage
-          id="account-settings.menuMap.notification"
-          defaultMessage="New Message Notification"
-        />
-      ),
+      notification: <FormattedMessage id="account-settings.menuMap.notification" defaultMessage="New Message Notification" />
     };
     this.state = {
       mode: 'inline',
@@ -61,10 +50,6 @@ class Settings extends Component<
   }
 
   componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'accountSettings/fetchCurrent',
-    });
     window.addEventListener('resize', this.resize);
     this.resize();
   }
@@ -73,22 +58,26 @@ class Settings extends Component<
     window.removeEventListener('resize', this.resize);
   }
 
+  // 左边菜单
   getMenu = () => {
     const { menuMap } = this.state;
     return Object.keys(menuMap).map(item => <Item key={item}>{menuMap[item]}</Item>);
   };
 
+  // 左边菜单标题
   getRightTitle = () => {
     const { selectKey, menuMap } = this.state;
     return menuMap[selectKey];
   };
 
+  // 选择的菜单
   selectKey = (key: SettingsStateKeys) => {
     this.setState({
       selectKey: key,
     });
   };
 
+  // 监听屏幕变化
   resize = () => {
     if (!this.main) {
       return;
@@ -111,29 +100,43 @@ class Settings extends Component<
     });
   };
 
+  // 修改个人信息
+  handlerChangeUserinfo = async (from: any) => {
+    try {
+      const { dispatch } = this.props;
+      await dispatch({
+        type: 'user/changeCurrent',
+        payload: from
+      });
+      notification.success({
+        description: formatMessage({ id: 'component.action-success' }),
+        message: formatMessage({ id: 'component.success' }),
+      });
+    } catch (e) {
+      console.log(e)
+      notification.error({
+        description: e.errorMsg,
+        message: formatMessage({ id: 'component.error' }),
+      });
+    }
+  }
+
+  // 渲染 菜单对应的内容
   renderChildren = () => {
     const { selectKey } = this.state;
+    const { currentUser } = this.props
     switch (selectKey) {
       case 'base':
-        return <BaseView />;
-      case 'security':
-        return <SecurityView />;
-      case 'binding':
-        return <BindingView />;
+        return <BaseView currentUser={currentUser} onSubmit={this.handlerChangeUserinfo} />;
       case 'notification':
         return <NotificationView />;
       default:
         break;
     }
-
     return null;
   };
 
   render() {
-    const { currentUser } = this.props;
-    if (!currentUser.userid) {
-      return '';
-    }
     const { mode, selectKey } = this.state;
     return (
       <GridContent>

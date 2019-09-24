@@ -9,9 +9,8 @@ const ButtonGroup = Button.Group;
 import { formatMessage } from 'umi-plugin-react/locale';
 import { Person } from '../data.d'
 import { Role } from '@/pages/authority/authority-role/data'
-import { MyConfig } from '../../../../../config/config'
+import { getBaseUrl } from '@/utils/utils'
 
-const baseUrl = process.env.NODE_ENV !== 'production' ? MyConfig.baseUrl.dev : MyConfig.baseUrl.pro
 interface PersonTableProp {
   personList: Person[],
   roleList: Role[],
@@ -69,7 +68,7 @@ const PersonTable: React.FC<PersonTableProp> = (props) => {
       dataIndex: 'iconUrl',
       key: 'iconUrl',
       // width: '15%',
-      render: (text: Person, record: Person, index: number) => (<Avatar src={baseUrl+record.iconUrl} />)
+      render: (text: Person, record: Person, index: number) => (<Avatar src={getBaseUrl()+record.iconUrl} />)
     },
     {
       title: formatMessage({ id: 'authority-person.table.operation' }),

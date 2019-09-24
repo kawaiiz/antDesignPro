@@ -162,7 +162,7 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
         upDataLoading: false
       })
       notification.success({
-        description: res.errorMsg ? res.errorMsg : formatMessage({ id: 'component.actionSuccess' }),
+        description: res.errorMsg ? res.errorMsg : formatMessage({ id: 'component.action-success' }),
         message: formatMessage({ id: 'component.success' }),
       });
     } catch (e) {
@@ -178,7 +178,7 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
     try {
       const { actionType, personList } = this.state
       const oldPersonList = lodash.cloneDeep(personList)
-      let res: { data?: Person | number, errorMsg: string } = { errorMsg: formatMessage({ id: 'component.actionError' }) }, newPersonList: Person[] = []
+      let res: { data?: Person | number, errorMsg: string } = { errorMsg: formatMessage({ id: 'component.action-error' }) }, newPersonList: Person[] = []
       this.setState({
         upDataLoading: true
       })
@@ -200,13 +200,13 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
         upDataLoading: false
       })
       notification.success({
-        description: res.errorMsg ? res.errorMsg : formatMessage({ id: 'component.actionSuccess' }),
+        description: res.errorMsg ? res.errorMsg : formatMessage({ id: 'component.action-success' }),
         message: formatMessage({ id: 'component.success' }),
       });
       this.initActionTag()
     } catch (e) {
       notification.error({
-        description: e.errorMsg ? e.errorMsg : formatMessage({ id: 'component.actionError' }),
+        description: e.errorMsg ? e.errorMsg : formatMessage({ id: 'component.action-error' }),
         message: formatMessage({ id: 'component.error' }),
       });
     }

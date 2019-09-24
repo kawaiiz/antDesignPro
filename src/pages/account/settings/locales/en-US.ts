@@ -20,6 +20,11 @@ export default {
   'account-settings.basic.address-message': 'Please input your address!',
   'account-settings.basic.phone': 'Phone Number',
   'account-settings.basic.phone-message': 'Please input your phone!',
+  'account-settings.basic.phone-message2': 'Please note the telephone format!',
+
+  'account-settings.basic.captcha': 'Captcha',
+  'account-settings.basic.captcha-message': 'Please input captcha!',
+  'account-settings.basic.captcha-get': 'get captcha',
   'account-settings.basic.update': 'Update Information',
   'account-settings.basic.update.success': 'Update basic information successfully',
   'account-settings.security.strong': 'Strong',

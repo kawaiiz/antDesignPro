@@ -1,24 +1,16 @@
 import axios from '@/utils/api.request';
+import { AxiosRequestConfig } from 'axios'
+import { Method } from 'axios'
 
-export async function query(): Promise<any> {
-  return axios.request({
-    url: '/api/users',
-    method: 'GET',
-  });
-}
+export async function handleUserinfo({ data, method }: { data: { iconUrl: string, phoneNumber: string, [propName: string]: any }, method: Method }): Promise<any> {
 
-export async function queryCurrent(): Promise<any> {
-  return axios.request({
+  const options: AxiosRequestConfig = {
     url: '/api/web/user',
-    method: 'GET',
-  });
-}
-
-export async function queryNotices(): Promise<any> {
-  return axios.request({
-    url: '/api/notices',
-    method: 'GET',
-  });
+    method: method,
+  }
+  if (method == 'delete' || method == 'DELETE') options.params = data
+  else if (method === 'post' || method === 'put' || method === 'POST' || method === 'PUT') options.data = data
+  return await axios.request(options);
 }
 
 

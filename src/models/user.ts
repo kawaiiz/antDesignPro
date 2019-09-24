@@ -2,9 +2,10 @@ import { Effect } from 'dva';
 import { Reducer } from 'redux';
 import { routerRedux } from 'dva/router';
 
-import { queryCurrent, query as queryUsers } from '@/services/user';
+import { handleUserinfo } from '@/services/user';
 import { setAuthority } from '@/utils/authority';
 import { reloadAuthorized } from '@/utils/Authorized'
+import { SetMethod } from '@/utils/axios'
 import { formatMessage } from 'umi-plugin-react/locale';
 import { notification } from 'antd';
 import route from 'mock/route';
@@ -27,8 +28,8 @@ export interface UserModelType {
   namespace: 'user';
   state: UserModelState;
   effects: {
-    fetch: Effect;
     fetchCurrent: Effect;
+    changeCurrent: Effect;
   };
   reducers: {
     saveCurrentUserReducers: Reducer<UserModelState>;
@@ -47,16 +48,24 @@ const UserModel: UserModelType = {
   },
 
   effects: {
-    *fetch(_, { call, put }) {
-      const response = yield call(queryUsers);
-      yield put({
-        type: 'save',
-        payload: response,
-      });
+    // 用户修改自己的信息  这里不涉及到权限修改 所以只调用put
+    *changeCurrent({ payload }, { call, put }) {
+      try {
+        const res: any = yield call(handleUserinfo, { data: payload, method: SetMethod['edit'] });
+        yield put({
+          type: 'saveCurrentUserReducers',
+          payload: res.data,
+        });
+        return Promise.resolve(res.data)
+      } catch (e) {
+        console.log(e)
+        return Promise.reject(e)
+      }
     },
+    // 获取用户信息
     *fetchCurrent(_, { call, put }) {
       try {
-        const res: any = yield call(queryCurrent);
+        const res: any = yield call(handleUserinfo, { data: null, method: SetMethod['get'] });
         const currentData: CurrentUser = res.data
         // 设置用户身份 localstorage
         setAuthority(currentData.roles!);
