@@ -25,9 +25,8 @@ export const isAntDesignProOrDev = (): boolean => {
   return isAntDesignPro();
 };
 
+// 获取当前页面的请求参数
 export const getPageQuery = () => parse(window.location.href.split('?')[1]);
-
-
 
 export const TOKEN_KEY = MyConfig.token
 
@@ -48,7 +47,14 @@ export const delToken = (tokanName?: string) => {
   localStorage.removeItem(tokanName ? tokanName : TOKEN_KEY);
 }
 
+// 获取请求地址
 export const getBaseUrl = (): string => {
   return process.env.NODE_ENV !== 'production' ? MyConfig.baseUrl.dev : MyConfig.baseUrl.pro
+}
 
+// 判断是否拥有某个资源的权限  传入参数是资源的id
+import { IRoute } from 'umi-types/config'
+export const getResourcesAuth = (id: number | string): boolean => {
+  const originalAuthList: IRoute[] = JSON.parse(sessionStorage.getItem('originalAuthList') || '[]')
+  return originalAuthList.some(item => item.id == id && item.own)
 }

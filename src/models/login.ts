@@ -1,7 +1,7 @@
 import { Reducer } from 'redux';
 import { routerRedux } from 'dva/router';
 import { Effect } from 'dva';
-import { fakeAccountLogin, getFakeCaptcha } from '@/services/login';
+import { fakeAccountLogin, fakeMobileLogin } from '@/services/login';
 import { setAuthority } from '@/utils/authority';
 import { getPageQuery, setToken, delToken } from '@/utils/utils';
 import { formatMessage } from 'umi-plugin-react/locale';
@@ -23,7 +23,6 @@ export interface LoginModelType {
   state: StateType;
   effects: {
     login: Effect;
-    getCaptcha: Effect;
     logout: Effect;
   };
   reducers: {
@@ -40,7 +39,12 @@ const Model: LoginModelType = {
   effects: {
     *login({ payload }, { call, put }) {
       try {
-        const res = yield call(fakeAccountLogin, payload);
+        let res
+        if (payload.type === "mobile") {
+          res = yield call(fakeMobileLogin, payload);
+        } else if (payload.type === "account") {
+          res = yield call(fakeAccountLogin, payload);
+        }
         yield put({
           type: 'changeLoginStatusReducers',
           payload: res,
@@ -75,10 +79,6 @@ const Model: LoginModelType = {
         });
         return Promise.reject(e)
       }
-    },
-
-    *getCaptcha({ payload }, { call }) {
-      yield call(getFakeCaptcha, payload);
     },
     *logout(_, { put }) {
       const { redirect } = getPageQuery();
@@ -129,7 +129,6 @@ const Model: LoginModelType = {
 
   reducers: {
     changeLoginStatusReducers(state, { payload }) {
-
       return {
         ...state,
         status: payload.status,

@@ -7,6 +7,7 @@ export interface LoginParamsType {
   captcha: string;
 }
 
+// 用户名登录
 export async function fakeAccountLogin(params: LoginParamsType): Promise<any> {
   return axios.request({
     url: '/api/public/web/login',
@@ -15,14 +16,10 @@ export async function fakeAccountLogin(params: LoginParamsType): Promise<any> {
   });
 }
 
-interface mobile {
-  mobile: string
-}
-
-export async function getFakeCaptcha(params: mobile): Promise<any> {
+export async function fakeMobileLogin(params: LoginParamsType): Promise<any> {
   return axios.request({
-    url: '/api/login/captcha',
-    method: 'GET',
-    params,
+    url: '/api/public/web/login-by-phone-number',
+    method: 'POST',
+    data: params,
   });
 }

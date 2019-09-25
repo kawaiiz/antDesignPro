@@ -30,15 +30,15 @@ export interface AuthModelType {
 }
 
 interface requestRoute {
-  "id": number,
-  "resourceName": string,
-  "component": string,
-  "icon": string,
-  "resourceUrl": string,
-  "operation": string,
-  "resourceType": string,
-  "pid": number,
-  "own": boolean
+  "id": number, // 路由资源id
+  "resourceName": string, // 资源名
+  "component": string, // 资源组件路径
+  "icon": string, // 图标
+  "resourceUrl": string, // 资源访问路径
+  "operation": string, // 请求方式
+  "resourceType": string, // 资源类别
+  "pid": number, // 父id
+  "own": boolean // 是否有权限操作这个资源
 }
 
 // 将扁平的一维数组 转成多维 
@@ -86,7 +86,7 @@ const AuthModel: AuthModelType = {
   namespace: 'auth',
   state: {
     allAuthList: [], //  // 多维 页面+接口 权限数组
-    authList: [], // 二维 页面权限 数组
+    authList: [], // 二维 页面权限数组
     originalAuthList: [],// 一维的权限数组 改了字段名的
     resources: [],// 后端发来的
     routes: []
@@ -96,6 +96,7 @@ const AuthModel: AuthModelType = {
       try {
         const res: { data: requestRoute[] } = yield call(setAuth, { data: null, method: SetMethod['get'] }) // 整体权限列表
         const { originalAuthList, authList, allAuthList } = processingData(res.data)
+        sessionStorage.setItem('originalAuthList', JSON.stringify(originalAuthList))
         yield put({
           type: 'setAuthListReducers',
           payload: { originalAuthList, authList, allAuthList, resources: res.data }
@@ -124,10 +125,8 @@ const AuthModel: AuthModelType = {
             }
             return item
           })
-          console.log(newResoutces)
         } else if (payload.type === 'delete') {
           for (let i = 0; i < oldResources.length; i++) {
-            console.log(oldResources[i].id, res.data)
             if (oldResources[i].id === res.data as number) {
               oldResources.splice(i, 1)
               break
@@ -136,6 +135,7 @@ const AuthModel: AuthModelType = {
           newResoutces = oldResources
         }
         const { originalAuthList, authList, allAuthList } = processingData(newResoutces)
+        sessionStorage.setItem('originalAuthList', JSON.stringify(originalAuthList))
         yield put({
           type: 'setAuthListReducers',
           payload: { originalAuthList, authList, allAuthList, resources: newResoutces }

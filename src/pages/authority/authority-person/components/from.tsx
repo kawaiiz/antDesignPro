@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { FormComponentProps } from 'antd/es/form';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import styles from '../style.less'
@@ -10,31 +10,57 @@ import {
   Popover,
   Progress,
   Upload,
-  Icon
+  Icon,
+  notification
 } from 'antd'
-import { Person } from '../data.d'
-import { Role } from '@/pages/authority/authority-role/data'
-import { notification } from 'antd';
-
 const { Option } = Select
 
+import { Person } from '../data.d'
+import { Role } from '@/pages/authority/authority-role/data'
+import { getResourcesAuth } from '@/utils/utils'
+import { setRole } from '@/pages/authority/authority-role/service'
 import { getToken, getBaseUrl } from '@/utils/utils'
-
 import { MyConfig } from '../../../../../config/config'
+import { SetMethod } from '@/utils/axios'
 
 const upImgFileUrl = MyConfig.upImgFileUrl
 
 interface PersonFormProp extends FormComponentProps {
   actionTag: Person,
-  roleList: Role[],
   upDataLoading: boolean,
   onClose: () => void,
   onSubmit: (from: Person) => void
 }
 
 const PersonForm: React.FC<PersonFormProp> = (props) => {
-  const { form, onClose, actionTag, onSubmit, upDataLoading, roleList } = props;
+  const { form, onClose, actionTag, onSubmit, upDataLoading } = props;
   const { getFieldDecorator } = form;
+  const [roleList, setRoleList] = useState([] as Role[])
+
+  // 获取权限角色数组
+  const getRoleList = async () => {
+    try {
+      if (!getResourcesAuth(46)) {
+        notification.error({
+          description: formatMessage({ id: 'component.not-role' }),
+          message: formatMessage({ id: 'component.error' }),
+        })
+        return
+      }
+      const res = await setRole({ data: {}, method: SetMethod['get'] })
+      setRoleList(res.data)
+    } catch (e) {
+      notification.error({
+        description: e.errorMsg,
+        message: formatMessage({ id: 'component.error' }),
+      });
+    }
+  }
+
+  useEffect(() => {
+    getRoleList()
+  }, [])
+
 
   const handleSubmit = () => {
     try {

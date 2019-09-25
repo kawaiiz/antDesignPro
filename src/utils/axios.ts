@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 import router from 'umi/router';
-import { getToken, delToken, setToken,getBaseUrl } from '@/utils/utils'
+import { getToken, delToken, setToken, getBaseUrl } from '@/utils/utils'
 import { notification } from 'antd';
 import { MyConfig } from '../../config/config'
 
@@ -36,8 +36,9 @@ const refreshAuthLogic = (failedRequest: any) => axios({
   method: 'get',
   params: { refreshToken: getToken(REFRESH_TOKEN) }
 }).then(tokenRefreshResponse => {
+  debugger
   console.log(tokenRefreshResponse)
-  if (tokenRefreshResponse.status === 1007) {
+  if (tokenRefreshResponse.data.status === 1007) {
     return Promise.reject(tokenRefreshResponse.data);
   }
   setToken(`${tokenRefreshResponse.data.data.token_type} ${tokenRefreshResponse.data.data.access_token}`);
@@ -45,6 +46,7 @@ const refreshAuthLogic = (failedRequest: any) => axios({
   failedRequest.response.config.headers['Authorization'] = `${tokenRefreshResponse.data.data.token_type} ${tokenRefreshResponse.data.data.access_token}`;
   return Promise.resolve(`${tokenRefreshResponse.data.data.token_type} ${tokenRefreshResponse.data.data.access_token}`);
 }).catch(err => {
+  debugger
   delToken(REFRESH_TOKEN)
   delToken()
   notification.error({
@@ -69,11 +71,6 @@ const errRouter = (errorInfo: Res) => {
     })
   } */
 }
-
-// 初始化拦截器
-// createAuthRefreshInterceptor(axios, refreshAuthLogic, {
-//   statusCodes: [401, 403]
-// });
 
 // 请求封装成类
 class HttpRequest {

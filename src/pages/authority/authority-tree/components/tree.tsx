@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { IRoute } from 'umi-types/config'
 import {
   Table,
@@ -8,6 +8,7 @@ import {
 } from 'antd';
 const ButtonGroup = Button.Group;
 import { formatMessage } from 'umi-plugin-react/locale';
+import { getResourcesAuth } from '@/utils/utils'
 
 import { toTree } from '@/models/auth'
 
@@ -18,88 +19,74 @@ interface TreeTableProp {
   handleBtnClickDeleteUpData: (auth: IRoute) => void,
 }
 
-interface TreeTableState {
-
-}
-
-class TreeTable extends Component<TreeTableProp, TreeTableState> {
-  state = {
-    columns: [
-      {
-        title: formatMessage({ id: 'authority-tree.table.name' }),
-        dataIndex: 'name',
-        key: 'name',
-        // render: (text: IRoute, record: IRoute, index: number) => {
-        //   return formatMessage({ id: `menu.${record.name}` })
-        // }
-      },
-      {
-        title: formatMessage({ id: 'authority-tree.table.path' }),
-        dataIndex: 'path',
-        key: 'path',
-        width: '20%',
-      },
-      {
-        title: formatMessage({ id: 'authority-tree.table.type' }),
-        dataIndex: 'type',
-        key: 'type',
-        width: '10%',
-        // render: (text: IRoute, record: IRoute, index: number) => {
-        //   return formatMessage({ id: `authority-tree.table.${record.type}` })
-        // }
-      },
-      {
-        title: formatMessage({ id: 'authority-tree.table.operation' }),
-        dataIndex: 'operation',
-        key: 'operation',
-        width: '10%',
-      },
-      {
-        title: formatMessage({ id: 'authority-tree.table.icon' }),
-        dataIndex: 'icon',
-        key: 'icon',
-        width: '10%',
-        render: (icon: string = ' ') => {
-          icon = icon.length > 0 ? icon : ' '
-          return <Icon type={icon} />
-        }
-      },
-      {
-        title: formatMessage({ id: 'authority-tree.table.operation' }),
-        key: 'action',
-        width: '15%',
-        render: (text: IRoute, record: IRoute, index: number) => {
-          const { handleBtnClickDeleteUpData, handleBtnClickEdit } = this.props
-          return (
-            <ButtonGroup>
-              <Button onClick={() => handleBtnClickEdit(record)}>
+const TreeTable: React.FC<TreeTableProp> = (props) => {
+  const { originalAuthList, handleBtnClickDeleteUpData, handleBtnClickEdit } = props
+  const columns = [
+    {
+      title: formatMessage({ id: 'authority-tree.table.name' }),
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: formatMessage({ id: 'authority-tree.table.path' }),
+      dataIndex: 'path',
+      key: 'path',
+      width: '20%',
+    },
+    {
+      title: formatMessage({ id: 'authority-tree.table.type' }),
+      dataIndex: 'type',
+      key: 'type',
+      width: '10%',
+    },
+    {
+      title: formatMessage({ id: 'authority-tree.table.operation' }),
+      dataIndex: 'operation',
+      key: 'operation',
+      width: '10%',
+    },
+    {
+      title: formatMessage({ id: 'authority-tree.table.icon' }),
+      dataIndex: 'icon',
+      key: 'icon',
+      width: '10%',
+      render: (icon: string = ' ') => {
+        icon = icon.length > 0 ? icon : ' '
+        return <Icon type={icon} />
+      }
+    },
+    {
+      title: formatMessage({ id: 'authority-tree.table.operation' }),
+      key: 'action',
+      width: '15%',
+      render: (text: IRoute, record: IRoute, index: number) => {
+        return (
+          <ButtonGroup>
+            {
+              getResourcesAuth(19) ? <Button onClick={() => handleBtnClickEdit(record)}>
                 {formatMessage({ id: 'authority-tree.table.edit' })}
-              </Button>
-              <Popconfirm
+              </Button> : ''
+            }
+            {
+              getResourcesAuth(38) ? <Popconfirm
                 title={`${formatMessage({ id: 'authority-tree.table.delete' })} ${record.name}?`}
                 okText={formatMessage({ id: 'component.confirm' })}
                 cancelText={formatMessage({ id: 'component.cancel' })}
                 onConfirm={() => handleBtnClickDeleteUpData(record)}>
                 <Button type="danger">{formatMessage({ id: 'authority-tree.table.delete' })}</Button>
-              </Popconfirm>
-            </ButtonGroup >
-          )
-        }
+              </Popconfirm> : ''
+            }
+          </ButtonGroup >
+        )
       }
-    ],
-  }
-
-  render() {
-    const { columns } = this.state
-    const { originalAuthList } = this.props
-
-    return <Table
-      rowKey={record => `${record.id}rowKey`}
-      pagination={false}
-      defaultExpandAllRows={true}
-      columns={columns}
-      dataSource={toTree(originalAuthList)} />
-  }
+    }
+  ]
+  return <Table
+    rowKey={record => `${record.id}rowKey`}
+    pagination={false}
+    defaultExpandAllRows={true}
+    columns={columns}
+    dataSource={toTree(originalAuthList)} />
 }
 
 export default TreeTable

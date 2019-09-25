@@ -8,6 +8,7 @@ export default {
   'component.success': '成功',
   'component.add': '新增',
   'component.detele': '删除',
+  'component.not-role': '没有权限',
   'component.action-error': '操作失败',
   'component.action-success': '操作成功',
   'component.captcha-get': '获取验证码',

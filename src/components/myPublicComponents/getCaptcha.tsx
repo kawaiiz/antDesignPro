@@ -11,11 +11,12 @@ interface getCaptchaProp {
   type: string;
   dispatch: Dispatch<any>;
   captchaTime: number,
-  captchaDisable: boolean
+  captchaDisable: boolean,
+  size?: 'small' | 'large' | 'default'
 }
 
 const getCaptcha: React.FC<getCaptchaProp> = (props) => {
-  const { captchaTime, captchaDisable, phoneNumber, type } = props
+  const { captchaTime, captchaDisable, phoneNumber, type, size } = props
   const getCaptchaRequest = async () => {
     try {
       const { dispatch } = props
@@ -38,7 +39,7 @@ const getCaptcha: React.FC<getCaptchaProp> = (props) => {
     }
   }
   return (
-    <Button onClick={getCaptchaRequest} disabled={captchaDisable}>
+    <Button onClick={getCaptchaRequest} disabled={captchaDisable} block size={size ? size : 'default'}>
       {captchaDisable ? `${captchaTime}s` : <FormattedMessage id="component.captcha-get" />}
     </Button>
   )

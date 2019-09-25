@@ -6,7 +6,6 @@ import styles from '../style.less'
 import {
   Form,
   Input,
-  Radio,
   Button,
   TreeSelect,
 } from 'antd'
@@ -78,7 +77,6 @@ class RoleForm extends Component<RoleFormProp, RoleFormState>{
   createTree = () => {
     const { allAuthList } = this.props;
     function _create(allAuthList: IRoute[]): TreeCreate[] {
-      console.log(allAuthList)
       return allAuthList.map((item, index) => ({
         title: item.type === 'PAGE' ? formatMessage({ id: `menu.${item.name}`, defaultMessage: item.name }) : item.name,
         value: item.id,

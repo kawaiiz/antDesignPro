@@ -84,7 +84,6 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
   const setIi8Menu = (authList: MenuDataItem[]): MenuDataItem[] => {
     return authList.map(item => {
       const loaclItem = {
-        name: item.name,
         ...item,
         children: item.children ? setIi8Menu(item.children) : []
       }

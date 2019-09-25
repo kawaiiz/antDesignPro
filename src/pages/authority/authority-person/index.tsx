@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react'
-import { Dispatch } from 'redux';
 import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
@@ -17,18 +16,14 @@ import { ConnectState } from '@/models/connect';
 import { Person } from './data.d'
 import { Role } from '@/pages/authority/authority-role/data'
 import { SetMethod } from '@/utils/axios'
+import { setPerson } from './service'
 
-import { setPerson, getPersonDetail } from './service'
-import { setRole } from '@/pages/authority/authority-role/service'
 
 
 import PersonTable from './components/table'
 import PersonForm from './components/from'
 import styles from './style.less'
-
-interface PersonProps {
-  loading: boolean
-}
+import { getResourcesAuth } from '@/utils/utils'
 
 interface PersonState {
   roleList: Role[],
@@ -41,7 +36,11 @@ interface PersonState {
   pageSize: number,
   dataTotal: number,
   getListLoading: boolean,
-  upDataLoading: boolean
+  upDataLoading: boolean,
+}
+
+interface PersonProps {
+  loading: boolean,
 }
 
 // 因为loading 导致每次请求后引发页面更新
@@ -61,24 +60,29 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
     pageSize: 8,//
     dataTotal: 0,
     getListLoading: false,
-    upDataLoading: false
+    upDataLoading: false,
   }
 
   constructor(props: PersonProps) {
     super(props)
     const authority = getAuthority()
     this.state.authority = typeof authority === 'string' ? authority : authority[0]
-
   }
 
   componentDidMount() {
-    this.getRoleList()
     this.getPersonList()
   }
 
   // 获取 人员数组
   getPersonList = async () => {
     try {
+      if (!getResourcesAuth(47)) {
+        notification.error({
+          description: formatMessage({ id: 'component.not-role' }),
+          message: formatMessage({ id: 'component.error' }),
+        })
+        return
+      }
       const { pageIndex, pageSize } = this.state
       this.setState({
         getListLoading: true
@@ -102,21 +106,7 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
     }
   }
 
-  // 获取权限数组
-  getRoleList = async () => {
-    try {
-      const res = await setRole({ data: {}, method: SetMethod['get'] })
-      this.setState({
-        roleList: res.data
-      })
-    } catch (e) {
-      console.log(e)
-      notification.error({
-        description: e.errorMsg,
-        message: formatMessage({ id: 'component.error' }),
-      });
-    }
-  }
+
 
   // 每次关闭抽屉的时候 清空活跃项
   initActionTag = () => {
@@ -226,11 +216,15 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
       <PageHeaderWrapper content={<FormattedMessage id="authority-person.header.description" />}>
         <Card loading={loading}>
           <Alert className={styles['authority-person-warning']} message={formatMessage({ id: 'authority-tree.warning' })} type="warning" />
-          <div className={styles['authority-add-button']}>
-            <Button size="large" type="primary" style={{ float: 'right' }} onClick={this.handleBtnClickAdd}>
-              <FormattedMessage id='component.add'></FormattedMessage>
-            </Button>
-          </div>
+
+          {
+            getResourcesAuth(43) ? <div className={styles['authority-add-button']}>
+              <Button size="large" type="primary" style={{ float: 'right' }} onClick={this.handleBtnClickAdd}>
+                <FormattedMessage id='component.add'></FormattedMessage>
+              </Button>
+            </div> : ''
+          }
+
           {
             personList.length > 0 ? (<div>
               <PersonTable
@@ -239,7 +233,6 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
                 pageSize={pageSize}
                 authority={authority}
                 personList={personList}
-                roleList={roleList}
                 upDataLoading={upDataLoading}
                 getListLoading={getListLoading}
                 handleBtnClickEdit={this.handleBtnClickEdit}

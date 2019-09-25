@@ -1,13 +1,10 @@
-
 import React, { Component } from 'react'
 import { Dispatch } from 'redux';
 import { connect } from 'dva';
 import { ConnectState } from '@/models/connect';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
-import { IRoute } from 'umi-types/config'
 import { getAuthority } from '@/utils/authority'
-import lodash from 'lodash'
 import {
   Card,
   Empty,
@@ -20,19 +17,21 @@ import {
 import TreeTable from './components/tree'
 import TreeForm from './components/from'
 import styles from './style.less'
+import { IRoute } from 'umi-types/config'
+import { getResourcesAuth } from '@/utils/utils'
 
 interface AuthState {
   authority: string,
   actionTag: IRoute,
   drawerVisible: boolean,
-  actionType: 'add' | 'edit' | 'delete' | null
+  actionType: 'add' | 'edit' | 'delete' | null,
 }
 
 interface Authprops {
   dispatch: Dispatch<any>,
   originalAuthList: IRoute[],
   authList: IRoute[],
-  loading: boolean
+  loading: boolean,
 }
 
 @connect(({ auth, loading }: ConnectState) => ({
@@ -54,7 +53,7 @@ class AuthorityTree extends Component<Authprops, AuthState> {
       authority: null,
     }, // 当前表单内容
     drawerVisible: false, // 是否打开表单
-    actionType: null // 点击按钮操作的类型
+    actionType: null, // 点击按钮操作的类型
   }
 
   constructor(props: Authprops) {
@@ -132,11 +131,13 @@ class AuthorityTree extends Component<Authprops, AuthState> {
     return (<PageHeaderWrapper content={<FormattedMessage id="authority-tree.header.description" />}>
       <Card loading={loading}>
         <Alert className={styles['authority-tree-warning']} message={formatMessage({ id: 'authority-tree.warning' })} type="warning" />
-        <div className={styles['authority-add-button']}>
-          <Button size="large" type="primary" style={{ float: 'right' }} onClick={this.handleBtnClickAdd}>
-            <FormattedMessage id='component.add'></FormattedMessage>
-          </Button>
-        </div>
+        {
+          getResourcesAuth(19) ? <div className={styles['authority-add-button']}>
+            <Button size="large" type="primary" style={{ float: 'right' }} onClick={this.handleBtnClickAdd}>
+              <FormattedMessage id='component.add'></FormattedMessage>
+            </Button>
+          </div> : ''
+        }
         {
           originalAuthList.length > 0 ? (<div>
             <TreeTable

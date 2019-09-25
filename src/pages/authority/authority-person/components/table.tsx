@@ -8,12 +8,11 @@ import {
 const ButtonGroup = Button.Group;
 import { formatMessage } from 'umi-plugin-react/locale';
 import { Person } from '../data.d'
-import { Role } from '@/pages/authority/authority-role/data'
 import { getBaseUrl } from '@/utils/utils'
+import { getResourcesAuth } from '@/utils/utils'
 
 interface PersonTableProp {
   personList: Person[],
-  roleList: Role[],
   authority: string,
   pageSize: number,
   pageIndex: number,
@@ -68,7 +67,7 @@ const PersonTable: React.FC<PersonTableProp> = (props) => {
       dataIndex: 'iconUrl',
       key: 'iconUrl',
       // width: '15%',
-      render: (text: Person, record: Person, index: number) => (<Avatar src={getBaseUrl()+record.iconUrl} />)
+      render: (text: Person, record: Person, index: number) => (<Avatar src={getBaseUrl() + record.iconUrl} />)
     },
     {
       title: formatMessage({ id: 'authority-person.table.operation' }),
@@ -78,16 +77,20 @@ const PersonTable: React.FC<PersonTableProp> = (props) => {
 
         return (
           <ButtonGroup>
-            <Button onClick={() => handleBtnClickEdit(record)}>
-              {formatMessage({ id: 'authority-person.table.edit' })}
-            </Button>
-            <Popconfirm
-              title={`${formatMessage({ id: 'authority-person.table.delete' })} ${record.username}?`}
-              okText={formatMessage({ id: 'component.confirm' })}
-              cancelText={formatMessage({ id: 'component.cancel' })}
-              onConfirm={() => handleBtnClickDeleteUpData(record)}>
-              <Button type="danger" loading={upDataLoading} disabled={upDataLoading}>{formatMessage({ id: 'authority-person.table.delete' })}</Button>
-            </Popconfirm>
+            {
+              getResourcesAuth(44) ? <Button onClick={() => handleBtnClickEdit(record)}>
+                {formatMessage({ id: 'authority-person.table.edit' })}
+              </Button> : ''
+            }
+            {
+              getResourcesAuth(45) ? <Popconfirm
+                title={`${formatMessage({ id: 'authority-person.table.delete' })} ${record.username}?`}
+                okText={formatMessage({ id: 'component.confirm' })}
+                cancelText={formatMessage({ id: 'component.cancel' })}
+                onConfirm={() => handleBtnClickDeleteUpData(record)}>
+                <Button type="danger" loading={upDataLoading} disabled={upDataLoading}>{formatMessage({ id: 'authority-person.table.delete' })}</Button>
+              </Popconfirm> : ''
+            }
           </ButtonGroup >
         )
       }

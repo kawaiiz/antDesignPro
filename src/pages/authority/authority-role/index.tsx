@@ -22,12 +22,7 @@ import { SetMethod } from '@/utils/axios'
 import RoleTable from './components/table'
 import RoleForm from './components/from'
 import styles from './style.less'
-
-interface RoleProps {
-  allAuthList: [],
-  originalAuthList: [],
-  loading: boolean
-}
+import { getResourcesAuth } from '@/utils/utils'
 
 interface RoleState {
   roleList: Role[],
@@ -35,9 +30,15 @@ interface RoleState {
   actionTag: Role,
   drawerVisible: boolean,
   actionType: 'add' | 'edit' | 'delete' | null,
+  getListLoading: boolean,
   upDataLoading: boolean,
 }
 
+interface RoleProps {
+  allAuthList: [],
+  originalAuthList: [],
+  loading: boolean,
+}
 
 // 因为loading 导致每次请求后引发页面更新
 @connect(({ auth, loading, }: ConnectState) => ({
@@ -53,22 +54,36 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
     actionTag: {}, // 当前表单内容
     drawerVisible: false, // 是否打开表单
     actionType: null, // 点击按钮操作的类型
-    upDataLoading: false
+    getListLoading: false,
+    upDataLoading: false,
   }
 
   constructor(props: RoleProps) {
     super(props)
     const authority = getAuthority()
     this.state.authority = typeof authority === 'string' ? authority : authority[0]
-    this.getRoleList()
   }
 
+  componentDidMount() {
+    this.getRoleList()
+  }
   // 获取数组
   getRoleList = async () => {
     try {
+      if (!getResourcesAuth(46)) {
+        notification.error({
+          description: formatMessage({ id: 'component.not-role' }),
+          message: formatMessage({ id: 'component.error' }),
+        })
+        return
+      }
+      this.setState({
+        getListLoading: true
+      })
       const res = await setRole({ data: {}, method: SetMethod['get'] })
       this.setState({
-        roleList: res.data
+        roleList: res.data,
+        getListLoading: false
       })
     } catch (e) {
       console.log(e)
@@ -186,21 +201,26 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
   }
 
   render() {
-    const { authority, drawerVisible, actionTag, actionType, roleList, upDataLoading } = this.state
+    const { authority, drawerVisible, actionTag, actionType, roleList, upDataLoading, getListLoading, } = this.state
     const { loading, allAuthList, originalAuthList } = this.props
     return (<PageHeaderWrapper content={<FormattedMessage id="authority-role.header.description" />}>
       <Card loading={loading}>
         <Alert className={styles['authority-role-warning']} message={formatMessage({ id: 'authority-tree.warning' })} type="warning" />
-        <div className={styles['authority-add-button']}>
-          <Button size="large" type="primary" style={{ float: 'right' }} onClick={this.handleBtnClickAdd}>
-            <FormattedMessage id='component.add'></FormattedMessage>
-          </Button>
-        </div>
+
+        {
+          getResourcesAuth(39) ? <div className={styles['authority-add-button']}>
+            <Button size="large" type="primary" style={{ float: 'right' }} onClick={this.handleBtnClickAdd}>
+              <FormattedMessage id='component.add'></FormattedMessage>
+            </Button>
+          </div> : ''
+        }
+
         {
           roleList.length > 0 ? (<div>
             <RoleTable
               authority={authority}
               roleList={roleList}
+              getListLoading={getListLoading}
               handleBtnClickEdit={this.handleBtnClickEdit}
               handleBtnClickDeleteUpData={this.handleBtnClickDeleteUpData}
             />
