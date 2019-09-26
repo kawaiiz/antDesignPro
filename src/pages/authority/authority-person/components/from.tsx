@@ -40,7 +40,7 @@ const PersonForm: React.FC<PersonFormProp> = (props) => {
   // 获取权限角色数组
   const getRoleList = async () => {
     try {
-      if (!getResourcesAuth(46)) {
+      if (!getResourcesAuth(15)) {
         notification.error({
           description: formatMessage({ id: 'component.not-role' }),
           message: formatMessage({ id: 'component.error' }),
@@ -65,7 +65,6 @@ const PersonForm: React.FC<PersonFormProp> = (props) => {
   const handleSubmit = () => {
     try {
       form.validateFields((err, value) => {
-        console.log(value)
         if (!err) {
           let formData: Person = { ...form.getFieldsValue(), userId: actionTag.id }
           onSubmit(formData)

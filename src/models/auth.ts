@@ -67,7 +67,7 @@ const processingData = (resources: requestRoute[]) => {
       id: item.id,
       path: item.resourceUrl,
       name: item.resourceName,
-      icon: item.icon,
+      icon: item.icon||' ',
       component: item.component,
       authority: item.own ? roles : [],
       type: item.resourceType,

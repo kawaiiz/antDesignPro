@@ -7,6 +7,7 @@ import { GridContent } from '@ant-design/pro-layout';
 import { Menu, notification } from 'antd';
 import BaseView from './components/base';
 import NotificationView from './components/notification';
+import ResetPassword from './components/resetPassword';
 import styles from './style.less';
 import { CurrentUser } from '@/models/user';
 
@@ -17,7 +18,7 @@ interface SettingsProps {
   dispatch: Dispatch<any>,
 }
 
-type SettingsStateKeys = 'base' | 'notification';
+type SettingsStateKeys = 'base' | 'notification' | 'resetPassword';
 interface SettingsState {
   mode: 'inline' | 'horizontal';
   menuMap: {
@@ -40,12 +41,13 @@ SettingsState
     super(props);
     const menuMap = {
       base: <FormattedMessage id="account-settings.menuMap.basic" defaultMessage="Basic Settings" />,
-      notification: <FormattedMessage id="account-settings.menuMap.notification" defaultMessage="New Message Notification" />
+      notification: <FormattedMessage id="account-settings.menuMap.notification" defaultMessage="New Message Notification" />,
+      resetPassword: <FormattedMessage id="account-settings.menuMap.reset-password" defaultMessage="reset password" />,
     };
     this.state = {
       mode: 'inline',
       menuMap,
-      selectKey: 'base',
+      selectKey: 'resetPassword',
     };
   }
 
@@ -121,6 +123,26 @@ SettingsState
     }
   }
 
+  // 修改密码
+  handlerChangePassword = async (from: any) => {
+    try {
+      const { dispatch } = this.props;
+      await dispatch({
+        type: 'user/changePassword',
+        payload: from
+      });
+      notification.success({
+        description: formatMessage({ id: 'component.action-success' }),
+        message: formatMessage({ id: 'component.success' }),
+      });
+    } catch (e) {
+      notification.error({
+        description: e.errorMsg,
+        message: formatMessage({ id: 'component.error' }),
+      });
+    }
+  }
+
   // 渲染 菜单对应的内容
   renderChildren = () => {
     const { selectKey } = this.state;
@@ -130,6 +152,8 @@ SettingsState
         return <BaseView currentUser={currentUser} onSubmit={this.handlerChangeUserinfo} />;
       case 'notification':
         return <NotificationView />;
+      case 'resetPassword':
+        return <ResetPassword onSubmit={this.handlerChangePassword} />;
       default:
         break;
     }

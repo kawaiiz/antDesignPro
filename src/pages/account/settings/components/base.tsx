@@ -144,7 +144,7 @@ class BaseView extends Component<BaseViewProps> {
                 </Col>
               </Row>
             </Form.Item>
-            <Button type="primary" onClick={this.handlerSubmit}>
+            <Button type="primary" htmlType="submit">
               <FormattedMessage id="account-settings.basic.update" defaultMessage="Update Information" />
             </Button>
           </div>

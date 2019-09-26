@@ -63,12 +63,12 @@ const TreeTable: React.FC<TreeTableProp> = (props) => {
         return (
           <ButtonGroup>
             {
-              getResourcesAuth(19) ? <Button onClick={() => handleBtnClickEdit(record)}>
+              getResourcesAuth(7) ? <Button onClick={() => handleBtnClickEdit(record)}>
                 {formatMessage({ id: 'authority-tree.table.edit' })}
               </Button> : ''
             }
             {
-              getResourcesAuth(38) ? <Popconfirm
+              getResourcesAuth(8) ? <Popconfirm
                 title={`${formatMessage({ id: 'authority-tree.table.delete' })} ${record.name}?`}
                 okText={formatMessage({ id: 'component.confirm' })}
                 cancelText={formatMessage({ id: 'component.cancel' })}

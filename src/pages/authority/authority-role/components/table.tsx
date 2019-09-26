@@ -57,12 +57,12 @@ const RoleTable: React.FC<RoleTableProp> = (props) => {
         return (
           <ButtonGroup>
             {
-              getResourcesAuth(40) ? <Button onClick={() => handleBtnClickEdit(record)}>
+              getResourcesAuth(10) ? <Button onClick={() => handleBtnClickEdit(record)}>
                 {formatMessage({ id: 'authority-role.table.edit' })}
               </Button> : ''
             }
             {
-              getResourcesAuth(41) ? <Popconfirm
+              getResourcesAuth(11) ? <Popconfirm
                 title={`${formatMessage({ id: 'authority-role.table.delete' })} ${record.roleName}?`}
                 okText={formatMessage({ id: 'component.confirm' })}
                 cancelText={formatMessage({ id: 'component.cancel' })}

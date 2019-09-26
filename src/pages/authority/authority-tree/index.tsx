@@ -132,7 +132,7 @@ class AuthorityTree extends Component<Authprops, AuthState> {
       <Card loading={loading}>
         <Alert className={styles['authority-tree-warning']} message={formatMessage({ id: 'authority-tree.warning' })} type="warning" />
         {
-          getResourcesAuth(19) ? <div className={styles['authority-add-button']}>
+          getResourcesAuth(6) ? <div className={styles['authority-add-button']}>
             <Button size="large" type="primary" style={{ float: 'right' }} onClick={this.handleBtnClickAdd}>
               <FormattedMessage id='component.add'></FormattedMessage>
             </Button>

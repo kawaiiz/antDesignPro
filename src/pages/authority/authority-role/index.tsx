@@ -70,7 +70,7 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
   // 获取数组
   getRoleList = async () => {
     try {
-      if (!getResourcesAuth(46)) {
+      if (!getResourcesAuth(15)) {
         notification.error({
           description: formatMessage({ id: 'component.not-role' }),
           message: formatMessage({ id: 'component.error' }),
@@ -208,7 +208,7 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
         <Alert className={styles['authority-role-warning']} message={formatMessage({ id: 'authority-tree.warning' })} type="warning" />
 
         {
-          getResourcesAuth(39) ? <div className={styles['authority-add-button']}>
+          getResourcesAuth(9) ? <div className={styles['authority-add-button']}>
             <Button size="large" type="primary" style={{ float: 'right' }} onClick={this.handleBtnClickAdd}>
               <FormattedMessage id='component.add'></FormattedMessage>
             </Button>

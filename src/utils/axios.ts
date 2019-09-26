@@ -36,8 +36,6 @@ const refreshAuthLogic = (failedRequest: any) => axios({
   method: 'get',
   params: { refreshToken: getToken(REFRESH_TOKEN) }
 }).then(tokenRefreshResponse => {
-  debugger
-  console.log(tokenRefreshResponse)
   if (tokenRefreshResponse.data.status === 1007) {
     return Promise.reject(tokenRefreshResponse.data);
   }
@@ -46,7 +44,6 @@ const refreshAuthLogic = (failedRequest: any) => axios({
   failedRequest.response.config.headers['Authorization'] = `${tokenRefreshResponse.data.data.token_type} ${tokenRefreshResponse.data.data.access_token}`;
   return Promise.resolve(`${tokenRefreshResponse.data.data.token_type} ${tokenRefreshResponse.data.data.access_token}`);
 }).catch(err => {
-  debugger
   delToken(REFRESH_TOKEN)
   delToken()
   notification.error({

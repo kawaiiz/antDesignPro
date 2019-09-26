@@ -1,11 +1,16 @@
 export default {
   'account-settings.menuMap.basic': '基本设置',
   'account-settings.menuMap.security': '安全设置',
+  'account-settings.menuMap.reset-password': '修改密码',
   'account-settings.menuMap.binding': '账号绑定',
   'account-settings.menuMap.notification': '新消息通知',
+  'account-settings.reset-password.oldPassword': '当前密码',
+  'account-settings.reset-password.oldPassword-message': '请输入当前密码', 'account-settings.reset-password.newPassword': '新密码',
+  'account-settings.reset-password.newPassword-message': '请输入新密码', 'account-settings.reset-password.confirmPassword': '确认密码',
+  'account-settings.reset-password.confirmPassword-message': '请输入确认密码',
+  'account-settings.reset-password.confirmPassword-message2': '新密码与确认密码不一致',
   'account-settings.basic.avatar': '头像',
   'account-settings.basic.change-avatar': '更换头像',
-
   'account-settings.basic.email': '邮箱',
   'account-settings.basic.email-message': '请输入您的邮箱!',
   'account-settings.basic.nickname': '昵称',

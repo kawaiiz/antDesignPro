@@ -21,9 +21,6 @@ interface SecurityLayoutProps extends ConnectProps {
   dispatch: Dispatch;
 }
 
-
-
-
 const SecurityLayoutFunc: React.FC<SecurityLayoutProps> = props => {
   const { dispatch, authList, route, initialRoutes, loading, currentUser, children } = props;
 

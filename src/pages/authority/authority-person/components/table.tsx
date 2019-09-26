@@ -78,12 +78,12 @@ const PersonTable: React.FC<PersonTableProp> = (props) => {
         return (
           <ButtonGroup>
             {
-              getResourcesAuth(44) ? <Button onClick={() => handleBtnClickEdit(record)}>
+              getResourcesAuth(13) ? <Button onClick={() => handleBtnClickEdit(record)}>
                 {formatMessage({ id: 'authority-person.table.edit' })}
               </Button> : ''
             }
             {
-              getResourcesAuth(45) ? <Popconfirm
+              getResourcesAuth(14) ? <Popconfirm
                 title={`${formatMessage({ id: 'authority-person.table.delete' })} ${record.username}?`}
                 okText={formatMessage({ id: 'component.confirm' })}
                 cancelText={formatMessage({ id: 'component.cancel' })}

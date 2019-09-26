@@ -27,7 +27,7 @@ const plugins: IPlugin[] = [
       dynamicImport: {
         loadingComponent: './components/PageLoading/index',
         webpackChunkName: true,
-        level: 3,
+        level: 4,
       },
       pwa: pwa
         ? {
@@ -87,7 +87,7 @@ export default {
   },
   hash: true,
   targets: {
-    ie: 11,
+    ie: 10,
   },
   devtool: isAntDesignProPreview ? 'source-map' : false,
   // umi routes: https://umijs.org/zh/guide/router.html
