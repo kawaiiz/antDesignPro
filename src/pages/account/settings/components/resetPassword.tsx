@@ -4,7 +4,7 @@ import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import { FormComponentProps } from 'antd/es/form';
 
 interface ResetPasswordProps extends FormComponentProps {
-  onSubmit: (from: any) => void
+  onSubmit: (from: any) => Promise<null>
 }
 
 
@@ -40,21 +40,16 @@ const resetPassword: React.FC<ResetPasswordProps> = (props) => {
 
 
   const handlerSubmit = () => {
-    try {
-      form.validateFields(err => {
-        console.log(err)
+    form.validateFields(async (err) => {
+      try {
         if (!err) {
-          onSubmit(form.getFieldsValue())
+          await onSubmit(form.getFieldsValue())
           form.resetFields()
         }
-      });
-    } catch (e) {
-      notification.error({
-        description: e.errorMsg,
-        message: formatMessage({ id: 'component.error' }),
-      });
-    }
-
+      } catch (e) {
+        console.log(e)
+      }
+    });
   };
 
   return (

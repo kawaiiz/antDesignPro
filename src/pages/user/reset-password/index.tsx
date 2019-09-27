@@ -95,7 +95,6 @@ ResetPasswordState
   interval: number | undefined = undefined;
 
   componentDidUpdate() {
-    console.log(this.props)
     const { userResetPassword } = this.props;
     if (userResetPassword.status === 'ok') {
       message.success('修改成功');

@@ -34,8 +34,6 @@ export interface CurrentUser {
   title: string;
   group: string;
   tags: TagType[];
-  notifyCount: number;
-  unreadCount: number;
   country: string;
   geographic: GeographicType;
   address: string;

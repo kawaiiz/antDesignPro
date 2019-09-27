@@ -103,6 +103,7 @@ class HttpRequest {
     // 响应拦截
     instance.interceptors.response.use((res: any) => res, (error: any) => {
       let errorInfo = error.response
+      console.log(typeof error)
       if (!errorInfo) {
         const { request: { statusText, status }, config } = JSON.parse(JSON.stringify(error))
         errorInfo = {

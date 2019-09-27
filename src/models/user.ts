@@ -20,8 +20,6 @@ export interface CurrentUser {
 
 export interface UserModelState {
   currentUser?: CurrentUser;
-  notifyCount?: number;
-  unreadCount?: number;
 }
 
 export interface UserModelType {
@@ -34,7 +32,6 @@ export interface UserModelType {
   };
   reducers: {
     saveCurrentUserReducers: Reducer<UserModelState>;
-    changeNotifyCountReducers: Reducer<UserModelState>;
     // saveAuth: Reducer<UserModelState>;
   };
 }
@@ -44,18 +41,15 @@ const UserModel: UserModelType = {
 
   state: {
     currentUser: {},
-    notifyCount: 0,
-    unreadCount: 0
   },
 
   effects: {
     // 修改密码
     *changePassword({ payload }, { call, put }) {
       try {
-        const res: any = yield call(handlePassword, { data: payload });
+        const res: any = yield call(handlePassword, payload);
         return Promise.resolve(res.data)
       } catch (e) {
-        console.log(e)
         return Promise.reject(e)
       }
     },
@@ -99,18 +93,6 @@ const UserModel: UserModelType = {
       return {
         ...state,
         currentUser: action.payload || {},
-      };
-    },
-    changeNotifyCountReducers(
-      state = {
-        currentUser: {},
-      },
-      action,
-    ) {
-      return {
-        ...state,
-        notifyCount: action.payload.totalCount,
-        unreadCount: action.payload.unreadCount,
       };
     },
   },

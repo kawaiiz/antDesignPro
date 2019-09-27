@@ -47,7 +47,7 @@ SettingsState
     this.state = {
       mode: 'inline',
       menuMap,
-      selectKey: 'resetPassword',
+      selectKey: 'base',
     };
   }
 
@@ -135,11 +135,13 @@ SettingsState
         description: formatMessage({ id: 'component.action-success' }),
         message: formatMessage({ id: 'component.success' }),
       });
+      return Promise.resolve()
     } catch (e) {
       notification.error({
         description: e.errorMsg,
         message: formatMessage({ id: 'component.error' }),
       });
+      return Promise.reject()
     }
   }
 

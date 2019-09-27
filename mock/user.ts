@@ -41,8 +41,6 @@ export default {
         label: '海纳百川',
       },
     ],
-    notifyCount: 12,
-    unreadCount: 11,
     country: 'China',
     geographic: {
       province: {
