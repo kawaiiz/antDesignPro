@@ -3,7 +3,7 @@ import { UserResetPasswordParams } from './index';
 
 export async function fakeResetPassword(params: UserResetPasswordParams): Promise<any>  {
   return axios.request({
-    url: '/api/resetPassword',
+    url: '/api/public/web/forget-password',
     method: 'POST',
     data: params,
   });

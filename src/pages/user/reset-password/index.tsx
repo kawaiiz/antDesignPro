@@ -10,6 +10,8 @@ import router from 'umi/router';
 import { StateType } from './model';
 import styles from './style.less';
 
+import GetCaptcha from '@/components/myPublicComponents/getCaptcha'
+
 const FormItem = Form.Item;
 const { Option } = Select;
 const InputGroup = Input.Group;
@@ -48,20 +50,17 @@ interface ResetPasswordProps extends FormComponentProps {
   submitting: boolean;
 }
 interface ResetPasswordState {
-  count: number;
   confirmDirty: boolean;
   visible: boolean;
   help: string;
-  prefix: string;
 }
 
 export interface UserResetPasswordParams {
   username: string;
   password: string;
   confirm: string;
-  mobile: string;
-  captcha: string;
-  prefix: string;
+  phoneNumber: string;
+  smsCode: string;
 }
 
 @connect(
@@ -85,11 +84,9 @@ ResetPasswordProps,
 ResetPasswordState
 > {
   state: ResetPasswordState = {
-    count: 0,
     confirmDirty: false,
     visible: false,
     help: '',
-    prefix: '86',
   };
 
   interval: number | undefined = undefined;
@@ -112,18 +109,6 @@ ResetPasswordState
     clearInterval(this.interval);
   }
 
-  onGetCaptcha = () => {
-    let count = 59;
-    this.setState({ count });
-    this.interval = window.setInterval(() => {
-      count -= 1;
-      this.setState({ count });
-      if (count === 0) {
-        clearInterval(this.interval);
-      }
-    }, 1000);
-  };
-
   getPasswordStatus = () => {
     const { form } = this.props;
     const value = form.getFieldValue('password');
@@ -137,21 +122,26 @@ ResetPasswordState
   };
 
   handleSubmit = (e: React.FormEvent) => {
+
     e.preventDefault();
     const { form, dispatch } = this.props;
-    form.validateFields({ force: true }, (err, values) => {
-      console.log(values)
-      if (!err) {
-        const { prefix } = this.state;
-        dispatch({
-          type: 'userResetPassword/submit',
-          payload: {
-            ...values,
-            prefix,
-          },
-        });
+    form.validateFields({ force: true }, async (err, values) => {
+      try {
+        if (!err) {
+          await dispatch({
+            type: 'userResetPassword/submit',
+            payload: values,
+          });
+          message.success(formatMessage({ id: 'component.action-success' }));
+          router.push({
+            pathname: '/user/login',
+          });
+        }
+      } catch (e) {
+        message.success(formatMessage({ id: 'component.action-error' }));
       }
     });
+
   };
 
   checkConfirm = (rule: any, value: string, callback: (messgae?: string) => void) => {
@@ -192,12 +182,6 @@ ResetPasswordState
     }
   };
 
-  changePrefix = (value: string) => {
-    this.setState({
-      prefix: value,
-    });
-  };
-
   renderPasswordProgress = () => {
     const { form } = this.props;
     const value = form.getFieldValue('password');
@@ -218,7 +202,7 @@ ResetPasswordState
   render() {
     const { form, submitting } = this.props;
     const { getFieldDecorator } = form;
-    const { count, prefix, help, visible } = this.state;
+    const { help, visible } = this.state;
     return (
       <div className={styles.main}>
         <h3>
@@ -277,7 +261,7 @@ ResetPasswordState
             </Popover>
           </FormItem>
           <FormItem>
-            {getFieldDecorator('confirm', {
+            {getFieldDecorator('confirmPassword', {
               rules: [
                 {
                   required: true,
@@ -297,16 +281,7 @@ ResetPasswordState
           </FormItem>
           <FormItem>
             <InputGroup compact>
-              <Select
-                size="large"
-                value={prefix}
-                onChange={this.changePrefix}
-                style={{ width: '20%' }}
-              >
-                <Option value="86">+86</Option>
-                <Option value="87">+87</Option>
-              </Select>
-              {getFieldDecorator('mobile', {
+              {getFieldDecorator('phoneNumber', {
                 rules: [
                   {
                     required: true,
@@ -320,7 +295,6 @@ ResetPasswordState
               })(
                 <Input
                   size="large"
-                  style={{ width: '80%' }}
                   placeholder={formatMessage({ id: 'reset-password.phone-number.placeholder' })}
                 />,
               )}
@@ -329,7 +303,7 @@ ResetPasswordState
           <FormItem>
             <Row gutter={8}>
               <Col span={16}>
-                {getFieldDecorator('captcha', {
+                {getFieldDecorator('smsCode', {
                   rules: [
                     {
                       required: true,
@@ -344,16 +318,7 @@ ResetPasswordState
                 )}
               </Col>
               <Col span={8}>
-                <Button
-                  size="large"
-                  disabled={!!count}
-                  className={styles.getCaptcha}
-                  onClick={this.onGetCaptcha}
-                >
-                  {count
-                    ? `${count} s`
-                    : formatMessage({ id: 'reset-password.register.get-verification-code' })}
-                </Button>
+                <GetCaptcha phoneNumber={form.getFieldValue('phoneNumber')} type='login' size="large" />
               </Col>
             </Row>
           </FormItem>
