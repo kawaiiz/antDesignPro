@@ -84,7 +84,8 @@ const TreeTable: React.FC<TreeTableProp> = (props) => {
   return <Table
     rowKey={record => `${record.id}rowKey`}
     pagination={false}
-    defaultExpandAllRows={true}
+    // defaultExpandAllRows={true}
+    defaultExpandAllRows={false}
     columns={columns}
     dataSource={toTree(originalAuthList)} />
 }

@@ -55,7 +55,37 @@ const plugins: IPlugin[] = [
   ],
 ]; // 针对 preview.pro.ant.design 的 GA 统计代码
 
-export const MyConfig = {
+// baseurl 本地域名 在线域名
+// footerContent 底部关于公司的文本
+// cookieExpires cookie过期时间 本项目用的localStorage
+// token token的字段名
+// refreshToken 重置token用的refreshToken的字段名
+// upImgFileUrl 上传文件的地址
+// meauType 左边菜单是i18ny文字还是原文字
+interface footerContentLinks {
+  key: string,
+  title: string,
+  href: string,
+  blankTarget: boolean
+}
+
+interface MyConfigInterFace {
+  baseUrl: {
+    dev: string,
+    pro: string
+  },
+  footerContent: {
+    links: footerContentLinks[],
+    copyright: string,
+  },
+  cookieExpires: number,
+  token: string,
+  refreshToken: string,
+  upImgFileUrl: string,
+  menuType: 'i18n' | 'text',
+  [key: string]: any
+}
+export const MyConfig: MyConfigInterFace = {
   // 请求的域名
   baseUrl: {
     dev: 'http://192.168.1.222:8080',
@@ -73,7 +103,8 @@ export const MyConfig = {
   // token 名称
   token: 'token',
   refreshToken: 'refreshToken',
-  upImgFileUrl: '/api/web/file/img'
+  upImgFileUrl: '/api/web/file/img',
+  menuType: 'text'
 };
 
 export default {

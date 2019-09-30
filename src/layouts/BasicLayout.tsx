@@ -39,21 +39,6 @@ export type BasicLayoutContext = { [K in 'location']: BasicLayoutProps[K] } & {
   };
 };
 
-/**
- * use Authorized check all menu item
- */
-
-const menuDataRender = (menuList: MenuDataItem[]): MenuDataItem[] => {
-  return menuList.map(item => {
-    const localItem = {
-      ...item,
-      children: item.children ? menuDataRender(item.children) : [],
-    };
-    return Authorized.check(item.authority, localItem, null) as MenuDataItem;
-  });
-}
-
-
 const footerRender: BasicLayoutProps['footerRender'] = (_, defaultDom) => {
   return React.cloneElement(defaultDom as React.ReactElement, MyConfig.footerContent)
 }
@@ -80,21 +65,24 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
     }
   };
 
-  // 自定义菜单的全球化函数 替代  原有的menuDataRender
-  const setIi8Menu = (authList: MenuDataItem[]): MenuDataItem[] => {
-    return authList.map(item => {
-      const loaclItem = {
+  /**
+  * use Authorized check all menu item
+  */
+  const menuDataRender = (menuList: MenuDataItem[]): MenuDataItem[] => {
+    return menuList.map(item => {
+      const localItem = {
         ...item,
-        children: item.children ? setIi8Menu(item.children) : []
+        children: item.children ? menuDataRender(item.children) : [],
+      };
+      if (MyConfig.menuType === 'i18n') {
+        localItem.name = formatMessage({
+          id: `menu.${item.name}`,
+          defaultMessage: item.name
+        })
       }
-      loaclItem.name = formatMessage({
-        id: `menu.${item.name}`,
-        defaultMessage: item.name
-      })
-      return Authorized.check(item.authority, loaclItem, null) as MenuDataItem
-    })
+      return Authorized.check(item.authority, localItem, null) as MenuDataItem;
+    });
   }
-
   return (
     <>
       <ProLayout
@@ -125,8 +113,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
             );
         }}
         footerRender={footerRender}
-        menuDataRender={() => setIi8Menu(authList)}
-        // menuDataRender={menuDataRender}
+        menuDataRender={() => menuDataRender(authList)}
         formatMessage={formatMessage}
         rightContentRender={rightProps => <RightContent {...rightProps} />}
         {...props}

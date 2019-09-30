@@ -38,7 +38,8 @@ interface requestRoute {
   "operation": string, // 请求方式
   "resourceType": string, // 资源类别
   "pid": number, // 父id
-  "own": boolean // 是否有权限操作这个资源
+  "own": boolean, // 是否有权限操作这个资源
+  "hideInMenu": boolean;
 }
 
 // 将扁平的一维数组 转成多维 
@@ -63,16 +64,17 @@ const processingData = (resources: requestRoute[]) => {
   const IRouteFormatRes = resources.map(item => {
     return {
       // parentId: item.pid ? item.pid : null,
-      parentId: item.pid,
-      id: item.id,
-      path: item.resourceUrl,
-      name: item.resourceName,
-      icon: item.icon||' ',
       component: item.component,
-      authority: item.own ? roles : [],
-      type: item.resourceType,
+      hideInMenu: item.hideInMenu,
+      icon: item.icon || ' ',
+      id: item.id,
       operation: item.operation,
-      own: item.own
+      own: item.own,
+      parentId: item.pid,
+      name: item.resourceName,
+      type: item.resourceType,
+      path: item.resourceUrl,
+      authority: item.own ? roles : [],
     }
   })
   const pageAuthList = IRouteFormatRes.filter(({ type }) => type && type === 'PAGE')
