@@ -39,7 +39,7 @@ interface requestRoute {
   "resourceType": string, // 资源类别
   "pid": number, // 父id
   "own": boolean, // 是否有权限操作这个资源
-  "hideInMenu": boolean;
+  "hideMenu": boolean;
 }
 
 // 将扁平的一维数组 转成多维 
@@ -65,7 +65,7 @@ const processingData = (resources: requestRoute[]) => {
     return {
       // parentId: item.pid ? item.pid : null,
       component: item.component,
-      hideInMenu: item.hideInMenu,
+      hideInMenu: item.hideMenu,
       icon: item.icon || ' ',
       id: item.id,
       operation: item.operation,

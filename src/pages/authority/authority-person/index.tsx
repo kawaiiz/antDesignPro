@@ -56,7 +56,7 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
     actionTag: {}, // 当前表单内容
     drawerVisible: false, // 是否打开表单
     actionType: null, // 点击按钮操作的类型
-    pageIndex: 1, // 分页
+    pageIndex: 0, // 分页
     pageSize: 8,//
     dataTotal: 0,
     getListLoading: false,

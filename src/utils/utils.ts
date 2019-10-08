@@ -58,3 +58,12 @@ export const getResourcesAuth = (id: number | string): boolean => {
   const originalAuthList: IRoute[] = JSON.parse(sessionStorage.getItem('originalAuthList') || '[]')
   return originalAuthList.some(item => item.id == id && item.own)
 }
+
+// 判断当前请求的类型给请求对象附参数 仅用于 接口地址相同 请求类型不同的接口
+import { AxiosRequestConfig, Method } from 'axios'
+export const setOptions = (options: AxiosRequestConfig, data: any, method: Method) => {
+  options.method = method
+  if (method == 'delete' || method == 'DELETE' || method == 'get' || method == 'GET') options.params = data
+  else if (method === 'post' || method === 'put' || method === 'POST' || method === 'PUT') options.data = data
+  return options
+}

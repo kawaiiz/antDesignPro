@@ -5,10 +5,12 @@ import { formatMessage } from 'umi-plugin-react/locale';
 import { ConnectProps, ConnectState } from '@/models/connect';
 
 import Avatar from './AvatarDropdown';
-import NoticeIconView from './NoticeIconView';
+
 import HeaderSearch from '../HeaderSearch';
 import SelectLang from '../SelectLang';
 import styles from './index.less';
+
+import { MyConfig } from '../../../config/config'
 
 export type SiderTheme = 'light' | 'dark';
 export interface GlobalHeaderRightProps extends ConnectProps {
@@ -26,7 +28,7 @@ const GlobalHeaderRight: React.SFC<GlobalHeaderRightProps> = props => {
 
   return (
     <div className={className}>
-      <HeaderSearch
+      {/* <HeaderSearch
         className={`${styles.action} ${styles.search}`}
         placeholder={formatMessage({
           id: 'component.globalHeader.search',
@@ -63,9 +65,11 @@ const GlobalHeaderRight: React.SFC<GlobalHeaderRightProps> = props => {
           <Icon type="question-circle-o" />
         </a>
       </Tooltip>
-      {/* <NoticeIconView /> */}
+      */}
       <Avatar menu />
-      <SelectLang className={styles.action} />
+      {
+        MyConfig.menuType === 'i18n' ? <SelectLang className={styles.action} /> : ''
+      }
     </div>
   );
 };
