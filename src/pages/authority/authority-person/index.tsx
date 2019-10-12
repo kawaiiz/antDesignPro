@@ -166,27 +166,21 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
   // 表单提交事件
   handleFormSubmit = async (form: Person) => {
     try {
-      const { actionType, personList } = this.state
-      const oldPersonList = lodash.cloneDeep(personList)
-      let res: { data?: Person | number, errorMsg: string } = { errorMsg: formatMessage({ id: 'component.action-error' }) }, newPersonList: Person[] = []
+      const { actionType } = this.state
+      let res: { data?: Person | number, errorMsg: string } = { errorMsg: formatMessage({ id: 'component.action-error' }) }
       this.setState({
         upDataLoading: true
       })
       if (actionType === 'edit') {
         res = await setPerson({ data: form, method: SetMethod['edit'] })
-        newPersonList = oldPersonList.map(item => {
-          if (item.id === (res.data as Person).id) {
-            return Object.assign({}, item, res.data)
-          }
-          return item
-        })
+        this.getPersonList()
       } else if (actionType === 'add') {
         res = await setPerson({ data: form, method: SetMethod['add'] })
-        oldPersonList.push(res.data as Person)
-        newPersonList = oldPersonList
+        this.setState({
+          pageIndex: 0
+        }, this.getPersonList)
       }
       this.setState({
-        personList: newPersonList,
         upDataLoading: false
       })
       notification.success({
@@ -214,7 +208,7 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
     const { loading } = this.props
     return (
       <PageHeaderWrapper content={<FormattedMessage id="authority-person.header.description" />}>
-        <Card loading={loading}>
+        <Card>
           <Alert className={styles['authority-person-warning']} message={formatMessage({ id: 'authority-tree.warning' })} type="warning" />
 
           {
@@ -225,22 +219,18 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
             </div> : ''
           }
 
-          {
-            personList.length > 0 ? (<div>
-              <PersonTable
-                dataTotal={dataTotal}
-                pageIndex={pageIndex}
-                pageSize={pageSize}
-                authority={authority}
-                personList={personList}
-                upDataLoading={upDataLoading}
-                getListLoading={getListLoading}
-                handleBtnClickEdit={this.handleBtnClickEdit}
-                handleBtnClickDeleteUpData={this.handleBtnClickDeleteUpData}
-                handleTableOnChange={this.handleTableOnChange}
-              />
-            </div>) : <Empty description={false} />
-          }
+          <PersonTable
+            dataTotal={dataTotal}
+            pageIndex={pageIndex}
+            pageSize={pageSize}
+            authority={authority}
+            personList={personList}
+            upDataLoading={upDataLoading}
+            getListLoading={getListLoading}
+            handleBtnClickEdit={this.handleBtnClickEdit}
+            handleBtnClickDeleteUpData={this.handleBtnClickDeleteUpData}
+            handleTableOnChange={this.handleTableOnChange}
+          />
         </Card>
         <Drawer
           title={`${actionType ? formatMessage({ id: 'authority-person.table.' + actionType }) : ''} ${actionTag.username || ''}`}
@@ -248,10 +238,11 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
           width={720}
           closable={false}
           maskClosable={false}
+          destroyOnClose={true}
           onClose={this.initActionTag}
           visible={drawerVisible}
         >
-          {drawerVisible ? <PersonForm actionTag={actionTag} roleList={roleList} upDataLoading={upDataLoading} onClose={this.initActionTag} onSubmit={this.handleFormSubmit} /> : null}
+          <PersonForm actionTag={actionTag} upDataLoading={upDataLoading} onClose={this.initActionTag} onSubmit={this.handleFormSubmit} />
         </Drawer>
       </PageHeaderWrapper>
     )

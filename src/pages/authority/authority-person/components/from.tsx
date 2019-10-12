@@ -311,7 +311,7 @@ const PersonForm: React.FC<PersonFormProp> = (props) => {
           disabled={upDataLoading}
           className={styles['authority-from-button']}
           type="primary"
-          htmlType="submit"
+          htmlType="submit" 
         >
           <FormattedMessage id="component.confirm" />
         </Button>

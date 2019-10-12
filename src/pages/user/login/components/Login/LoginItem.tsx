@@ -35,7 +35,7 @@ export interface LoginItemProps extends GetFieldDecoratorOptions {
   tabUtil?: LoginContextProps['tabUtil'];
 }
 
-import GetCaptcha from '@/components/myPublicComponents/getCaptcha'
+import GetCaptcha from '@/components/zml/GetCaptcha/index'
 
 
 interface LoginItemState {

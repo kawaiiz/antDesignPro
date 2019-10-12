@@ -138,16 +138,12 @@ class AuthorityTree extends Component<Authprops, AuthState> {
             </Button>
           </div> : ''
         }
-        {
-          originalAuthList.length > 0 ? (<div>
-            <TreeTable
-              authority={authority}
-              originalAuthList={originalAuthList}
-              handleBtnClickEdit={this.handleBtnClickEdit}
-              handleBtnClickDeleteUpData={this.handleBtnClickDeleteUpData}
-            />
-          </div>) : <Empty description={false} />
-        }
+        <TreeTable
+          authority={authority}
+          originalAuthList={originalAuthList}
+          handleBtnClickEdit={this.handleBtnClickEdit}
+          handleBtnClickDeleteUpData={this.handleBtnClickDeleteUpData}
+        />
       </Card>
       <Drawer
         title={`${actionType ? formatMessage({ id: 'authority-tree.table.' + actionType }) : ''} ${actionTag.name}`}
@@ -155,10 +151,11 @@ class AuthorityTree extends Component<Authprops, AuthState> {
         width={720}
         closable={false}
         maskClosable={false}
+        destroyOnClose={true}
         onClose={this.initActionTag}
         visible={drawerVisible}
       >
-        {drawerVisible ? <TreeForm actionTag={actionTag} authList={authList} onClose={this.initActionTag} onSubmit={this.handleFormSubmit} /> : null}
+        <TreeForm actionTag={actionTag} authList={authList} onClose={this.initActionTag} onSubmit={this.handleFormSubmit} />
       </Drawer>
     </PageHeaderWrapper >);
   }

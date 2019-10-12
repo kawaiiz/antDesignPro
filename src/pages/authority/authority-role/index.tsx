@@ -204,9 +204,8 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
     const { authority, drawerVisible, actionTag, actionType, roleList, upDataLoading, getListLoading, } = this.state
     const { loading, allAuthList, originalAuthList } = this.props
     return (<PageHeaderWrapper content={<FormattedMessage id="authority-role.header.description" />}>
-      <Card loading={loading}>
+      <Card>
         <Alert className={styles['authority-role-warning']} message={formatMessage({ id: 'authority-tree.warning' })} type="warning" />
-
         {
           getResourcesAuth(9) ? <div className={styles['authority-add-button']}>
             <Button size="large" type="primary" style={{ float: 'right' }} onClick={this.handleBtnClickAdd}>
@@ -214,18 +213,13 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
             </Button>
           </div> : ''
         }
-
-        {
-          roleList.length > 0 ? (<div>
-            <RoleTable
-              authority={authority}
-              roleList={roleList}
-              getListLoading={getListLoading}
-              handleBtnClickEdit={this.handleBtnClickEdit}
-              handleBtnClickDeleteUpData={this.handleBtnClickDeleteUpData}
-            />
-          </div>) : <Empty description={false} />
-        }
+        <RoleTable
+          authority={authority}
+          roleList={roleList}
+          getListLoading={getListLoading}
+          handleBtnClickEdit={this.handleBtnClickEdit}
+          handleBtnClickDeleteUpData={this.handleBtnClickDeleteUpData}
+        />
       </Card>
       <Drawer
         title={`${actionType ? formatMessage({ id: 'authority-role.table.' + actionType }) : ''} ${actionTag.roleName || ''}`}
@@ -233,10 +227,11 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
         width={720}
         closable={false}
         maskClosable={false}
+        destroyOnClose={true}
         onClose={this.initActionTag}
         visible={drawerVisible}
       >
-        {drawerVisible ? <RoleForm actionTag={actionTag} originalAuthList={originalAuthList} upDataLoading={upDataLoading} allAuthList={allAuthList} onClose={this.initActionTag} onSubmit={this.handleFormSubmit} /> : null}
+        <RoleForm actionTag={actionTag} originalAuthList={originalAuthList} upDataLoading={upDataLoading} allAuthList={allAuthList} onClose={this.initActionTag} onSubmit={this.handleFormSubmit} /> 
       </Drawer>
     </PageHeaderWrapper>)
   }

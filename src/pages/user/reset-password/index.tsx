@@ -10,7 +10,7 @@ import router from 'umi/router';
 import { StateType } from './model';
 import styles from './style.less';
 
-import GetCaptcha from '@/components/myPublicComponents/getCaptcha'
+import GetCaptcha from '@/components/zml/GetCaptcha/index'
 
 const FormItem = Form.Item;
 const { Option } = Select;
