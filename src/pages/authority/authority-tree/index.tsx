@@ -19,6 +19,7 @@ import TreeForm from './components/from'
 import styles from './style.less'
 import { IRoute } from 'umi-types/config'
 import { getResourcesAuth } from '@/utils/utils'
+import { MyConfig } from '../../../../config/config';
 
 interface AuthState {
   authority: string,
@@ -132,7 +133,7 @@ class AuthorityTree extends Component<Authprops, AuthState> {
       <Card loading={loading}>
         <Alert className={styles['authority-tree-warning']} message={formatMessage({ id: 'authority-tree.warning' })} type="warning" />
         {
-          getResourcesAuth(6) ? <div className={styles['authority-add-button']}>
+          authority === MyConfig.SUPER_ADMIN ? <div className={styles['authority-add-button']}>
             <Button size="large" type="primary" style={{ float: 'right' }} onClick={this.handleBtnClickAdd}>
               <FormattedMessage id='component.add'></FormattedMessage>
             </Button>

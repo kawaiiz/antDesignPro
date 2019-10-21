@@ -9,6 +9,7 @@ import {
 const ButtonGroup = Button.Group;
 import { formatMessage } from 'umi-plugin-react/locale';
 import { getResourcesAuth } from '@/utils/utils'
+import { MyConfig } from '../../../../../config/config'
 
 import { toTree } from '@/models/auth'
 
@@ -20,7 +21,7 @@ interface TreeTableProp {
 }
 
 const TreeTable: React.FC<TreeTableProp> = (props) => {
-  const { originalAuthList, handleBtnClickDeleteUpData, handleBtnClickEdit } = props
+  const { originalAuthList, handleBtnClickDeleteUpData, handleBtnClickEdit, authority } = props
   const columns = [
     {
       title: formatMessage({ id: 'authority-tree.table.name' }),
@@ -62,7 +63,7 @@ const TreeTable: React.FC<TreeTableProp> = (props) => {
       render: (text: IRoute, record: IRoute, index: number) => {
         return (
           <ButtonGroup>
-            {
+            {/* {
               getResourcesAuth(7) ? <Button onClick={() => handleBtnClickEdit(record)}>
                 {formatMessage({ id: 'authority-tree.table.edit' })}
               </Button> : ''
@@ -75,6 +76,22 @@ const TreeTable: React.FC<TreeTableProp> = (props) => {
                 onConfirm={() => handleBtnClickDeleteUpData(record)}>
                 <Button type="danger">{formatMessage({ id: 'authority-tree.table.delete' })}</Button>
               </Popconfirm> : ''
+            } */}
+            {
+              authority === MyConfig.SUPER_ADMIN && (
+                <>
+                  <Button onClick={() => handleBtnClickEdit(record)}>
+                    {formatMessage({ id: 'authority-tree.table.edit' })}
+                  </Button>
+                  <Popconfirm
+                    title={`${formatMessage({ id: 'authority-tree.table.delete' })} ${record.name}?`}
+                    okText={formatMessage({ id: 'component.confirm' })}
+                    cancelText={formatMessage({ id: 'component.cancel' })}
+                    onConfirm={() => handleBtnClickDeleteUpData(record)}>
+                    <Button type="danger">{formatMessage({ id: 'authority-tree.table.delete' })}</Button>
+                  </Popconfirm>
+                </>
+              )
             }
           </ButtonGroup >
         )

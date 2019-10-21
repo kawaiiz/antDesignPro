@@ -2,6 +2,7 @@ import React from 'react';
 import { CURRENT } from './renderAuthorize';
 // eslint-disable-next-line import/no-cycle
 import PromiseRender from './PromiseRender';
+import { MyConfig } from '../../../config/config'
 
 export type IAuthorityType =
   | undefined
@@ -29,7 +30,7 @@ const checkPermissions = <T, K>(
   if (!authority) {
     return target;
   }
-  if (currentAuthority === 'SUPER_ADMIN') {
+  if (currentAuthority === MyConfig.SUPER_ADMIN) {
     return target
   }
   // 数组处理

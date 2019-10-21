@@ -62,6 +62,8 @@ const plugins: IPlugin[] = [
 // refreshToken 重置token用的refreshToken的字段名
 // upImgFileUrl 上传文件的地址
 // meauType 左边菜单是i18ny文字还是原文字
+// SUPER_ADMIN 超级管理员的字段名
+// HOME_PATH 首页路径 假如这个人没有home的权限 需要给他新的首页
 interface footerContentLinks {
   key: string,
   title: string,
@@ -83,7 +85,9 @@ interface MyConfigInterFace {
   refreshToken: string,
   upImgFileUrl: string,
   menuType: 'i18n' | 'text',
-  [key: string]: any
+  [key: string]: any,
+  SUPER_ADMIN: string,
+  HOME_PATH: string
 }
 export const MyConfig: MyConfigInterFace = {
   // 请求的域名
@@ -104,7 +108,9 @@ export const MyConfig: MyConfigInterFace = {
   token: 'token',
   refreshToken: 'refreshToken',
   upImgFileUrl: '/api/web/file/img',
-  menuType: 'text'
+  menuType: 'text',
+  SUPER_ADMIN: 'SUPER_ADMIN',
+  HOME_PATH: '/home'
 };
 
 export default {

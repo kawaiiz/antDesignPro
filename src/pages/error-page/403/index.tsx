@@ -3,6 +3,7 @@ import router from 'umi/router';
 import { Result, Button } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { formatMessage } from 'umi-plugin-react/locale';
+import { MyConfig } from '../../../../config/config'
 
 const error403: React.FC = props => {
   const [num, setNum] = useState(5)
@@ -34,7 +35,7 @@ const error403: React.FC = props => {
         (
           <>
             <div>{num}秒后返回上一页</div>
-            <Link to="/">
+            <Link  to={MyConfig.HOME_PATH}>
               <Button type="primary">
                 {formatMessage({ id: 'error-page-403.exception.back', defaultMessage: 'Back Home' })}
               </Button>
