@@ -3,7 +3,7 @@ import Link from 'umi/link';
 import { Result, Button } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { formatMessage } from 'umi-plugin-react/locale';
-import { MyConfig } from '../../../../config/config'
+import { MyConfig } from 'config'
 
 const error404: React.FC = props => {
   const [num, setNum] = useState(5)

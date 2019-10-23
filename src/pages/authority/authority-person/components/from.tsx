@@ -20,7 +20,7 @@ import { Role } from '@/pages/authority/authority-role/data'
 import { getResourcesAuth } from '@/utils/utils'
 import { setRole } from '@/pages/authority/authority-role/service'
 import { getToken, getBaseUrl } from '@/utils/utils'
-import { MyConfig } from '../../../../../config/config'
+import { MyConfig } from 'config'
 import { SetMethod } from '@/utils/axios'
 
 const upImgFileUrl = MyConfig.upImgFileUrl

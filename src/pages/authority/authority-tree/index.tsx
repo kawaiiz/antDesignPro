@@ -19,7 +19,7 @@ import TreeForm from './components/from'
 import styles from './style.less'
 import { IRoute } from 'umi-types/config'
 import { getResourcesAuth } from '@/utils/utils'
-import { MyConfig } from '../../../../config/config';
+import { MyConfig } from 'config';
 
 interface AuthState {
   authority: string,

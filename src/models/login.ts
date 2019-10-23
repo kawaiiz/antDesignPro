@@ -8,7 +8,7 @@ import { formatMessage } from 'umi-plugin-react/locale';
 import { notification } from 'antd';
 import { reloadAuthorized } from '@/utils/Authorized'
 
-import { MyConfig } from '../../config/config'
+import { MyConfig } from 'config'
 
 const REFRESH_TOKEN = MyConfig.refreshToken
 

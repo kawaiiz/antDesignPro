@@ -13,7 +13,7 @@ import styles from './style.less';
 import { LoginParamsType } from '@/services/login';
 import { ConnectState } from '@/models/connect';
 import { delToken } from '@/utils/utils'
-import { MyConfig } from '../../../../config/config'
+import { MyConfig } from 'config'
 
 const REFRESH_TOKEN = MyConfig.refreshToken
 

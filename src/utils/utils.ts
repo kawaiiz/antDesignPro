@@ -1,7 +1,7 @@
 import { parse } from 'querystring';
 import Cookies from 'js-cookie'
 
-import { MyConfig } from '../../config/config'
+import { MyConfig } from 'config'
 
 
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */

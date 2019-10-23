@@ -12,7 +12,7 @@ import logo from '../assets/logo.png';
 import styles from './UserLayout.less';
 
 import defaultSettings from '../../config/defaultSettings'
-import { MyConfig } from '../../config/config'
+import { MyConfig } from 'config'
 
 export interface UserLayoutProps extends ConnectProps {
   breadcrumbNameMap: { [path: string]: MenuDataItem };

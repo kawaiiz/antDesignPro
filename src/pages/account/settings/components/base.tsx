@@ -6,7 +6,7 @@ import { CurrentUser } from '@/models/user';
 import styles from './BaseView.less';
 
 import { getBaseUrl, getToken } from '@/utils/utils'
-import { MyConfig } from '../../../../../config/config'
+import { MyConfig } from 'config'
 import GetCaptcha from '@/components/zml/GetCaptcha/index'
 
 const upImgFileUrl = MyConfig.upImgFileUrl

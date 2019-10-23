@@ -9,7 +9,7 @@ import {
 const ButtonGroup = Button.Group;
 import { formatMessage } from 'umi-plugin-react/locale';
 import { getResourcesAuth } from '@/utils/utils'
-import { MyConfig } from '../../../../../config/config'
+import { MyConfig } from 'config'
 
 import { toTree } from '@/models/auth'
 

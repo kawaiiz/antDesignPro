@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 import router from 'umi/router';
 import { getToken, delToken, setToken, getBaseUrl } from '@/utils/utils'
 import { notification } from 'antd';
-import { MyConfig } from '../../config/config'
+import { MyConfig } from 'config'
 
 const REFRESH_TOKEN = MyConfig.refreshToken
 

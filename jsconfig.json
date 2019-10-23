@@ -4,7 +4,12 @@
     "experimentalDecorators": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ],
+      "config": [
+        "./config/config"
+      ],
     }
   }
 }
