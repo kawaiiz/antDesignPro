@@ -4,12 +4,13 @@ import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import { FormComponentProps } from 'antd/es/form';
 
 interface ResetPasswordProps extends FormComponentProps {
+  upDataLoading: boolean
   onSubmit: (from: any) => Promise<null>
 }
 
 
 const resetPassword: React.FC<ResetPasswordProps> = (props) => {
-  const { form, onSubmit } = props;
+  const { form, onSubmit, upDataLoading } = props;
   const { getFieldDecorator } = form
   const [help, setHelp] = useState('')
 
@@ -64,7 +65,9 @@ const resetPassword: React.FC<ResetPasswordProps> = (props) => {
                   message: formatMessage({ id: 'account-settings.reset-password.oldPassword-message' }, {}),
                 },
               ],
-            })(<Input />)}
+            })(<Input
+              type="password"
+            />)}
           </Form.Item>
           <Form.Item help={help} label={formatMessage({ id: 'account-settings.reset-password.newPassword' })}>
             {getFieldDecorator('newPassword', {
@@ -79,7 +82,6 @@ const resetPassword: React.FC<ResetPasswordProps> = (props) => {
               ],
             })(
               <Input
-                size="large"
                 type="password"
               />,
             )}
@@ -97,12 +99,11 @@ const resetPassword: React.FC<ResetPasswordProps> = (props) => {
               ],
             })(
               <Input
-                size="large"
                 type="password"
               />,
             )}
           </Form.Item>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" loading={upDataLoading} disabled={upDataLoading}>
             <FormattedMessage id="component.confirm" defaultMessage="Update Information" />
           </Button>
         </Form>

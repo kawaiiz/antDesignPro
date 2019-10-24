@@ -115,7 +115,7 @@ export const MyConfig: MyConfigInterFace = {
   token: 'token',
   refreshToken: 'refreshToken',
   upImgFileUrl: '/api/web/file/img',
-  menuType: 'text',
+  menuType: 'i18n',
   SUPER_ADMIN: 'SUPER_ADMIN',
   HOME_PATH: '/home'
 };

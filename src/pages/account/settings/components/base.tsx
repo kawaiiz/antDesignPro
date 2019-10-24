@@ -13,6 +13,7 @@ const upImgFileUrl = MyConfig.upImgFileUrl
 
 interface BaseViewProps extends FormComponentProps {
   currentUser: CurrentUser;
+  upDataLoading: boolean;
   onSubmit: (from: any) => void
 }
 
@@ -99,7 +100,7 @@ class BaseView extends Component<BaseViewProps> {
 
   render() {
     const {
-      form, currentUser
+      form, currentUser, upDataLoading
     } = this.props;
     const { getFieldDecorator } = form
     return (
@@ -144,7 +145,7 @@ class BaseView extends Component<BaseViewProps> {
                 </Col>
               </Row>
             </Form.Item>
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" loading={upDataLoading} disabled={upDataLoading}>
               <FormattedMessage id="account-settings.basic.update" defaultMessage="Update Information" />
             </Button>
           </div>

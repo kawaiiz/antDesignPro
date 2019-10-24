@@ -15,6 +15,7 @@ import Link from 'umi/link';
 import { Dispatch } from 'redux';
 import { connect } from 'dva';
 import { formatMessage } from 'umi-plugin-react/locale';
+import { IRoute } from 'umi-types/config'
 
 import Authorized from '@/utils/Authorized';
 import RightContent from '@/components/GlobalHeader/RightContent';
@@ -22,7 +23,7 @@ import { ConnectState } from '@/models/connect';
 
 import { MyConfig } from 'config'
 // import logo from '../assets/logo.svg';
-import logo from '../assets/logo.png';
+import logo from '@/assets/logo.png';
 
 export interface BasicLayoutProps extends ProLayoutProps {
   breadcrumbNameMap: {
@@ -45,6 +46,26 @@ const footerRender: BasicLayoutProps['footerRender'] = (_, defaultDom) => {
 
 const BasicLayout: React.FC<BasicLayoutProps> = props => {
   const { dispatch, children, settings, authList } = props;
+
+  /**
+ * use Authorized check all menu item
+ */
+  const menuDataRender = (menuList: MenuDataItem[]): MenuDataItem[] => {
+    return menuList.map(item => {
+      const localItem = {
+        ...item,
+        children: item.children ? menuDataRender(item.children) : [],
+      };
+      if (MyConfig.menuType === 'i18n') {
+        localItem.name = formatMessage({
+          id: `menu.${item.name}`,
+          defaultMessage: item.name
+        })
+      }
+      return Authorized.check(item.authority, localItem, null) as MenuDataItem;
+    });
+  }
+
   useState(() => {
     if (dispatch) {
       dispatch({
@@ -65,24 +86,6 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
     }
   };
 
-  /**
-  * use Authorized check all menu item
-  */
-  const menuDataRender = (menuList: MenuDataItem[]): MenuDataItem[] => {
-    return menuList.map(item => {
-      const localItem = {
-        ...item,
-        children: item.children ? menuDataRender(item.children) : [],
-      };
-      if (MyConfig.menuType === 'i18n') {
-        localItem.name = formatMessage({
-          id: `menu.${item.name}`,
-          defaultMessage: item.name
-        })
-      }
-      return Authorized.check(item.authority, localItem, null) as MenuDataItem;
-    });
-  }
   return (
     <>
       <ProLayout
@@ -95,13 +98,13 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
           return <Link to={menuItemProps.path}>{defaultDom}</Link>;
         }}
         breadcrumbRender={(routers = []) => [
-          {
-            path: '/',
-            breadcrumbName: formatMessage({
-              id: 'menu.home',
-              defaultMessage: 'Home',
-            }),
-          },
+          // {
+          //   path: '/',
+          //   breadcrumbName: formatMessage({
+          //     id: 'menu.home',
+          //     defaultMessage: 'Home',
+          //   }),
+          // },
           ...routers,
         ]}
         itemRender={(route, params, routes, paths) => {
@@ -113,7 +116,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
             );
         }}
         footerRender={footerRender}
-        menuDataRender={() => menuDataRender(authList)}
+        menuDataRender={() => menuDataRender(authList as MenuDataItem[])}
         formatMessage={formatMessage}
         rightContentRender={rightProps => <RightContent {...rightProps} />}
         {...props}

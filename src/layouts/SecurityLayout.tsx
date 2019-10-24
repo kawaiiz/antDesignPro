@@ -12,6 +12,7 @@ import { getToken } from '@/utils/utils'
 import { Route } from '@ant-design/pro-layout/lib/typings'
 import lodash from 'lodash'
 import { IRoute } from 'umi-types';
+import { MyConfig } from 'config';
 
 interface SecurityLayoutProps extends ConnectProps {
   loading: boolean;
@@ -62,16 +63,30 @@ const SecurityLayoutFunc: React.FC<SecurityLayoutProps> = props => {
   const [components, setComponents] = useState<Map<string, any>>();// react hook
   const newInitialRoutes = lodash.cloneDeep(initialRoutes); // 防止每次请求到权限资源信息都添加到route.router，导致很多重复并且很长，所以先储存最开始的，然后每请求一次就注入route.router里
 
-  function addRoute(menuItem: MenuDataItem) {
+  let HOME_PATH = ''
+
+  // 只插入第一级的路由，因为子路由在第一级路由的children/router字段里
+function addRoute(menuItem: MenuDataItem, index: number) {
     let newMenuItem = lodash.cloneDeep(menuItem)
+    newMenuItem.routes = []
+    newMenuItem.component = typeof menuItem.name === 'string' ? components!.get(menuItem.name) : undefined
+    newMenuItem.exact = true
     if (menuItem.children && menuItem.children.length > 0) {
-      (newMenuItem.children!).forEach(t => addRoute(t));
-    } else if (route && route.routes && components) {
-      newMenuItem.component = typeof menuItem.name === 'string' ? components.get(menuItem.name) : undefined
-      newMenuItem.exact = true
-      // route.routes.unshift(newMenuItem);
+      // (newMenuItem.children!).forEach((t: MenuDataItem) => addRoute(t, index + 1));
+      for (let i = 0; i < newMenuItem.children!.length; i++) {
+        newMenuItem.routes[i] = addRoute(newMenuItem.children![i], index + 1)
+      }
+    }
+    if (index === 0) {
       newInitialRoutes.unshift(newMenuItem);
     }
+    // 插入 当path:'/'重定向的路径
+    if (HOME_PATH.length === 0 && menuItem.own) {
+      HOME_PATH = menuItem.path
+      MyConfig.HOME_PATH = menuItem.path
+      newInitialRoutes.unshift({ path: '/', redirect: menuItem.path, exact: true })
+    }
+    return newMenuItem
   }
 
   // 将组件传到component变量里 react hook  重复的变量路由 
@@ -96,7 +111,7 @@ const SecurityLayoutFunc: React.FC<SecurityLayoutProps> = props => {
   // 当只有components, authList 变化 才会触发变化 
   useEffect(() => {
     if (route && route.routes && components && authList) {
-      authList.forEach(addRoute);
+      authList.forEach((item) => addRoute(item, 0))
       // 原本这里是 router.push(location.pathName) 发现总是跳 location.pathName=/  打印了location 发现有hash值 所以 直接截取hash值放进去 
       // router.push(location.hash.slice(1));
       // 因为在不打开调试情况下 newInitialRoutes第一次运行是空数组 
@@ -109,7 +124,6 @@ const SecurityLayoutFunc: React.FC<SecurityLayoutProps> = props => {
       setIsReady(false)
     }
   }, [components, authList]);
-
 
   if ((!currentUser.id && loading) || !isReady) {
     return <PageLoading />;

@@ -6,7 +6,6 @@ import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import { GridContent } from '@ant-design/pro-layout';
 import { Menu, notification } from 'antd';
 import BaseView from './components/base';
-import NotificationView from './components/notification';
 import ResetPassword from './components/resetPassword';
 import styles from './style.less';
 import { CurrentUser } from '@/models/user';
@@ -18,13 +17,14 @@ interface SettingsProps {
   dispatch: Dispatch<any>,
 }
 
-type SettingsStateKeys = 'base' | 'notification' | 'resetPassword';
+type SettingsStateKeys = 'base' | 'resetPassword';
 interface SettingsState {
   mode: 'inline' | 'horizontal';
   menuMap: {
     [key: string]: React.ReactNode;
   };
   selectKey: SettingsStateKeys;
+  upDataLoading: boolean
 }
 
 @connect(
@@ -41,13 +41,13 @@ SettingsState
     super(props);
     const menuMap = {
       base: <FormattedMessage id="account-settings.menuMap.basic" defaultMessage="Basic Settings" />,
-      notification: <FormattedMessage id="account-settings.menuMap.notification" defaultMessage="New Message Notification" />,
       resetPassword: <FormattedMessage id="account-settings.menuMap.reset-password" defaultMessage="reset password" />,
     };
     this.state = {
       mode: 'inline',
       menuMap,
       selectKey: 'base',
+      upDataLoading: false
     };
   }
 
@@ -106,6 +106,9 @@ SettingsState
   handlerChangeUserinfo = async (from: any) => {
     try {
       const { dispatch } = this.props;
+      this.setState({
+        upDataLoading: true
+      })
       await dispatch({
         type: 'user/changeCurrent',
         payload: from
@@ -114,19 +117,28 @@ SettingsState
         description: formatMessage({ id: 'component.action-success' }),
         message: formatMessage({ id: 'component.success' }),
       });
+      this.setState({
+        upDataLoading: false
+      })
     } catch (e) {
       console.log(e)
       notification.error({
         description: e.errorMsg,
         message: formatMessage({ id: 'component.error' }),
       });
+      this.setState({
+        upDataLoading: false
+      })
     }
   }
 
   // 修改密码
-  handlerChangePassword = async (from: any) => {
+  handlerChangePassword = async (from: any): Promise<any> => {
     try {
       const { dispatch } = this.props;
+      this.setState({
+        upDataLoading: true
+      })
       await dispatch({
         type: 'user/changePassword',
         payload: from
@@ -135,12 +147,18 @@ SettingsState
         description: formatMessage({ id: 'component.action-success' }),
         message: formatMessage({ id: 'component.success' }),
       });
+      this.setState({
+        upDataLoading: false
+      })
       return Promise.resolve()
     } catch (e) {
       notification.error({
         description: e.errorMsg,
         message: formatMessage({ id: 'component.error' }),
       });
+      this.setState({
+        upDataLoading: false
+      })
       return Promise.reject()
     }
   }
@@ -152,8 +170,6 @@ SettingsState
     switch (selectKey) {
       case 'base':
         return <BaseView currentUser={currentUser} onSubmit={this.handlerChangeUserinfo} />;
-      case 'notification':
-        return <NotificationView />;
       case 'resetPassword':
         return <ResetPassword onSubmit={this.handlerChangePassword} />;
       default:
