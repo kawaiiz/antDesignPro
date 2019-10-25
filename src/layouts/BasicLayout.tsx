@@ -31,7 +31,7 @@ export interface BasicLayoutProps extends ProLayoutProps {
   };
   settings: Settings;
   dispatch: Dispatch;
-  authList: [];
+  authList: IRoute[];
 }
 
 export type BasicLayoutContext = { [K in 'location']: BasicLayoutProps[K] } & {
@@ -46,7 +46,6 @@ const footerRender: BasicLayoutProps['footerRender'] = (_, defaultDom) => {
 
 const BasicLayout: React.FC<BasicLayoutProps> = props => {
   const { dispatch, children, settings, authList } = props;
-
   /**
  * use Authorized check all menu item
  */

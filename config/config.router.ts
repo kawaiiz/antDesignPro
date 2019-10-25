@@ -43,8 +43,7 @@ export const contentRoutes: IRoute[] = [{
       icon: ' ',
       component: './authority/authority-person/index',
     }],
-},
-]
+}]
 
 const routes: IRoute[] = [
   {
@@ -85,33 +84,77 @@ const routes: IRoute[] = [
         path: '/',
         component: '../layouts/BasicLayout',
         Routes: ['src/pages/Authorized'],
-        routes: [{
-          path: '/',
-          redirect: '/home',
-        }, {
-          name: 'settings',
-          path: '/account/settings',
-          component: './account/settings',
-          hideInMenu: true,
-        },
-        {
-          name: '404',
-          path: '/error-page/404',
-          component: './error-page/404/index',
-          hideInMenu: true,
-        },
-        {
-          name: '403',
-          path: '/error-page/403',
-          component: './error-page/403/index',
-          hideInMenu: true,
-        },
-        {
-          name: '500',
-          path: '/error-page/500',
-          component: './error-page/500/index',
-          hideInMenu: true,
-        },
+        routes: [
+          {
+            path: '/',
+            redirect: '/index',
+          },
+          {
+            name: 'index',
+            path: '/index',
+            component: './index',
+            hideInMenu: true,
+          }, {
+            name: 'settings',
+            path: '/account/settings',
+            component: './account/settings',
+            hideInMenu: true,
+          },
+          {
+            name: '404',
+            path: '/error-page/404',
+            component: './error-page/404/index',
+            hideInMenu: true,
+          },
+          {
+            name: '403',
+            path: '/error-page/403',
+            component: './error-page/403/index',
+            hideInMenu: true,
+          },
+          {
+            name: '500',
+            path: '/error-page/500',
+            component: './error-page/500/index',
+            hideInMenu: true,
+          },
+          {
+            path: '/home',
+            name: 'home',
+            icon: 'smile',
+            component: './content/home/index',
+          },
+          {
+            path: '/authority',
+            name: 'authority',
+            icon: ' ',
+            routes: [
+              {
+                path: '/authority',
+                redirect: '/authority/role',
+              },
+              {
+                path: '/authority/tree',
+                name: 'authority-tree',
+                icon: ' ',
+                component: './authority/authority-tree/index',
+              }, {
+                path: '/authority/role',
+                name: 'authority-role',
+                icon: ' ',
+                component: './authority/authority-role/index',
+              }, {
+                path: '/authority/person',
+                name: 'authority-person',
+                icon: ' ',
+                component: './authority/authority-person/index',
+              },
+              { component: './error-page/404/index', }
+            ],
+          },
+          {
+            component: './error-page/404/index',
+          },
         ],
       },
       {
@@ -120,17 +163,15 @@ const routes: IRoute[] = [
     ],
   },
   {
+    component: './error-page/404/index',
+  },
+  {
     component: './error-page/403/index',
   },
   {
     component: './error-page/404/index',
   },
-  {
-    component: './error-page/404/index',
-  },
 ]
-
-routes[1].routes[0].routes = routes[1].routes[0].routes.concat(contentRoutes)
 
 export default routes
 

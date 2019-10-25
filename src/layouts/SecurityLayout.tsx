@@ -12,7 +12,6 @@ import { getToken } from '@/utils/utils'
 import { Route } from '@ant-design/pro-layout/lib/typings'
 import lodash from 'lodash'
 import { IRoute } from 'umi-types';
-import { MyConfig } from 'config';
 
 interface SecurityLayoutProps extends ConnectProps {
   loading: boolean;
@@ -63,28 +62,23 @@ const SecurityLayoutFunc: React.FC<SecurityLayoutProps> = props => {
   const [components, setComponents] = useState<Map<string, any>>();// react hook
   const newInitialRoutes = lodash.cloneDeep(initialRoutes); // 防止每次请求到权限资源信息都添加到route.router，导致很多重复并且很长，所以先储存最开始的，然后每请求一次就注入route.router里
 
-  let HOME_PATH = ''
-
-  // 只插入第一级的路由，因为子路由在第一级路由的children/router字段里
-function addRoute(menuItem: MenuDataItem, index: number) {
+  // 只插入第一级的路由，因为子路由在第一级路由的children/router字段里 这里只管注入路由， 不管首页 首页在 page/index.tsx里判断
+  function addRoute(menuItem: MenuDataItem, index: number) {
     let newMenuItem = lodash.cloneDeep(menuItem)
     newMenuItem.routes = []
     newMenuItem.component = typeof menuItem.name === 'string' ? components!.get(menuItem.name) : undefined
     newMenuItem.exact = true
     if (menuItem.children && menuItem.children.length > 0) {
-      // (newMenuItem.children!).forEach((t: MenuDataItem) => addRoute(t, index + 1));
       for (let i = 0; i < newMenuItem.children!.length; i++) {
-        newMenuItem.routes[i] = addRoute(newMenuItem.children![i], index + 1)
+        // 当是有折叠列表的栏目时，给路由添加重定向 
+        if (i === 0 && index === 0) {
+          newMenuItem.routes.unshift({ path: newMenuItem.path, redirect: newMenuItem.children![i].path, exact: true })
+        }
+        newMenuItem.routes[i + 1] = addRoute(newMenuItem.children![i], index + 1)
       }
     }
     if (index === 0) {
       newInitialRoutes.unshift(newMenuItem);
-    }
-    // 插入 当path:'/'重定向的路径
-    if (HOME_PATH.length === 0 && menuItem.own) {
-      HOME_PATH = menuItem.path
-      MyConfig.HOME_PATH = menuItem.path
-      newInitialRoutes.unshift({ path: '/', redirect: menuItem.path, exact: true })
     }
     return newMenuItem
   }

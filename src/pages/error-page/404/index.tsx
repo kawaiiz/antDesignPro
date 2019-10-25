@@ -35,7 +35,7 @@ const error404: React.FC = props => {
         (
           <>
             <div>{num}秒后返回上一页</div>
-            <Link  to={MyConfig.HOME_PATH}>
+            <Link  to='/index'>
               <Button type="primary">
                 {formatMessage({ id: 'error-page-404.exception.back', defaultMessage: 'Back Home' })}
               </Button>
