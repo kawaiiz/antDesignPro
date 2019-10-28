@@ -208,7 +208,7 @@ ResetPasswordState
         <h3>
           <FormattedMessage id="reset-password.reset-password.reset-password" />
         </h3>
-        <Form onSubmit={this.handleSubmit}>
+        <Form>
           <FormItem>
             {getFieldDecorator('username', {
               rules: [
@@ -328,7 +328,7 @@ ResetPasswordState
               loading={submitting}
               className={styles.submit}
               type="primary"
-              htmlType="submit"
+              onClick={this.handleSubmit}
             >
               <FormattedMessage id="reset-password.form.submit" />
             </Button>

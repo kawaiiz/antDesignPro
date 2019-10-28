@@ -88,7 +88,7 @@ class TreeForm extends Component<TreeFormProp, TreeFormState> {
     const { getFieldDecorator } = form;
 
     return (
-      <Form layout="vertical" onSubmit={this.handleSubmit}>
+      <Form layout="vertical">
         <Form.Item label={formatMessage({ id: 'authority-tree.table.name' })}>
           {getFieldDecorator('resourceName', {
             initialValue: actionTag.name,
@@ -164,7 +164,7 @@ class TreeForm extends Component<TreeFormProp, TreeFormState> {
             loading={loading}
             className={styles['authority-from-button']}
             type="primary"
-            htmlType="submit"
+            onClick={this.handleSubmit}
           >
             <FormattedMessage id="component.confirm" />
           </Button>

@@ -105,7 +105,7 @@ class BaseView extends Component<BaseViewProps> {
     const { getFieldDecorator } = form
     return (
       <div ref={this.getViewDom}>
-        <Form className={styles.baseView} layout="vertical" hideRequiredMark onSubmit={this.handlerSubmit}>
+        <Form className={styles.baseView} layout="vertical" hideRequiredMark>
           <div className={styles.left}>
             <Form.Item label={formatMessage({ id: 'account-settings.basic.nickname' })}>
               {getFieldDecorator('username', {
@@ -145,7 +145,7 @@ class BaseView extends Component<BaseViewProps> {
                 </Col>
               </Row>
             </Form.Item>
-            <Button type="primary" htmlType="submit" loading={upDataLoading} disabled={upDataLoading}>
+            <Button type="primary" loading={upDataLoading} disabled={upDataLoading} onClick={this.handlerSubmit}>
               <FormattedMessage id="account-settings.basic.update" defaultMessage="Update Information" />
             </Button>
           </div>

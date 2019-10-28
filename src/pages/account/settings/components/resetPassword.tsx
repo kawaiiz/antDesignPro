@@ -56,7 +56,7 @@ const resetPassword: React.FC<ResetPasswordProps> = (props) => {
   return (
     <Row>
       <Col lg={12} xl={8}>
-        <Form layout="vertical" hideRequiredMark onSubmit={handlerSubmit}>
+        <Form layout="vertical" hideRequiredMark>
           <Form.Item label={formatMessage({ id: 'account-settings.reset-password.oldPassword' })}>
             {getFieldDecorator('oldPassword', {
               rules: [
@@ -103,7 +103,7 @@ const resetPassword: React.FC<ResetPasswordProps> = (props) => {
               />,
             )}
           </Form.Item>
-          <Button type="primary" htmlType="submit" loading={upDataLoading} disabled={upDataLoading}>
+          <Button type="primary" loading={upDataLoading} disabled={upDataLoading} onClick={handlerSubmit}>
             <FormattedMessage id="component.confirm" defaultMessage="Update Information" />
           </Button>
         </Form>

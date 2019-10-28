@@ -199,7 +199,7 @@ const PersonForm: React.FC<PersonFormProp> = (props) => {
   };
 
   return (
-    <Form layout="vertical" onSubmit={handleSubmit}>
+    <Form layout="vertical">
       <Form.Item label={formatMessage({ id: 'authority-person.form.name' })}>
         {getFieldDecorator('username', {
           initialValue: actionTag.username,
@@ -312,6 +312,7 @@ const PersonForm: React.FC<PersonFormProp> = (props) => {
           className={styles['authority-from-button']}
           type="primary"
           htmlType="submit" 
+          onClick={handleSubmit}
         >
           <FormattedMessage id="component.confirm" />
         </Button>

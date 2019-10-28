@@ -228,7 +228,7 @@ RegisterState
         <h3>
           <FormattedMessage id="user-register.register.register" />
         </h3>
-        <Form onSubmit={this.handleSubmit}>
+        <Form>
           <FormItem>
             {getFieldDecorator('username', {
               rules: [
@@ -367,7 +367,7 @@ RegisterState
               loading={submitting}
               className={styles.submit}
               type="primary"
-              htmlType="submit"
+              onClick={this.handleSubmit}
             >
               <FormattedMessage id="user-register.register.register" />
             </Button>

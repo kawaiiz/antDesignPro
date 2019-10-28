@@ -103,7 +103,7 @@ class RoleForm extends Component<RoleFormProp, RoleFormState>{
     const { form, onClose, upDataLoading } = this.props;
     const { getFieldDecorator } = form;
     return (
-      <Form layout="vertical" onSubmit={this.handleSubmit}>
+      <Form layout="vertical">
         <Form.Item label={formatMessage({ id: 'authority-role.form.name' })}>
           {getFieldDecorator('roleName', {
             initialValue: newActionTag.roleName,
@@ -138,7 +138,7 @@ class RoleForm extends Component<RoleFormProp, RoleFormState>{
             loading={upDataLoading}
             className={styles['authority-from-button']}
             type="primary"
-            htmlType="submit"
+            onClick={this.handleSubmit}
           >
             <FormattedMessage id="component.confirm" />
           </Button>
