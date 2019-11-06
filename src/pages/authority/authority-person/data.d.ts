@@ -10,4 +10,4 @@ export interface Person {
   "userId"?: number, // 请求的时候要把 id变成userId
   "id"?: number, //  后台给的数据会给id
   "username"?: string
-}
+} 

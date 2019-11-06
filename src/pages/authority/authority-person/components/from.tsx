@@ -17,7 +17,6 @@ const { Option } = Select
 
 import { Person } from '../data.d'
 import { Role } from '@/pages/authority/authority-role/data'
-import { getResourcesAuth } from '@/utils/utils'
 import { setRole } from '@/pages/authority/authority-role/service'
 import { getToken, getBaseUrl } from '@/utils/utils'
 import { MyConfig } from 'config'
@@ -36,17 +35,9 @@ const PersonForm: React.FC<PersonFormProp> = (props) => {
   const { form, onClose, actionTag, onSubmit, upDataLoading } = props;
   const { getFieldDecorator } = form;
   const [roleList, setRoleList] = useState([] as Role[])
-
   // 获取权限角色数组
   const getRoleList = async () => {
     try {
-      if (!getResourcesAuth(15)) {
-        notification.error({
-          description: formatMessage({ id: 'component.not-role' }),
-          message: formatMessage({ id: 'component.error' }),
-        })
-        return
-      }
       const res = await setRole({ data: {}, method: SetMethod['get'] })
       setRoleList(res.data)
     } catch (e) {
@@ -311,7 +302,6 @@ const PersonForm: React.FC<PersonFormProp> = (props) => {
           disabled={upDataLoading}
           className={styles['authority-from-button']}
           type="primary"
-          htmlType="submit" 
           onClick={handleSubmit}
         >
           <FormattedMessage id="component.confirm" />

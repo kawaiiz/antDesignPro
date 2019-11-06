@@ -8,7 +8,7 @@ import {
 } from 'antd';
 const ButtonGroup = Button.Group;
 import { formatMessage } from 'umi-plugin-react/locale';
-import { getResourcesAuth } from '@/utils/utils'
+import { getResourcesAuthById } from '@/utils/utils'
 import { MyConfig } from 'config'
 
 import { toTree } from '@/models/auth'
@@ -23,10 +23,16 @@ interface TreeTableProp {
 const TreeTable: React.FC<TreeTableProp> = (props) => {
   const { originalAuthList, handleBtnClickDeleteUpData, handleBtnClickEdit, authority } = props
   const columns = [
+
     {
       title: formatMessage({ id: 'authority-tree.table.name' }),
       dataIndex: 'name',
       key: 'name',
+    },
+    {
+      title: formatMessage({ id: 'authority-tree.table.name' }),
+      dataIndex: 'id',
+      key: 'id',
     },
     {
       title: formatMessage({ id: 'authority-tree.table.path' }),
@@ -64,18 +70,18 @@ const TreeTable: React.FC<TreeTableProp> = (props) => {
         return (
           <ButtonGroup>
             {/* {
-              getResourcesAuth(7) ? <Button onClick={() => handleBtnClickEdit(record)}>
+              getResourcesAuthById(7) && <Button onClick={() => handleBtnClickEdit(record)}>
                 {formatMessage({ id: 'authority-tree.table.edit' })}
-              </Button> : ''
+              </Button> 
             }
             {
-              getResourcesAuth(8) ? <Popconfirm
+              getResourcesAuthById(8) && <Popconfirm
                 title={`${formatMessage({ id: 'authority-tree.table.delete' })} ${record.name}?`}
                 okText={formatMessage({ id: 'component.confirm' })}
                 cancelText={formatMessage({ id: 'component.cancel' })}
                 onConfirm={() => handleBtnClickDeleteUpData(record)}>
                 <Button type="danger">{formatMessage({ id: 'authority-tree.table.delete' })}</Button>
-              </Popconfirm> : ''
+              </Popconfirm> 
             } */}
             {
               authority === MyConfig.SUPER_ADMIN && (

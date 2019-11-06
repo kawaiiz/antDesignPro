@@ -6,12 +6,12 @@ import { getAuthority } from '@/utils/authority'
 import lodash from 'lodash'
 import {
   Card,
-  Empty,
   Alert,
   Drawer,
   Button,
-  notification
+  notification,
 } from 'antd';
+import { IRoute } from 'umi-types/config'
 
 import { ConnectState } from '@/models/connect';
 import { Role } from './data.d'
@@ -22,7 +22,7 @@ import { SetMethod } from '@/utils/axios'
 import RoleTable from './components/table'
 import RoleForm from './components/from'
 import styles from './style.less'
-import { getResourcesAuth } from '@/utils/utils'
+import { getResourcesAuthById } from '@/utils/utils'
 
 interface RoleState {
   roleList: Role[],
@@ -35,8 +35,8 @@ interface RoleState {
 }
 
 interface RoleProps {
-  allAuthList: [],
-  originalAuthList: [],
+  allAuthList: IRoute[],
+  originalAuthList: IRoute[],
   loading: boolean,
 }
 
@@ -67,16 +67,9 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
   componentDidMount() {
     this.getRoleList()
   }
-  // 获取数组
+  // 获取角色数组
   getRoleList = async () => {
     try {
-      if (!getResourcesAuth(15)) {
-        notification.error({
-          description: formatMessage({ id: 'component.not-role' }),
-          message: formatMessage({ id: 'component.error' }),
-        })
-        return
-      }
       this.setState({
         getListLoading: true
       })
@@ -87,6 +80,9 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
       })
     } catch (e) {
       console.log(e)
+      this.setState({
+        getListLoading: false
+      })
       notification.error({
         description: e.errorMsg,
         message: formatMessage({ id: 'component.error' }),
@@ -104,12 +100,17 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
   }
 
   handleBtnClickAdd = () => {
+    const { actionTag } = this.state
+    const { originalAuthList } = this.props
+    const resourceIds = originalAuthList.map(item => item.id)
     this.setState({
+      actionTag: Object.assign({}, actionTag, { resourceIds }),
       actionType: 'add',
       drawerVisible: true
     })
   }
 
+  // 点击修改 请求这个角色的权限id数组 融合进去
   handleBtnClickEdit = async (row: Role) => {
     try {
       this.setState({
@@ -123,6 +124,9 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
         upDataLoading: false
       })
     } catch (e) {
+      this.setState({
+        upDataLoading: false
+      })
       notification.error({
         description: e.errorMsg,
         message: formatMessage({ id: 'component.error' }),
@@ -154,6 +158,9 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
         message: formatMessage({ id: 'component.success' }),
       });
     } catch (e) {
+      this.setState({
+        upDataLoading: false
+      })
       notification.error({
         description: e.errorMsg,
         message: formatMessage({ id: 'component.error' }),
@@ -171,7 +178,7 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
         upDataLoading: true
       })
       if (actionType === 'edit') {
-        res = await setRole({ data: form, method: SetMethod['edit'] })
+        res = await setRole({ data: form, method: SetMethod['edit']})
         newRoleList = oldRoleList.map(item => {
           if (item.roleId === (res.data as Role).roleId) {
             return Object.assign({}, item, res.data)
@@ -193,6 +200,9 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
       });
       this.initActionTag()
     } catch (e) {
+      this.setState({
+        upDataLoading: false
+      })
       notification.error({
         description: e.errorMsg ? e.errorMsg : formatMessage({ id: 'component.action-error' }),
         message: formatMessage({ id: 'component.error' }),
@@ -204,15 +214,17 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
     const { authority, drawerVisible, actionTag, actionType, roleList, upDataLoading, getListLoading, } = this.state
     const { loading, allAuthList, originalAuthList } = this.props
     return (<PageHeaderWrapper content={<FormattedMessage id="authority-role.header.description" />}>
-      <Card>
-        <Alert className={styles['authority-role-warning']} message={formatMessage({ id: 'authority-tree.warning' })} type="warning" />
+      <Card loading={loading}>
+        <Alert className={styles['authority-role-warning']} message={formatMessage({ id: 'authority-role.warning' })} type="warning" />
+        {/* 新增按钮 */}
         {
-          getResourcesAuth(9) ? <div className={styles['authority-add-button']}>
+          getResourcesAuthById(9) && <div className='box box-row-end btn-mb'>
             <Button size="large" type="primary" style={{ float: 'right' }} onClick={this.handleBtnClickAdd}>
               <FormattedMessage id='component.add'></FormattedMessage>
             </Button>
-          </div> : ''
+          </div>
         }
+
         <RoleTable
           authority={authority}
           roleList={roleList}
@@ -231,7 +243,14 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
         onClose={this.initActionTag}
         visible={drawerVisible}
       >
-        <RoleForm actionTag={actionTag} originalAuthList={originalAuthList} upDataLoading={upDataLoading} allAuthList={allAuthList} onClose={this.initActionTag} onSubmit={this.handleFormSubmit} /> 
+        <RoleForm
+          actionTag={actionTag}
+          actionType={actionType}
+          originalAuthList={originalAuthList}
+          upDataLoading={upDataLoading}
+          allAuthList={allAuthList}
+          onClose={this.initActionTag}
+          onSubmit={this.handleFormSubmit} />
       </Drawer>
     </PageHeaderWrapper>)
   }

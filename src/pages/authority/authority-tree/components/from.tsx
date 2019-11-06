@@ -53,6 +53,8 @@ class TreeForm extends Component<TreeFormProp, TreeFormState> {
   constructor(props: TreeFormProp) {
     super(props)
     const { actionTag } = this.state
+    console.log(props.actionTag)
+
     this.state.actionTag = Object.assign(actionTag, props.actionTag)
     this.createTree()
   }
@@ -153,6 +155,7 @@ class TreeForm extends Component<TreeFormProp, TreeFormState> {
             initialValue: actionTag.hideInMenu,
           })(
             <Radio.Group>
+              {actionTag.hideInMenu}
               <Radio value={true}><FormattedMessage id="authority-tree.form.hide" /></Radio>
               <Radio value={false}><FormattedMessage id="authority-tree.form.show" /></Radio>
             </Radio.Group>,

@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import {
   Table,
   Avatar,
@@ -8,8 +8,8 @@ import {
 const ButtonGroup = Button.Group;
 import { formatMessage } from 'umi-plugin-react/locale';
 import { Person } from '../data.d'
-import { getBaseUrl } from '@/utils/utils'
-import { getResourcesAuth } from '@/utils/utils'
+import { getBaseUrl, getResourcesAuthById } from '@/utils/utils'
+
 
 interface PersonTableProp {
   personList: Person[],
@@ -78,18 +78,18 @@ const PersonTable: React.FC<PersonTableProp> = (props) => {
         return (
           <ButtonGroup>
             {
-              getResourcesAuth(13) ? <Button onClick={() => handleBtnClickEdit(record)}>
+              getResourcesAuthById(13) && <Button onClick={() => handleBtnClickEdit(record)}>
                 {formatMessage({ id: 'authority-person.table.edit' })}
-              </Button> : ''
+              </Button>
             }
             {
-              getResourcesAuth(14) ? <Popconfirm
+              getResourcesAuthById(14) && <Popconfirm
                 title={`${formatMessage({ id: 'authority-person.table.delete' })} ${record.username}?`}
                 okText={formatMessage({ id: 'component.confirm' })}
                 cancelText={formatMessage({ id: 'component.cancel' })}
                 onConfirm={() => handleBtnClickDeleteUpData(record)}>
                 <Button type="danger" loading={upDataLoading} disabled={upDataLoading}>{formatMessage({ id: 'authority-person.table.delete' })}</Button>
-              </Popconfirm> : ''
+              </Popconfirm>
             }
           </ButtonGroup >
         )

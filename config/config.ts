@@ -62,6 +62,7 @@ const plugins: IPlugin[] = [
   ],
 ]; // 针对 preview.pro.ant.design 的 GA 统计代码
 
+
 // baseurl 本地域名 在线域名
 // footerContent 底部关于公司的文本
 // cookieExpires cookie过期时间 本项目用的localStorage
@@ -69,8 +70,6 @@ const plugins: IPlugin[] = [
 // refreshToken 重置token用的refreshToken的字段名
 // upImgFileUrl 上传文件的地址
 // meauType 左边菜单是i18ny文字还是原文字
-// SUPER_ADMIN 超级管理员的字段名
-// HOME_PATH 首页路径 假如这个人没有home的权限 需要给他新的首页
 interface footerContentLinks {
   key: string,
   title: string,
@@ -96,6 +95,7 @@ interface MyConfigInterFace {
   SUPER_ADMIN: string,
   HOME_PATH: string
 }
+
 export const MyConfig: MyConfigInterFace = {
   // 请求的域名
   baseUrl: {
@@ -115,6 +115,7 @@ export const MyConfig: MyConfigInterFace = {
   token: 'token',
   refreshToken: 'refreshToken',
   upImgFileUrl: '/api/web/file/img',
+  // menuType: 'text'
   menuType: 'i18n',
   SUPER_ADMIN: 'SUPER_ADMIN',
   HOME_PATH: '/home'

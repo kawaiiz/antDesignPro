@@ -14,7 +14,7 @@ export async function setRole({ data, method }: { data: Role, method: Method }):
 export async function getRoleDetail(data: { roleId: number }) {
   return await axios.request({
     url: '/api/web/roles/detail',
-    method: 'get',
+    method: 'GET',
     params: data
   })
 }

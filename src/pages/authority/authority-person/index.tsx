@@ -3,10 +3,8 @@ import { connect } from 'dva';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import { getAuthority } from '@/utils/authority'
-import lodash from 'lodash'
 import {
   Card,
-  Empty,
   Alert,
   Drawer,
   Button,
@@ -18,12 +16,10 @@ import { Role } from '@/pages/authority/authority-role/data'
 import { SetMethod } from '@/utils/axios'
 import { setPerson } from './service'
 
-
-
 import PersonTable from './components/table'
 import PersonForm from './components/from'
 import styles from './style.less'
-import { getResourcesAuth } from '@/utils/utils'
+import { getResourcesAuthById } from '@/utils/utils'
 
 interface PersonState {
   roleList: Role[],
@@ -57,7 +53,7 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
     drawerVisible: false, // 是否打开表单
     actionType: null, // 点击按钮操作的类型
     pageIndex: 0, // 分页
-    pageSize: 8,//
+    pageSize: 6,//
     dataTotal: 0,
     getListLoading: false,
     upDataLoading: false,
@@ -76,13 +72,6 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
   // 获取 人员数组
   getPersonList = async () => {
     try {
-      if (!getResourcesAuth(16)) {
-        notification.error({
-          description: formatMessage({ id: 'component.not-role' }),
-          message: formatMessage({ id: 'component.error' }),
-        })
-        return
-      }
       const { pageIndex, pageSize } = this.state
       this.setState({
         getListLoading: true
@@ -99,6 +88,9 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
       })
     } catch (e) {
       console.log(e)
+      this.setState({
+        getListLoading: false
+      })
       notification.error({
         description: e.errorMsg,
         message: formatMessage({ id: 'component.error' }),
@@ -134,21 +126,13 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
 
   // 点击删除浮窗的确认按钮
   handleBtnClickDeleteUpData = async (row: Person) => {
-    const { personList } = this.state
-    const oldPersonList = lodash.cloneDeep(personList)
     try {
       this.setState({
         upDataLoading: true
       })
       const res = await setPerson({ data: { userId: row.id }, method: SetMethod['delete'] })
-      for (let i = 0; i < oldPersonList.length; i++) {
-        if (oldPersonList[i].id === res.data as number) {
-          oldPersonList.splice(i, 1)
-          break
-        }
-      }
+      this.getPersonList()
       this.setState({
-        personList: oldPersonList,
         upDataLoading: false
       })
       notification.success({
@@ -156,6 +140,9 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
         message: formatMessage({ id: 'component.success' }),
       });
     } catch (e) {
+      this.setState({
+        upDataLoading: false
+      })
       notification.error({
         description: e.errorMsg,
         message: formatMessage({ id: 'component.error' }),
@@ -189,6 +176,9 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
       });
       this.initActionTag()
     } catch (e) {
+      this.setState({
+        upDataLoading: false
+      })
       notification.error({
         description: e.errorMsg ? e.errorMsg : formatMessage({ id: 'component.action-error' }),
         message: formatMessage({ id: 'component.error' }),
@@ -198,9 +188,8 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
 
   handleTableOnChange = async (page: number, pageSize?: number | undefined) => {
     this.setState({
-      pageIndex: page
-    })
-    this.getPersonList()
+      pageIndex: page - 1
+    }, this.getPersonList)
   }
 
   render() {
@@ -208,17 +197,16 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
     const { loading } = this.props
     return (
       <PageHeaderWrapper content={<FormattedMessage id="authority-person.header.description" />}>
-        <Card>
-          <Alert className={styles['authority-person-warning']} message={formatMessage({ id: 'authority-tree.warning' })} type="warning" />
+        <Card loading={loading}>
+          <Alert className={styles['authority-person-warning']} message={formatMessage({ id: 'authority-person.warning' })} type="warning" />
 
           {
-            getResourcesAuth(12) ? <div className={styles['authority-add-button']}>
+            getResourcesAuthById(12) && <div className='box box-row-end btn-mb'>
               <Button size="large" type="primary" style={{ float: 'right' }} onClick={this.handleBtnClickAdd}>
                 <FormattedMessage id='component.add'></FormattedMessage>
               </Button>
-            </div> : ''
+            </div>
           }
-
           <PersonTable
             dataTotal={dataTotal}
             pageIndex={pageIndex}
@@ -242,7 +230,12 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
           onClose={this.initActionTag}
           visible={drawerVisible}
         >
-          <PersonForm actionTag={actionTag} upDataLoading={upDataLoading} onClose={this.initActionTag} onSubmit={this.handleFormSubmit} />
+          <PersonForm
+            actionTag={actionTag}
+            roleList={roleList}
+            upDataLoading={upDataLoading}
+            onClose={this.initActionTag}
+            onSubmit={this.handleFormSubmit} />
         </Drawer>
       </PageHeaderWrapper>
     )

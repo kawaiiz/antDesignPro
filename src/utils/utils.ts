@@ -54,10 +54,21 @@ export const getBaseUrl = (): string => {
 
 // 判断是否拥有某个资源的权限  传入参数是资源的id
 import { IRoute } from 'umi-types/config'
-export const getResourcesAuth = (id: number | string): boolean => {
+export const getResourcesAuthById = (id: number | string): boolean => {
   const originalAuthList: IRoute[] = JSON.parse(sessionStorage.getItem('originalAuthList') || '[]')
   return originalAuthList.some(item => item.id == id && item.own)
 }
+
+export const getResourcesAuthByUrl = (url: string, method: string): boolean => {
+  const originalAuthList: IRoute[] = JSON.parse(sessionStorage.getItem('originalAuthList') || '[]')
+  for (let i = 0; i < originalAuthList.length; i++) {
+    if (originalAuthList[i].type === 'INTERFACE' && originalAuthList[i].path == url && originalAuthList[i].operation === method) {
+      return originalAuthList[i].own
+    }
+  }
+  return true
+}
+
 
 // 判断当前请求的类型给请求对象附参数 仅用于 接口地址相同 请求类型不同的接口
 import { AxiosRequestConfig, Method } from 'axios'

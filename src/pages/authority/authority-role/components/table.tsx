@@ -1,14 +1,13 @@
 import React from 'react'
 import {
   Table,
-  Icon,
   Button,
   Popconfirm
 } from 'antd';
 const ButtonGroup = Button.Group;
 import { formatMessage } from 'umi-plugin-react/locale';
 import { Role } from '../data.d'
-import { getResourcesAuth } from '@/utils/utils'
+import { getResourcesAuthById } from '@/utils/utils'
 
 
 interface RoleTableProp {
@@ -57,18 +56,18 @@ const RoleTable: React.FC<RoleTableProp> = (props) => {
         return (
           <ButtonGroup>
             {
-              getResourcesAuth(10) ? <Button onClick={() => handleBtnClickEdit(record)}>
+              getResourcesAuthById(10) && <Button onClick={() => handleBtnClickEdit(record)}>
                 {formatMessage({ id: 'authority-role.table.edit' })}
-              </Button> : ''
+              </Button> 
             }
             {
-              getResourcesAuth(11) ? <Popconfirm
+              getResourcesAuthById(11) &&<Popconfirm
                 title={`${formatMessage({ id: 'authority-role.table.delete' })} ${record.roleName}?`}
                 okText={formatMessage({ id: 'component.confirm' })}
                 cancelText={formatMessage({ id: 'component.cancel' })}
                 onConfirm={() => handleBtnClickDeleteUpData(record)}>
                 <Button type="danger">{formatMessage({ id: 'authority-role.table.delete' })}</Button>
-              </Popconfirm> : ''
+              </Popconfirm> 
             }
 
           </ButtonGroup >

@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { Dispatch } from 'redux';
 import { connect } from 'dva';
 import { ConnectState } from '@/models/connect';
@@ -7,7 +7,6 @@ import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import { getAuthority } from '@/utils/authority'
 import {
   Card,
-  Empty,
   Alert,
   Drawer,
   Button,
@@ -18,7 +17,8 @@ import TreeTable from './components/tree'
 import TreeForm from './components/from'
 import styles from './style.less'
 import { IRoute } from 'umi-types/config'
-import { getResourcesAuth } from '@/utils/utils'
+import { getResourcesAuthById } from '@/utils/utils'
+// import { MyConfig } from '_config/config';
 import { MyConfig } from 'config';
 
 interface AuthState {
@@ -40,7 +40,7 @@ interface Authprops {
   authList: auth.authList,
   loading: loading.effects['auth/getAuthList'] || loading.effects['auth/upDataAuthList'],
 }))
-class AuthorityTree extends Component<Authprops, AuthState> {
+class AuthorityTree extends PureComponent<Authprops, AuthState> {
   state: AuthState = {
     authority: '',
     actionTag: {
@@ -133,11 +133,11 @@ class AuthorityTree extends Component<Authprops, AuthState> {
       <Card loading={loading}>
         <Alert className={styles['authority-tree-warning']} message={formatMessage({ id: 'authority-tree.warning' })} type="warning" />
         {
-          authority === MyConfig.SUPER_ADMIN ? <div className={styles['authority-add-button']}>
+          authority === MyConfig.SUPER_ADMIN && <div className='box box-row-end btn-mb'>
             <Button size="large" type="primary" style={{ float: 'right' }} onClick={this.handleBtnClickAdd}>
               <FormattedMessage id='component.add'></FormattedMessage>
             </Button>
-          </div> : ''
+          </div>
         }
         <TreeTable
           authority={authority}
@@ -156,7 +156,11 @@ class AuthorityTree extends Component<Authprops, AuthState> {
         onClose={this.initActionTag}
         visible={drawerVisible}
       >
-        <TreeForm actionTag={actionTag} authList={authList} onClose={this.initActionTag} onSubmit={this.handleFormSubmit} />
+        <TreeForm
+          actionTag={actionTag}
+          authList={authList}
+          onClose={this.initActionTag}
+          onSubmit={this.handleFormSubmit} />
       </Drawer>
     </PageHeaderWrapper >);
   }

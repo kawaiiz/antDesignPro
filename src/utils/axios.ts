@@ -1,6 +1,8 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 import router from 'umi/router';
-import { getToken, delToken, setToken, getBaseUrl } from '@/utils/utils'
+import { formatMessage } from 'umi-plugin-react/locale';
+
+import { getToken, delToken, setToken, getBaseUrl, getResourcesAuthByUrl } from '@/utils/utils'
 import { notification } from 'antd';
 import { MyConfig } from 'config'
 
@@ -16,11 +18,11 @@ export interface Res {
 
 // 设置请求类型
 export enum SetMethod {
-  get = 'get',
+  get = 'GET',
   add = 'POST',
-  edit = 'put',
-  delete = 'delete',
-  del = 'delete'
+  edit = 'PUT',
+  delete = 'DELETE',
+  del = 'DELETE'
 }
 
 // 为防止同时多个请求进入
@@ -33,7 +35,7 @@ let requests: any[] = [] // 请求数组
 // axios 返回拦截器刷新token的函数
 const refreshAuthLogic = (failedRequest: any) => axios({
   url: `${getBaseUrl()}/api/public/web/refresh-token`,
-  method: 'get',
+  method: 'GET',
   params: { refreshToken: getToken(REFRESH_TOKEN) }
 }).then(tokenRefreshResponse => {
   if (tokenRefreshResponse.data.status === 1007) {
@@ -46,13 +48,14 @@ const refreshAuthLogic = (failedRequest: any) => axios({
 }).catch(err => {
   delToken(REFRESH_TOKEN)
   delToken()
-  notification.error({
-    description: '您的登录已失效，请重新登录',
-    message: '登录失效',
-  });
+  // notification.error({
+  //   description: '您的登录已失效，请重新登录',
+  //   message: '登录失效',
+  // });
   router.push({
     pathname: '/user/login',
   });
+  err.errorMsg = '您的登录已失效，请重新登录'
   return Promise.reject(err);
 })
 
@@ -114,7 +117,7 @@ class HttpRequest {
       // Reject promise if the error status is not in options.ports or defaults.ports
       const refreshStatusCodes: number[] = [401]
       // 判断是不是特殊错误 没有返回信息  或 不是401 的进
-      if (!errorInfo || (errorInfo.status && refreshStatusCodes.indexOf(errorInfo.status) === -1)) {
+      if (!errorInfo || (errorInfo.status && !refreshStatusCodes.includes(errorInfo.status))) {
         errRouter(errorInfo)
         let errMsg = errorInfo.data || {
           errorMsg: 'Page Error'
@@ -133,7 +136,7 @@ class HttpRequest {
         return refreshCall.then((token) => {
           // axios.interceptors.request.eject(requestQueueInterceptorId);
           requests.forEach(cb => cb(token))
-          // 重试完了别忘了清空这个队列（掘金评论区同学指点）
+          // 重试完了别忘了清空这个队列
           requests = []
           return instance(error.response.config);
         }).catch(error => {
@@ -156,6 +159,12 @@ class HttpRequest {
 
   // 照明胧
   request(options: AxiosRequestConfig) {
+    // 请求拦截 对有资源id的接口 判断该用户是否拥有这个权限
+    if (!getResourcesAuthByUrl(options.url!, options.method!)) {
+      return Promise.reject({
+        errorMsg: formatMessage({ id: 'component.not-role' })
+      })
+    }
     // 创建一个axios实例
     const instance = axios.create()
     // 将默认配置与请求配置混合
@@ -176,7 +185,7 @@ class HttpRequest {
 
     return instance(options).then((res: AxiosResponse) => {
       const statusCode = [200]
-      if (statusCode.indexOf(res.data.status) !== -1 || !res.data.hasOwnProperty('status')) {
+      if (statusCode.includes(res.data.status) || !res.data.hasOwnProperty('status')) {
         return Promise.resolve(res.data)
       } else {
         return Promise.reject(res.data)

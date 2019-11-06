@@ -9,11 +9,3 @@ export async function setPerson({ data, method }: { data: Person | { pageIndex: 
   }, data, method)
   return await axios.request(options);
 }
-
-export async function getPersonDetail(data: { userId: number }) {
-  return await axios.request({
-    url: '/api/web/manage-user/detail',
-    method: 'get',
-    params: data
-  })
-}

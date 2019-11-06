@@ -13,9 +13,9 @@ const { SHOW_ALL } = TreeSelect;
 import { Role } from '../data.d'
 
 interface RoleFormState {
-  actionTag: Role,
+  actionTag: Role, // 点击修改的对象
   tree?: TreeCreate[], // 下拉框内数据
-  newActionTag: NewActionTag
+  newActionTag: NewActionTag // 不能直接修改actionTag 拷贝一份修改
 }
 
 interface TreeCreate {
@@ -27,7 +27,8 @@ interface TreeCreate {
 
 interface RoleFormProp extends FormComponentProps {
   actionTag: Role,
-  allAuthList: [],
+  actionType: 'add' | 'edit' | 'delete' | null,
+  allAuthList: IRoute[],
   originalAuthList: IRoute[],
   upDataLoading: boolean,
   onClose: () => void,
@@ -56,6 +57,7 @@ class RoleForm extends Component<RoleFormProp, RoleFormState>{
     let newActionTag: NewActionTag = {}
     newActionTag = Object.assign(newActionTag, actionTag, props.actionTag)
     newActionTag.newAuth = this.createTreeValue()
+    console.log(newActionTag)
     this.state.newActionTag = newActionTag
     this.createTree()
   }
@@ -74,11 +76,12 @@ class RoleForm extends Component<RoleFormProp, RoleFormState>{
     })
   }
 
+  // 创建树形结构
   createTree = () => {
     const { allAuthList } = this.props;
     function _create(allAuthList: IRoute[]): TreeCreate[] {
       return allAuthList.map((item, index) => ({
-        title: item.type === 'PAGE' ? formatMessage({ id: `menu.${item.name}`, defaultMessage: item.name }) : item.name,
+        title: item.type === 'PAGE' ? formatMessage({ id: `menu.${item.name}`, defaultMessage: item.name }) + '页面' : item.name,
         value: item.id,
         key: item.id,
         children: item.children && item.children.length > 0 ? _create(item.children) : null,
