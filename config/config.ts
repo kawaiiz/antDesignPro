@@ -89,6 +89,7 @@ interface MyConfigInterFace {
   cookieExpires: number,
   token: string,
   refreshToken: string,
+  autoLogin: string,
   upImgFileUrl: string,
   menuType: 'i18n' | 'text',
   [key: string]: any,
@@ -99,10 +100,10 @@ interface MyConfigInterFace {
 export const MyConfig: MyConfigInterFace = {
   // 请求的域名
   baseUrl: {
-    dev: 'http://192.168.1.222:8080',
+    dev: 'http://36.155.115.191:8000',
     // dev: 'http://192.168.1.74:3001',
     // dev: '',
-    pro: 'http://192.168.1.222:8080',
+    pro: 'http://36.155.115.191:8000',
   },
   // 底部的文字
   footerContent: {
@@ -114,6 +115,7 @@ export const MyConfig: MyConfigInterFace = {
   // token 名称
   token: 'token',
   refreshToken: 'refreshToken',
+  autoLogin: 'autoLogin',
   upImgFileUrl: '/api/web/file/img',
   // menuType: 'text'
   menuType: 'i18n',

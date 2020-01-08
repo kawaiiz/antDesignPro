@@ -1,8 +1,8 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
+import axios, { AxiosRequestConfig, AxiosResponse, Method } from 'axios'
 import router from 'umi/router';
 import { formatMessage } from 'umi-plugin-react/locale';
 
-import { getToken, delToken, setToken, getBaseUrl, getResourcesAuthByUrl } from '@/utils/utils'
+import { getToken, delToken, setToken, getBaseUrl } from '@/utils/utils'
 import { notification } from 'antd';
 import { MyConfig } from 'config'
 
@@ -107,11 +107,20 @@ class HttpRequest {
     instance.interceptors.response.use((res: any) => res, (error: any) => {
       let errorInfo = error.response
       if (!errorInfo) {
-        const { request: { statusText, status }, config } = JSON.parse(JSON.stringify(error))
-        errorInfo = {
-          statusText,
-          status,
-          request: { responseURL: config.url }
+        const errorJson = JSON.parse(JSON.stringify(error))
+        if (typeof errorJson === 'object') {
+          const { request: { statusText, status }, config } = errorJson
+          errorInfo = {
+            statusText,
+            status,
+            request: { responseURL: config.url }
+          }
+        } else {
+          errorInfo = {
+            statusText: null,
+            status: 0,
+            request: {}
+          }
         }
       }
       // Reject promise if the error status is not in options.ports or defaults.ports
@@ -120,7 +129,7 @@ class HttpRequest {
       if (!errorInfo || (errorInfo.status && !refreshStatusCodes.includes(errorInfo.status))) {
         errRouter(errorInfo)
         let errMsg = errorInfo.data || {
-          errorMsg: 'Page Error'
+          errorMsg: 'System Error'
         }
         return Promise.reject(errMsg)
       }
@@ -159,12 +168,6 @@ class HttpRequest {
 
   // 照明胧
   request(options: AxiosRequestConfig) {
-    // 请求拦截 对有资源id的接口 判断该用户是否拥有这个权限
-    if (!getResourcesAuthByUrl(options.url!, options.method!)) {
-      return Promise.reject({
-        errorMsg: formatMessage({ id: 'component.not-role' })
-      })
-    }
     // 创建一个axios实例
     const instance = axios.create()
     // 将默认配置与请求配置混合

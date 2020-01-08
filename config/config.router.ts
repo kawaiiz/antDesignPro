@@ -4,46 +4,15 @@
   根据下面这个例子
   从而写出了这个乱七八糟的代码
   https://github.com/ant-design/ant-design-pro/issues/4286
-  第一 所有的路由要先在代码里定义好（因为路由的component需要在开始的时候初始化），可以不带权限字段
+  第一 所有的路由要先在代码里定义好（因为路由的component需要在开始的时候初始化），不带权限字段
   第二 在src/models/global里请求权限列表(函数getRouteTree)：interface IRoute[],这里请求的路由是完整的带权限的路由，
-  第三 那获得的完整路由去src/layouts/basicLayout 找到basicLayout函数构造，开始的addroute ,useState ,useEffect 是 注入新路由的
-  第四 src/layouts/basicLayout 里的 setIi8Menu 是控制全球化文字的函数，动态列表貌似不支持全球化，只能通过函数插入
+  第三 那获得的完整路由去src/layouts/SecurityLayout 找到SecurityLayout函数构造，开始的addroute ,useState ,useEffect 是 注入新路由的
+  第四 默认跳往index页 在index页里再做重定向跳转到这个人所拥有的首页
+  第四 src/layouts/basicLayout 动态列表貌似不支持全球化，只能通过函数插入
 */
 
 import { IRoute } from 'umi-types/config'
 
-export const contentRoutes: IRoute[] = [{
-  path: '/home',
-  name: 'home',
-  icon: 'smile',
-  component: './content/home/index',
-},
-{
-  path: '/authority',
-  name: 'authority',
-  icon: ' ',
-  routes: [
-    {
-      path: '/authority',
-      redirect: '/authority/role',
-    },
-    {
-      path: '/authority/tree',
-      name: 'authority-tree',
-      icon: ' ',
-      component: './authority/authority-tree/index',
-    }, {
-      path: '/authority/role',
-      name: 'authority-role',
-      icon: ' ',
-      component: './authority/authority-role/index',
-    }, {
-      path: '/authority/person',
-      name: 'authority-person',
-      icon: ' ',
-      component: './authority/authority-person/index',
-    }],
-}]
 
 const routes: IRoute[] = [
   {
@@ -94,7 +63,8 @@ const routes: IRoute[] = [
             path: '/index',
             component: './index',
             hideInMenu: true,
-          }, {
+          },
+          {
             name: 'settings',
             path: '/account/settings',
             component: './account/settings',
@@ -131,13 +101,18 @@ const routes: IRoute[] = [
             routes: [
               {
                 path: '/authority',
-                redirect: '/authority/role',
+                redirect: '/authority/resources',
               },
               {
-                path: '/authority/tree',
-                name: 'authority-tree',
+                path: '/authority/resources',
+                name: 'authority-resources',
                 icon: ' ',
-                component: './authority/authority-tree/index',
+                component: './authority/authority-resources/index',
+              }, {
+                path: '/authority/auth',
+                name: 'authority-auth',
+                icon: ' ',
+                component: './authority/authority-auth/index',
               }, {
                 path: '/authority/role',
                 name: 'authority-role',
@@ -152,26 +127,13 @@ const routes: IRoute[] = [
               { component: './error-page/404/index', }
             ],
           },
-          {
-            component: './error-page/404/index',
-          },
+          { component: './error-page/404/index', }
         ],
-      },
-      {
-        component: './error-page/404/index',
-      },
+      }
     ],
-  },
-  {
-    component: './error-page/404/index',
-  },
-  {
-    component: './error-page/403/index',
-  },
-  {
-    component: './error-page/404/index',
-  },
+  }
 ]
+
 
 export default routes
 

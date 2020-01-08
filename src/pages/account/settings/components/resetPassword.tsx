@@ -5,7 +5,7 @@ import { FormComponentProps } from 'antd/es/form';
 
 interface ResetPasswordProps extends FormComponentProps {
   upDataLoading: boolean
-  onSubmit: (from: any) => Promise<null>
+  onSubmit: (from: any) => Promise<any>,
 }
 
 
@@ -103,7 +103,7 @@ const resetPassword: React.FC<ResetPasswordProps> = (props) => {
               />,
             )}
           </Form.Item>
-          <Button type="primary" loading={upDataLoading} disabled={upDataLoading} onClick={handlerSubmit}>
+          <Button type="primary" onClick={handlerSubmit} loading={upDataLoading} disabled={upDataLoading}>
             <FormattedMessage id="component.confirm" defaultMessage="Update Information" />
           </Button>
         </Form>

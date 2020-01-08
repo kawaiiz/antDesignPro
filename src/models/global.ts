@@ -4,15 +4,20 @@ import { ConnectState } from './connect.d';
 import { formatMessage } from 'umi-plugin-react/locale';
 import { notification } from 'antd';
 
-import { getCaptcha } from '@/services/globle'
-
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+import { getCaptcha, getLayoutType, getColumnType, getLinkType, getChannelType, getAuthType } from '@/services/globle'
+import { delay } from '@/utils/utils'
+// const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
 
 export interface GlobalModelState {
   collapsed?: boolean; // 是否菜单折叠
   captchaTime?: number;// 请求短信的倒计时时间
   captchaDisable?: boolean; // 是否允许请求短信
+  layoutTypeList?: any[],// 布局类型列表
+  columnTypeList?: any[],// 栏目类型列表
+  channelTypeList?: any[],// 频道类型列表
+  jumpWayList?: any[],// 跳转方式列表
+  authTypeList?: any[],// 鉴权方式列表
 }
 
 export interface GlobalModelType {
@@ -20,11 +25,18 @@ export interface GlobalModelType {
   state: GlobalModelState;
   effects: {
     getCaptcha: Effect;
+    setBtnTime: Effect;
+    getLayoutType: Effect;
+    getColumnType: Effect;
+    getChannelType: Effect;
+    getJumpWayList: Effect;
+    getAuthTypeList: Effect;
   };
   reducers: {
     changeLayoutCollapsedReducers: Reducer<GlobalModelState>;
     setCaptchaTime: Reducer<GlobalModelState>;
     setCaptchaDisable: Reducer<GlobalModelState>;
+    setStateAttrReducers: Reducer<GlobalModelState>;
   };
   subscriptions: { setup: Subscription };
 }
@@ -35,46 +47,98 @@ const GlobalModel: GlobalModelType = {
   state: {
     collapsed: false,
     captchaTime: 5,
-    captchaDisable: false
+    captchaDisable: false,
+    layoutTypeList: [],
+    columnTypeList: [],
+    channelTypeList: [],
+    jumpWayList: [],
+    authTypeList: [],
   },
 
   effects: {
-    *getCaptcha({ payload }, { call, select, put }) {
+    *getCaptcha({ payload }, { call, put }) {
       try {
         yield call(getCaptcha, payload);
         yield put({
           type: 'setCaptchaDisable',
           payload: true
         })
-        while (true) {
-          const time: number = yield select(
-            (state: ConnectState) => state.global.captchaTime
-          );
-          yield call(delay, 1000); // 延时1之后进行下一次的while循环执行
-          if (time > 0) {
-            yield put({
-              type: 'setCaptchaTime',
-              payload: time - 1
-            })
-          } else {
-            yield put({
-              type: 'setCaptchaTime',
-              payload: 5
-            })
-            yield put({
-              type: 'setCaptchaDisable',
-              payload: false
-            })
-            break
-          }
-        }
+        return Promise.resolve()
       } catch (e) {
-        console.log(e)
+        return Promise.reject(e)
+      }
+    },
+    *setBtnTime(_, { call, put, select }) {
+      while (true) {
+        const time: number = yield select(
+          (state: ConnectState) => state.global.captchaTime
+        );
+        yield call(delay, 1000); // 延时1之后进行下一次的while循环执行
+        if (time > 0) {
+          yield put({
+            type: 'setCaptchaTime',
+            payload: time - 1
+          })
+        } else {
+          yield put({
+            type: 'setCaptchaTime',
+            payload: 5
+          })
+          yield put({
+            type: 'setCaptchaDisable',
+            payload: false
+          })
+          break
+        }
+      }
+    },
+    *getLayoutType(_, { call, put }) {
+      try {
+        const res = yield call(getLayoutType)
+        yield put({ type: 'setStateAttrReducers', payload: { layoutTypeList: res.data } })
+        return Promise.resolve(res.data)
+      } catch (e) {
+        return Promise.reject(e)
+      }
+    },
+    *getColumnType(_, { call, put }) {
+      try {
+        const res = yield call(getColumnType)
+        yield put({ type: 'setStateAttrReducers', payload: { columnTypeList: res.data } })
+        return Promise.resolve(res.data)
+      } catch (e) {
+        return Promise.reject(e)
+      }
+    },
+    *getChannelType(_, { call, put }) {
+      try {
+        const res = yield call(getChannelType)
+        yield put({ type: 'setStateAttrReducers', payload: { channelTypeList: res.data } })
+        return Promise.resolve(res.data)
+      } catch (e) {
+        return Promise.reject(e)
+      }
+    },
+    *getJumpWayList(_, { call, put }) {
+      try {
+        const res = yield call(getLinkType)
+        yield put({ type: 'setStateAttrReducers', payload: { jumpWayList: res.data } })
+        return Promise.resolve(res.data)
+      } catch (e) {
+        return Promise.reject(e)
+      }
+    },
+    *getAuthTypeList(_, { call, put }) {
+      try {
+        const res = yield call(getAuthType)
+        yield put({ type: 'setStateAttrReducers', payload: { authTypeList: res.data } })
+        return Promise.resolve(res.data)
+      } catch (e) {
+        return Promise.reject(e)
       }
     },
   },
   reducers: {
-
     setCaptchaTime(state, { payload }): GlobalModelState {
       return {
         ...state,
@@ -93,6 +157,10 @@ const GlobalModel: GlobalModelType = {
         collapsed: payload,
       };
     },
+    // 要求修改的字段名要与赋值的相同
+    setStateAttrReducers(state, { payload }) {
+      return Object.assign({}, state, payload)
+    }
   },
 
   subscriptions: {

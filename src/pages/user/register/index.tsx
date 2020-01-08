@@ -2,9 +2,9 @@ import { Button, Col, Form, Input, Popover, Progress, Row, Select, message } fro
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import React, { Component } from 'react';
 import { Dispatch } from 'redux';
+import { connect } from 'dva';
 import { FormComponentProps } from 'antd/es/form';
 import Link from 'umi/link';
-import { connect } from 'dva';
 import router from 'umi/router';
 
 import { StateType } from './model';

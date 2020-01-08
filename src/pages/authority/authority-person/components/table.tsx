@@ -78,12 +78,12 @@ const PersonTable: React.FC<PersonTableProp> = (props) => {
         return (
           <ButtonGroup>
             {
-              getResourcesAuthById(13) && <Button onClick={() => handleBtnClickEdit(record)}>
+              getResourcesAuthById(39) && <Button onClick={() => handleBtnClickEdit(record)}>
                 {formatMessage({ id: 'authority-person.table.edit' })}
               </Button>
             }
             {
-              getResourcesAuthById(14) && <Popconfirm
+              getResourcesAuthById(40) && <Popconfirm
                 title={`${formatMessage({ id: 'authority-person.table.delete' })} ${record.username}?`}
                 okText={formatMessage({ id: 'component.confirm' })}
                 cancelText={formatMessage({ id: 'component.cancel' })}
@@ -100,7 +100,6 @@ const PersonTable: React.FC<PersonTableProp> = (props) => {
     loading={getListLoading}
     rowKey={record => `${record.id}rowKey`}
     pagination={{ current: pageIndex, pageSize: pageSize, total: dataTotal, onChange: handleTableOnChange }}
-    defaultExpandAllRows={true}
     columns={columns}
     dataSource={personList} />
 }

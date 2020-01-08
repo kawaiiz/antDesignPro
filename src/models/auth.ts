@@ -1,6 +1,6 @@
 import { Reducer } from 'redux';
 import { Effect } from 'dva';
-import { setAuth } from '@/services/auth';
+import { setGlobalAuth, getGlobalAuthTree } from '@/services/auth';
 import { IRoute } from 'umi-types/config'
 import { formatMessage } from 'umi-plugin-react/locale';
 import { notification } from 'antd';
@@ -8,11 +8,11 @@ import { SetMethod } from '@/utils/axios'
 import lodash from 'lodash'
 import { getAuthority } from '@/utils/authority';
 import { Route } from '@ant-design/pro-layout/lib/typings'
+import { Auth } from '@/pages/authority/authority-auth/data'
+
 export interface AuthModelState {
-  allAuthList?: [], // 多维 页面+接口 权限数组
-  authList?: IRoute[], // 多维 页面权限 数组
-  originalAuthList?: IRoute[], // 一维权限数组
-  resources?: requestRoute[], // 后端发来的
+  globalAuth?: Auth[], // 权限数组
+  authRoutes?: (Route | IRoute)[],
   routes?: Route[] // 初始路由
 }
 
@@ -20,88 +20,70 @@ export interface AuthModelType {
   namespace: 'auth';
   state: AuthModelState;
   effects: {
-    getAuthList: Effect;
-    setAuth: Effect;
+    getGlobalAuthTree: Effect;
+    setGlobalAuth: Effect;
   };
   reducers: {
-    setAuthListReducers: Reducer<AuthModelState>;
     setRoutesReducers: Reducer<AuthModelState>;
+    setGlobalAuthReducers: Reducer<AuthModelState>;
   };
 }
+//       parentId: item.pid ? item.pid : null,
+//       component: item.component,
+//       hideInMenu: item.hideInMenu,
+//       icon: item.icon || ' ',
+//       id: item.id,
+//       operation: item.operation,
+//       own: item.own,
+//       parentId: item.pid,
+//       name: item.resourceName,
+//       type: item.resourceType,
+//       path: item.resourceUrl,
+//       authority: item.own ? roles : [],
 
-interface requestRoute {
-  "id": number, // 路由资源id
-  "resourceName": string, // 资源名
-  "component": string, // 资源组件路径
-  "icon": string, // 图标
-  "resourceUrl": string, // 资源访问路径
-  "operation": string, // 请求方式
-  "resourceType": string, // 资源类别
-  "pid": number, // 父id
-  "own": boolean, // 是否有权限操作这个资源
-  "hideMenu": boolean;
-}
-
-// 将扁平的一维数组 转成多维 
-export const toTree = (arr: IRoute[]) => {
-  const ids = arr.map(a => a.id) // 获取所有的id
-  const arrNotParent = arr.filter(
-    ({ parentId }) => parentId && !ids.includes(parentId)// 返回所有父id存在 且 父id不存在与所有的资源id数组中  
-  )
-  const _ = (arr: IRoute[], pID: string | number | null): IRoute[] =>
-    arr
-      .filter(({ parentId }) => parentId == pID)
-      .map(a => ({
-        ...a,
-        children: _(arr.filter(({ parentId }) => parentId != pID), a.id),
-      }))
-  // 这里 pID=0是因为后台设置一级页面的父id都是0
-  return _(arr, 0).concat(arrNotParent)
-}
-
-const processingData = (resources: requestRoute[]) => {
+const createAuthRoute = (globalAuth: Auth[]): IRoute => {
   const roles = getAuthority()
-  const IRouteFormatRes = resources.map(item => {
-    return {
-      // parentId: item.pid ? item.pid : null,
-      component: item.component,
-      hideInMenu: item.hideMenu,
-      icon: item.icon || ' ',
-      id: item.id,
-      operation: item.operation,
-      own: item.own,
-      parentId: item.pid,
-      name: item.resourceName,
-      type: item.resourceType,
-      path: item.resourceUrl,
-      authority: item.own ? roles : [],
+  let authRoutes = []
+  for (let i = 0; i < globalAuth.length; i++) {
+    // 如果是生产环境就跳过这两个页面
+    if (process.env.NODE_ENV === 'production' && (globalAuth[i].htmlId == 28 || globalAuth[i].htmlId === 29)) continue;
+
+    if (globalAuth[i].htmlType === 'PAGE') {
+      const newItem = {
+        id: globalAuth[i].htmlId,
+        path: globalAuth[i].htmlAddr,
+        htmlName: globalAuth[i].htmlName,
+        type: globalAuth[i].htmlType,
+        icon: globalAuth[i].iconUrl || ' ',
+        name: globalAuth[i].alias,
+        children: globalAuth[i].children && globalAuth[i].children!.length > 0 ? createAuthRoute(globalAuth[i].children!) : [],
+        hideInMenu: false,
+        authority: globalAuth[i].own ? roles : [],
+        // authority: true ? roles : [],
+        own: globalAuth[i].own,
+      }
+      authRoutes.push(newItem)
     }
-  })
-  const pageAuthList = IRouteFormatRes.filter(({ type }) => type && type === 'PAGE')
-  const authList = toTree(pageAuthList)
-  const allAuthList = toTree(IRouteFormatRes)
-  return { originalAuthList: IRouteFormatRes, authList, allAuthList }
+  }
+  return authRoutes
 }
 
 // 筛出页面
 const AuthModel: AuthModelType = {
   namespace: 'auth',
   state: {
-    allAuthList: [], //  // 多维 页面+接口 权限数组
-    authList: [], // 二维 页面权限数组
-    originalAuthList: [],// 一维的权限数组 改了字段名的
-    resources: [],// 后端发来的
+    globalAuth: [], // 权限数组
+    authRoutes: [],
     routes: []
   },
   effects: {
-    *getAuthList(_, { call, put }) {
+    *getGlobalAuthTree(_, { call, put }) {
       try {
-        const res: { data: requestRoute[] } = yield call(setAuth, { data: null, method: SetMethod['get'] }) // 整体权限列表
-        const { originalAuthList, authList, allAuthList } = processingData(res.data)
-        sessionStorage.setItem('originalAuthList', JSON.stringify(originalAuthList))
+        const res: { data: Auth[] } = yield call(getGlobalAuthTree, { data: null, method: SetMethod['get'] }) // 整体权限列表树
+        sessionStorage.setItem('globalAuth', JSON.stringify(res.data))
         yield put({
-          type: 'setAuthListReducers',
-          payload: { originalAuthList, authList, allAuthList, resources: res.data }
+          type: 'setGlobalAuthReducers',
+          payload: { globalAuth: res.data, authRoutes: createAuthRoute(res.data) }
         })
         return Promise.resolve()
       } catch (e) {
@@ -109,38 +91,36 @@ const AuthModel: AuthModelType = {
           description: e.errorMsg,
           message: formatMessage({ id: 'component.error' }),
         });
-        return Promise.reject()
+        return Promise.reject(e)
       }
     },
-    *setAuth({ payload }, { call, put, select }) {
+    *setGlobalAuth({ payload }, { call, put, select }) {
       try {
-        const res: { data: requestRoute | number } = yield call(setAuth, { data: payload.data, method: SetMethod[payload.type] }) // 整体权限列表更新后返回全部的权限列表
-        const oldResources: requestRoute[] = lodash.cloneDeep(yield select((state: any) => state.auth.resources))
-        let newResoutces: requestRoute[] = []
+        const res: { data: Auth | number } = yield call(setGlobalAuth, { data: payload.data, method: SetMethod[payload.type] }) // 整体权限列表更新后返回全部的权限列表
+        const oldGlobalAuth: Auth[] = lodash.cloneDeep(yield select((state: any) => state.auth.globalAuth))
+        let newGlobalAuth: Auth[] = []
         if (payload.type === 'add') {
-          oldResources.push(res.data as requestRoute)
-          newResoutces = oldResources
+          oldGlobalAuth.push(res.data as Auth)
+          newGlobalAuth = oldGlobalAuth
         } else if (payload.type === 'edit') {
-          newResoutces = oldResources.map(item => {
-            if (item.id === (res.data as requestRoute).id) {
+          newGlobalAuth = oldGlobalAuth.map(item => {
+            if (item.htmlId === (res.data as Auth).htmlId) {
               return Object.assign({}, item, res.data)
             }
             return item
           })
         } else if (payload.type === 'delete') {
-          for (let i = 0; i < oldResources.length; i++) {
-            if (oldResources[i].id === res.data as number) {
-              oldResources.splice(i, 1)
+          for (let i = 0; i < oldGlobalAuth.length; i++) {
+            if (oldGlobalAuth[i].htmlId === res.data as number) {
+              oldGlobalAuth.splice(i, 1)
               break
             }
           }
-          newResoutces = oldResources
+          newGlobalAuth = oldGlobalAuth
         }
-        const { originalAuthList, authList, allAuthList } = processingData(newResoutces)
-        sessionStorage.setItem('originalAuthList', JSON.stringify(originalAuthList))
         yield put({
-          type: 'setAuthListReducers',
-          payload: { originalAuthList, authList, allAuthList, resources: newResoutces }
+          type: 'setGlobalAuthReducers',
+          payload: { globalAuth: newGlobalAuth }
         })
         return Promise.resolve()
       } catch (e) {
@@ -148,26 +128,23 @@ const AuthModel: AuthModelType = {
           description: e.errorMsg,
           message: formatMessage({ id: 'component.error' }),
         });
-        return Promise.reject()
+        return Promise.reject(e)
       }
     },
   },
   reducers: {
-    setAuthListReducers(state, { payload }): AuthModelState {
-      return {
-        ...state,
-        allAuthList: payload.allAuthList,
-        authList: payload.authList,
-        originalAuthList: payload.originalAuthList,
-        resources: payload.resources
-      };
-    },
     setRoutesReducers(state, { payload }): AuthModelState {
       return {
         ...state,
         routes: payload
       };
-    }
+    },
+    setGlobalAuthReducers(state, { payload }): AuthModelState {
+      return {
+        ...state,
+        ...payload
+      };
+    },
   },
 }
 

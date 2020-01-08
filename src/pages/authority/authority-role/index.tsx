@@ -14,6 +14,9 @@ import {
 import { IRoute } from 'umi-types/config'
 
 import { ConnectState } from '@/models/connect';
+import { getAuthTree } from '@/pages/authority/authority-auth/service'
+import { Auth } from '@/pages/authority/authority-auth/data'
+
 import { Role } from './data.d'
 
 import { setRole, getRoleDetail } from './service';
@@ -26,6 +29,7 @@ import { getResourcesAuthById } from '@/utils/utils'
 
 interface RoleState {
   roleList: Role[],
+  authList: Auth[],
   authority: string,
   actionTag: Role,
   drawerVisible: boolean,
@@ -34,22 +38,12 @@ interface RoleState {
   upDataLoading: boolean,
 }
 
-interface RoleProps {
-  allAuthList: IRoute[],
-  originalAuthList: IRoute[],
-  loading: boolean,
-}
+interface RoleProps { }
 
-// 因为loading 导致每次请求后引发页面更新
-@connect(({ auth, loading, }: ConnectState) => ({
-  allAuthList: auth.allAuthList,
-  originalAuthList: auth.originalAuthList,
-  loading: loading.effects['role/getRoleList'] || loading.effects['role/setRole'],
-}),
-)
 class AuthorityRole extends PureComponent<RoleProps, RoleState> {
   state: RoleState = {
     roleList: [],
+    authList: [],
     authority: '',
     actionTag: {}, // 当前表单内容
     drawerVisible: false, // 是否打开表单
@@ -65,28 +59,63 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
   }
 
   componentDidMount() {
-    this.getRoleList()
+    this.getList()
   }
-  // 获取角色数组
-  getRoleList = async () => {
+
+  getList = async () => {
+    if (!getResourcesAuthById(33)) {
+      notification.error({
+        description: formatMessage({ id: 'component.not-role' }),
+        message: formatMessage({ id: 'component.error' }),
+      });
+      return;
+    }
     try {
       this.setState({
         getListLoading: true
       })
+      await Promise.all([this.getAuthTree(), this.getRoleList()])
+      this.setState({
+        getListLoading: false
+      })
+    } catch (e) {
+      this.setState({
+        getListLoading: false
+      })
+      console.log(e)
+      notification.error({
+        description: e.errorMsg,
+        message: formatMessage({ id: 'component.error' }),
+      });
+    }
+  }
+
+  // 获取 權限数组
+  getAuthTree = async () => {
+    try {
+      const res = await getAuthTree()
+      this.setState({
+        authList: res.data,
+      })
+      return Promise.resolve()
+    } catch (e) {
+      console.log(e)
+      return Promise.reject(e)
+    }
+  }
+
+  // 获取角色数组
+  getRoleList = async () => {
+    try {
       const res = await setRole({ data: {}, method: SetMethod['get'] })
       this.setState({
         roleList: res.data,
         getListLoading: false
       })
+      return Promise.resolve()
     } catch (e) {
       console.log(e)
-      this.setState({
-        getListLoading: false
-      })
-      notification.error({
-        description: e.errorMsg,
-        message: formatMessage({ id: 'component.error' }),
-      });
+      return Promise.reject(e)
     }
   }
 
@@ -100,11 +129,20 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
   }
 
   handleBtnClickAdd = () => {
-    const { actionTag } = this.state
-    const { originalAuthList } = this.props
-    const resourceIds = originalAuthList.map(item => item.id)
+    function _create(authList: Auth[], htmlIds: number[]) {
+      authList.forEach(item => {
+        htmlIds.push(item.htmlId!)
+        if (item.children! && item.children!.length > 0) {
+          _create(item.children!, htmlIds)
+        }
+      })
+    }
+
+    const { actionTag, authList } = this.state
+    const htmlIds: number[] = []
+    _create(authList, htmlIds)
     this.setState({
-      actionTag: Object.assign({}, actionTag, { resourceIds }),
+      actionTag: Object.assign({}, actionTag, { htmlIds }),
       actionType: 'add',
       drawerVisible: true
     })
@@ -118,7 +156,7 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
       })
       const res = await getRoleDetail({ roleId: row.roleId! })
       this.setState({
-        actionTag: Object.assign({}, row, { resourceIds: res.data }),
+        actionTag: res.data,
         actionType: 'edit',
         drawerVisible: true,
         upDataLoading: false
@@ -178,7 +216,7 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
         upDataLoading: true
       })
       if (actionType === 'edit') {
-        res = await setRole({ data: form, method: SetMethod['edit']})
+        res = await setRole({ data: form, method: SetMethod['edit'] })
         newRoleList = oldRoleList.map(item => {
           if (item.roleId === (res.data as Role).roleId) {
             return Object.assign({}, item, res.data)
@@ -211,14 +249,13 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
   }
 
   render() {
-    const { authority, drawerVisible, actionTag, actionType, roleList, upDataLoading, getListLoading, } = this.state
-    const { loading, allAuthList, originalAuthList } = this.props
+    const { authority, drawerVisible, actionTag, actionType, roleList, upDataLoading, getListLoading, authList } = this.state
     return (<PageHeaderWrapper content={<FormattedMessage id="authority-role.header.description" />}>
-      <Card loading={loading}>
+      <Card>
         <Alert className={styles['authority-role-warning']} message={formatMessage({ id: 'authority-role.warning' })} type="warning" />
         {/* 新增按钮 */}
         {
-          getResourcesAuthById(9) && <div className='box box-row-end btn-mb'>
+          getResourcesAuthById(34) && <div className='box box-row-end btn-mb'>
             <Button size="large" type="primary" style={{ float: 'right' }} onClick={this.handleBtnClickAdd}>
               <FormattedMessage id='component.add'></FormattedMessage>
             </Button>
@@ -244,11 +281,10 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
         visible={drawerVisible}
       >
         <RoleForm
+          authList={authList}
           actionTag={actionTag}
           actionType={actionType}
-          originalAuthList={originalAuthList}
           upDataLoading={upDataLoading}
-          allAuthList={allAuthList}
           onClose={this.initActionTag}
           onSubmit={this.handleFormSubmit} />
       </Drawer>

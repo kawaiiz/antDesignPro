@@ -159,19 +159,19 @@ SettingsState
       this.setState({
         upDataLoading: false
       })
-      return Promise.reject()
+      return Promise.reject(e)
     }
   }
 
   // 渲染 菜单对应的内容
   renderChildren = () => {
-    const { selectKey } = this.state;
+    const { selectKey, upDataLoading } = this.state;
     const { currentUser } = this.props
     switch (selectKey) {
       case 'base':
-        return <BaseView currentUser={currentUser} onSubmit={this.handlerChangeUserinfo} />;
+        return <BaseView currentUser={currentUser} onSubmit={this.handlerChangeUserinfo} upDataLoading={upDataLoading} />;
       case 'resetPassword':
-        return <ResetPassword onSubmit={this.handlerChangePassword} />;
+        return <ResetPassword onSubmit={this.handlerChangePassword} upDataLoading={upDataLoading} />;
       default:
         break;
     }

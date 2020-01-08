@@ -58,7 +58,7 @@ export default {
   "menu": {
     "locale": true
   },
-  "title": "tklvyou",
+  "title": "mean上方名称",
   "pwa": false,
   "iconfontUrl": "",
   "collapse": true,

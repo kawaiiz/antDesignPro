@@ -24,6 +24,7 @@ import { ConnectState } from '@/models/connect';
 import { MyConfig } from 'config'
 // import logo from '../assets/logo.svg';
 import logo from '@/assets/logo.png';
+import { router } from 'umi';
 
 export interface BasicLayoutProps extends ProLayoutProps {
   breadcrumbNameMap: {
@@ -31,7 +32,7 @@ export interface BasicLayoutProps extends ProLayoutProps {
   };
   settings: Settings;
   dispatch: Dispatch;
-  authList: IRoute[];
+  authRoutes: IRoute[];
 }
 
 export type BasicLayoutContext = { [K in 'location']: BasicLayoutProps[K] } & {
@@ -45,7 +46,7 @@ const footerRender: BasicLayoutProps['footerRender'] = (_, defaultDom) => {
 }
 
 const BasicLayout: React.FC<BasicLayoutProps> = props => {
-  const { dispatch, children, settings, authList } = props;
+  const { dispatch, children, settings, authRoutes } = props;
   /**
  * use Authorized check all menu item
  */
@@ -53,6 +54,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
     return menuList.map(item => {
       const localItem = {
         ...item,
+        name: item.alias,
         children: item.children ? menuDataRender(item.children) : [],
       };
       if (MyConfig.menuType === 'i18n') {
@@ -96,16 +98,18 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
           }
           return <Link to={menuItemProps.path}>{defaultDom}</Link>;
         }}
-        breadcrumbRender={(routers = []) => [
-          // {
-          //   path: '/',
-          //   breadcrumbName: formatMessage({
-          //     id: 'menu.home',
-          //     defaultMessage: 'Home',
-          //   }),
-          // },
-          ...routers,
-        ]}
+        breadcrumbRender={(routers = []) =>
+          [
+            // {
+            //   path: '/',
+            //   breadcrumbName: formatMessage({
+            //     id: 'menu.home',
+            //     defaultMessage: 'Home',
+            //   }),
+            // },
+            // ...routers,
+          ]
+        }
         itemRender={(route, params, routes, paths) => {
           const first = routes.indexOf(route) === 0;
           return first ? (
@@ -115,7 +119,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
             );
         }}
         footerRender={footerRender}
-        menuDataRender={() => menuDataRender(authList as MenuDataItem[])}
+        menuDataRender={() => menuDataRender(authRoutes as MenuDataItem[])}
         formatMessage={formatMessage}
         rightContentRender={rightProps => <RightContent {...rightProps} />}
         {...props}
@@ -139,5 +143,5 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
 export default connect(({ global, auth, settings }: ConnectState) => ({
   collapsed: global.collapsed,
   settings,
-  authList: auth.authList,
+  authRoutes: auth.authRoutes,
 }))(BasicLayout);

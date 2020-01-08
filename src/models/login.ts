@@ -1,7 +1,7 @@
 import { Reducer } from 'redux';
 import { routerRedux } from 'dva/router';
 import { Effect } from 'dva';
-import { fakeAccountLogin, fakeMobileLogin } from '@/services/login';
+import { fakeAccountLogin, fakeMobileLogin, logout } from '@/services/login';
 import { setAuthority } from '@/utils/authority';
 import { getPageQuery, setToken, delToken } from '@/utils/utils';
 import { formatMessage } from 'umi-plugin-react/locale';
@@ -80,10 +80,14 @@ const Model: LoginModelType = {
         return Promise.reject(e)
       }
     },
-    *logout(_, { put }) {
+    *logout(_, { call, put }) {
       const { redirect } = getPageQuery();
       // redirect
       if (window.location.pathname !== '/user/login' && !redirect) {
+        yield call(logout)
+        // 删除token
+        delToken() 
+        delToken(REFRESH_TOKEN)
         // 跳到登录页
         yield put(
           routerRedux.replace({
@@ -97,9 +101,6 @@ const Model: LoginModelType = {
             type: ''
           }
         }
-        // 删除token
-        delToken()
-        delToken(REFRESH_TOKEN)
         // 重置login的status
         yield put({
           type: 'changeLoginStatusReducers',
@@ -112,15 +113,12 @@ const Model: LoginModelType = {
         });
         // 清除 权限数组
         yield put({
-          type: 'auth/setAuthListReducers',
-          payload: { originalAuthList: [], authList: [], allAuthList: [], resources: [] }
+          type: 'auth/setResourcesReducers',
+          payload: { originalResourcesList: [], resourcesList: [], allResourcesList: [], resources: [] }
         });
       }
-
       // 设置用户身份 localstorage
       setAuthority('');
-      // 设置token cookie
-      setToken('')
       // 更新权限
       reloadAuthorized()
 

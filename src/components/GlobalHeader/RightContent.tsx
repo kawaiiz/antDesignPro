@@ -5,7 +5,6 @@ import { formatMessage } from 'umi-plugin-react/locale';
 import { ConnectProps, ConnectState } from '@/models/connect';
 
 import Avatar from './AvatarDropdown';
-
 import HeaderSearch from '../HeaderSearch';
 import SelectLang from '../SelectLang';
 import styles from './index.less';
@@ -64,12 +63,12 @@ const GlobalHeaderRight: React.SFC<GlobalHeaderRightProps> = props => {
         >
           <Icon type="question-circle-o" />
         </a>
-      </Tooltip>
-      */}
+      </Tooltip> */}
       <Avatar menu />
       {
         MyConfig.menuType === 'i18n' ? <SelectLang className={styles.action} /> : ''
       }
+
     </div>
   );
 };

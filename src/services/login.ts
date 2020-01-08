@@ -23,3 +23,10 @@ export async function fakeMobileLogin(params: LoginParamsType): Promise<any> {
     data: params,
   });
 }
+
+export async function logout(): Promise<any> {
+  return axios.request({
+    url: '/api/web/user/logout',
+    method: 'GET',
+  });
+}

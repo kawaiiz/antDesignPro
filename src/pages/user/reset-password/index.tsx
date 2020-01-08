@@ -1,4 +1,4 @@
-import { Button, Col, Form, Input, Popover, Progress, Row, Select, message } from 'antd';
+import { Button, Col, Form, Input, Popover, Progress, Row, Select, message, notification } from 'antd';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import React, { Component } from 'react';
 import { Dispatch } from 'redux';
@@ -138,7 +138,10 @@ ResetPasswordState
           });
         }
       } catch (e) {
-        message.success(formatMessage({ id: 'component.action-error' }));
+        notification.error({
+          description: e.errorMsg,
+          message: formatMessage({ id: 'component.error' }),
+        });
       }
     });
 

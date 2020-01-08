@@ -1,7 +1,9 @@
-import { Button, Form, Input, Upload, message, Row, Col, notification } from 'antd';
+import { Button, Form, Input, Upload, Row, Col, notification } from 'antd';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import React, { Component, Fragment } from 'react';
 import { FormComponentProps } from 'antd/es/form';
+import lodash from 'lodash'
+
 import { CurrentUser } from '@/models/user';
 import styles from './BaseView.less';
 
@@ -17,8 +19,21 @@ interface BaseViewProps extends FormComponentProps {
   onSubmit: (from: any) => void
 }
 
-class BaseView extends Component<BaseViewProps> {
+interface BaseViewState {
+  currentUser: CurrentUser;
+}
+
+class BaseView extends Component<BaseViewProps, BaseViewState> {
   view: HTMLDivElement | undefined = undefined;
+  state: BaseViewState = {
+    currentUser: {}
+  }
+
+  constructor(props: BaseViewProps) {
+    super(props)
+    console.log(props)
+    this.state.currentUser = lodash.cloneDeep(props.currentUser)
+  }
 
   componentDidMount() {
     this.setBaseInfo();
@@ -51,13 +66,39 @@ class BaseView extends Component<BaseViewProps> {
     this.view = ref;
   };
 
+  // 验证手机号是否修改了 修改了则判断短信是否填入
+  validateMobile = (value: any) => {
+    console.log(this.state)
+    const { currentUser } = this.state
+    console.log(currentUser)
+    console.log(value)
+    if (value.phoneNumber === currentUser.phoneNumber) { 
+      delete value.smsCode
+      delete value.phoneNumber
+      return true
+    } else {
+      if (value.smsCode) {
+        return true
+      } else {
+        notification.error({
+          description: formatMessage({ id: 'account-settings.basic.captcha-message' }),
+          message: formatMessage({ id: 'component.error' }),
+        });
+        return false
+      }
+    }
+  }
+
   handlerSubmit = () => {
     try {
       const { form, onSubmit } = this.props;
       form.validateFields(err => {
         if (!err) {
-          onSubmit(form.getFieldsValue())
-          form.resetFields(['smsCode'])
+          const value = form.getFieldsValue()
+          if (this.validateMobile(value)) {
+            onSubmit(value)
+            form.resetFields(['smsCode'])
+          }
         }
       });
     } catch (e) {
@@ -105,7 +146,7 @@ class BaseView extends Component<BaseViewProps> {
     const { getFieldDecorator } = form
     return (
       <div ref={this.getViewDom}>
-        <Form className={styles.baseView} layout="vertical" hideRequiredMark>
+        <Form className={styles.baseView} layout="vertical" hideRequiredMark >
           <div className={styles.left}>
             <Form.Item label={formatMessage({ id: 'account-settings.basic.nickname' })}>
               {getFieldDecorator('username', {
@@ -137,7 +178,7 @@ class BaseView extends Component<BaseViewProps> {
               <Row gutter={8}>
                 <Col span={12}>
                   {getFieldDecorator('smsCode', {
-                    rules: [{ required: true, message: formatMessage({ id: 'account-settings.basic.captcha-message' }) }],
+                    // rules: [{ required: true, message: formatMessage({ id: 'account-settings.basic.captcha-message' }) }],
                   })(<Input />)}
                 </Col>
                 <Col span={12}>
@@ -145,7 +186,7 @@ class BaseView extends Component<BaseViewProps> {
                 </Col>
               </Row>
             </Form.Item>
-            <Button type="primary" loading={upDataLoading} disabled={upDataLoading} onClick={this.handlerSubmit}>
+            <Button type="primary" onClick={this.handlerSubmit} loading={upDataLoading} disabled={upDataLoading}>
               <FormattedMessage id="account-settings.basic.update" defaultMessage="Update Information" />
             </Button>
           </div>

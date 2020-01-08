@@ -7,7 +7,7 @@ export default {
   'component.error': 'error',
   'component.success': 'success',
   'component.add': 'add',
-  'component.detele': 'detele',
+  'component.delete': 'delete',
   'component.not-role': 'not authority',
   'component.action-error': 'action fail',
   'component.action-success': 'action success',

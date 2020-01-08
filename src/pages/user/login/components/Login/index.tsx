@@ -43,8 +43,8 @@ class Login extends Component<LoginProps, LoginState> {
   static defaultProps = {
     className: '',
     defaultActiveKey: '',
-    onTabChange: () => {},
-    onSubmit: () => {},
+    onTabChange: () => { },
+    onSubmit: () => { },
   };
 
   constructor(props: LoginProps) {
@@ -145,7 +145,7 @@ class Login extends Component<LoginProps, LoginState> {
         <div className={classNames(className, styles.login)}>
           <Form onSubmit={this.handleSubmit}>
             {tabs.length ? (
-              <React.Fragment>
+              <>
                 <Tabs
                   animated={false}
                   className={styles.tabs}
@@ -155,10 +155,10 @@ class Login extends Component<LoginProps, LoginState> {
                   {TabChildren}
                 </Tabs>
                 {otherChildren}
-              </React.Fragment>
+              </>
             ) : (
-              children
-            )}
+                children
+              )}
           </Form>
         </div>
       </LoginContext.Provider>

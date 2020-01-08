@@ -25,6 +25,7 @@ import { SetMethod } from '@/utils/axios'
 const upImgFileUrl = MyConfig.upImgFileUrl
 
 interface PersonFormProp extends FormComponentProps {
+  roleList: Role[],
   actionTag: Person,
   upDataLoading: boolean,
   onClose: () => void,
@@ -32,26 +33,8 @@ interface PersonFormProp extends FormComponentProps {
 }
 
 const PersonForm: React.FC<PersonFormProp> = (props) => {
-  const { form, onClose, actionTag, onSubmit, upDataLoading } = props;
+  const { form, onClose, actionTag, onSubmit, upDataLoading, roleList } = props;
   const { getFieldDecorator } = form;
-  const [roleList, setRoleList] = useState([] as Role[])
-  // 获取权限角色数组
-  const getRoleList = async () => {
-    try {
-      const res = await setRole({ data: {}, method: SetMethod['get'] })
-      setRoleList(res.data)
-    } catch (e) {
-      notification.error({
-        description: e.errorMsg,
-        message: formatMessage({ id: 'component.error' }),
-      });
-    }
-  }
-
-  useEffect(() => {
-    getRoleList()
-  }, [])
-
 
   const handleSubmit = () => {
     try {

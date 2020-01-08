@@ -37,15 +37,15 @@ const Model: ModelType = {
   effects: {
     *submit({ payload }, { call, put }) {
       try {
-        
+        const response = yield call(fakeResetPassword, payload);
+        yield put({
+          type: 'resetPasswordHandleReducers',
+          payload: response,
+        });
+        return Promise.resolve()
       } catch (e) {
-        
+        return Promise.reject(e)
       }
-      const response = yield call(fakeResetPassword, payload);
-      yield put({
-        type: 'resetPasswordHandleReducers',
-        payload: response,
-      });
     },
     initState({ payload }, { call, put }) {
       put({

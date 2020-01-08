@@ -17,5 +17,5 @@ export default {
   'authority-role.form.desc': '描述',
   'authority-role.form.rule.name': '请输入名称',
   'authority-role.form.rule.auth': '请选择权限',
-  'authority-role.form.rule.desc': '请输入权限',
+  'authority-role.form.rule.desc': '请输入描述',
 }

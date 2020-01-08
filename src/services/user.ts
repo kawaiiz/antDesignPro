@@ -1,6 +1,5 @@
 import axios from '@/utils/api.request';
-import { AxiosRequestConfig } from 'axios'
-import { Method } from 'axios'
+import { Method, AxiosRequestConfig } from 'axios'
 import { setOptions } from '@/utils/utils'
 
 

@@ -4,9 +4,11 @@ import { RouterTypes } from 'umi';
 import { DefaultSettings as SettingModelState } from '../../config/defaultSettings';
 import { UserModelState } from './user';
 import { LoginModelType } from './login';
-
 import { GlobalModelState } from './global';
 import { AuthModelState } from './auth';
+
+import { PageManagementState } from '@/pages/content/page-management/model'
+
 export { GlobalModelState, SettingModelState, UserModelState };
 
 export interface Loading {
@@ -19,6 +21,7 @@ export interface Loading {
     user?: boolean;
     login?: boolean;
     auth?: boolean;
+    PageManagementState?: boolean
   };
 }
 
@@ -29,6 +32,7 @@ export interface ConnectState {
   settings: SettingModelState;
   user: UserModelState;
   login: LoginModelType;
+  pageManagement: PageManagementState;
 }
 
 export interface Route extends MenuDataItem {

@@ -12,10 +12,10 @@ import {
 } from 'antd';
 import { ConnectState } from '@/models/connect';
 import { Person } from './data.d'
-import { Role } from '@/pages/authority/authority-role/data'
 import { SetMethod } from '@/utils/axios'
 import { setPerson } from './service'
-
+import { Role } from '@/pages/authority/authority-role/data'
+import { setRole } from '@/pages/authority/authority-role/service'
 import PersonTable from './components/table'
 import PersonForm from './components/from'
 import styles from './style.less'
@@ -52,7 +52,7 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
     actionTag: {}, // 当前表单内容
     drawerVisible: false, // 是否打开表单
     actionType: null, // 点击按钮操作的类型
-    pageIndex: 0, // 分页
+    pageIndex: 1, // 分页
     pageSize: 6,//
     dataTotal: 0,
     getListLoading: false,
@@ -66,7 +66,49 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
   }
 
   componentDidMount() {
-    this.getPersonList()
+    this.getList()
+  }
+
+
+  getList = async () => {
+    if (!getResourcesAuthById(37)) {
+      notification.error({
+        description: formatMessage({ id: 'component.not-role' }),
+        message: formatMessage({ id: 'component.error' }),
+      });
+      return;
+    }
+    try {
+      this.setState({
+        getListLoading: true
+      })
+      await Promise.all([this.getRoleList(), this.getPersonList()])
+      this.setState({
+        getListLoading: false
+      })
+    } catch (e) {
+      this.setState({
+        getListLoading: false
+      })
+      console.log(e)
+      notification.error({
+        description: e.errorMsg,
+        message: formatMessage({ id: 'component.error' }),
+      });
+    }
+  }
+
+  // 获取权限角色数组
+  getRoleList = async () => {
+    try {
+      const res = await setRole({ data: {}, method: SetMethod['get'] })
+      this.setState({
+        roleList: res.data
+      })
+      return Promise.resolve()
+    } catch (e) {
+      return Promise.reject(e)
+    }
   }
 
   // 获取 人员数组
@@ -78,7 +120,7 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
       })
       const res = await setPerson({
         data: {
-          pageIndex, pageSize
+          pageIndex: pageIndex - 1, pageSize
         }, method: SetMethod['get']
       })
       this.setState({
@@ -86,15 +128,9 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
         dataTotal: res.data.totalElements,
         getListLoading: false
       })
+      return Promise.resolve()
     } catch (e) {
-      console.log(e)
-      this.setState({
-        getListLoading: false
-      })
-      notification.error({
-        description: e.errorMsg,
-        message: formatMessage({ id: 'component.error' }),
-      });
+      return Promise.reject(e)
     }
   }
 
@@ -164,7 +200,7 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
       } else if (actionType === 'add') {
         res = await setPerson({ data: form, method: SetMethod['add'] })
         this.setState({
-          pageIndex: 0
+          pageIndex: 1
         }, this.getPersonList)
       }
       this.setState({
@@ -188,7 +224,7 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
 
   handleTableOnChange = async (page: number, pageSize?: number | undefined) => {
     this.setState({
-      pageIndex: page - 1
+      pageIndex: page
     }, this.getPersonList)
   }
 
@@ -201,7 +237,7 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
           <Alert className={styles['authority-person-warning']} message={formatMessage({ id: 'authority-person.warning' })} type="warning" />
 
           {
-            getResourcesAuthById(12) && <div className='box box-row-end btn-mb'>
+            getResourcesAuthById(38) && <div className='box box-row-end btn-mb'>
               <Button size="large" type="primary" style={{ float: 'right' }} onClick={this.handleBtnClickAdd}>
                 <FormattedMessage id='component.add'></FormattedMessage>
               </Button>
@@ -231,8 +267,8 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
           visible={drawerVisible}
         >
           <PersonForm
-            actionTag={actionTag}
             roleList={roleList}
+            actionTag={actionTag}
             upDataLoading={upDataLoading}
             onClose={this.initActionTag}
             onSubmit={this.handleFormSubmit} />

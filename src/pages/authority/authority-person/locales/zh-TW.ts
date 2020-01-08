@@ -24,6 +24,6 @@ export default {
   'authority-person.form.rule.name': '請輸入名称',
   'authority-person.form.rule.phone': '請輸入手機号码',
   'authority-person.form.rule.phone-style': '請檢查手機號碼格式',
-  'authority-person.form.rule.role': '請選擇权限',
-  'authority-person.form.rule.desc': '請輸入权限',
+  'authority-person.form.rule.role': '請選擇權限角色',
+  'authority-person.form.rule.desc': '請輸入介紹',
 }

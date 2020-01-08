@@ -1,6 +1,7 @@
 import { Alert, Checkbox } from 'antd';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import React, { Component } from 'react';
+import { router } from 'umi';
 
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { Dispatch, AnyAction } from 'redux';
@@ -12,11 +13,11 @@ import LoginComponents from './components/Login';
 import styles from './style.less';
 import { LoginParamsType } from '@/services/login';
 import { ConnectState } from '@/models/connect';
-import { delToken } from '@/utils/utils'
+import { delToken, getToken } from '@/utils/utils'
 import { MyConfig } from 'config'
 
 const REFRESH_TOKEN = MyConfig.refreshToken
-
+const AUTO_LOGIN = MyConfig.autoLogin
 const { Tab, UserName, Password, Mobile, Captcha, Submit } = LoginComponents;
 
 interface LoginProps {
@@ -38,17 +39,29 @@ class Login extends Component<LoginProps, LoginState> {
 
   state: LoginState = {
     type: 'account',
-    autoLogin: true,
+    autoLogin: false,
   };
 
   constructor(props: any) {
     super(props)
-    delToken()
-    delToken(REFRESH_TOKEN)
+    const token = getToken()
+    const refresh_token = getToken(REFRESH_TOKEN)
+    if (token.length > 0 && refresh_token.length > 0) {
+      router.replace({
+        pathname: '/index',
+      });
+    }
+  }
 
+  componentDidMount() {
+    const autoLogin = localStorage.getItem(AUTO_LOGIN) || ''
+    this.setState({
+      autoLogin: autoLogin === 'true'
+    })
   }
 
   changeAutoLogin = (e: CheckboxChangeEvent) => {
+    localStorage.setItem(AUTO_LOGIN, e.target.checked ? 'true' : 'false')
     this.setState({
       autoLogin: e.target.checked,
     });
@@ -82,7 +95,6 @@ class Login extends Component<LoginProps, LoginState> {
 
   render() {
     const { userLogin, submitting } = this.props;
-    const { status, type: loginType } = userLogin;
     const { type, autoLogin } = this.state;
     return (
       <div className={styles.main}>
@@ -95,12 +107,6 @@ class Login extends Component<LoginProps, LoginState> {
           }}
         >
           <Tab key="account" tab={formatMessage({ id: 'user-login.login.tab-login-credentials' })}>
-            {status === 'error' &&
-              loginType === 'account' &&
-              !submitting &&
-              this.renderMessage(
-                formatMessage({ id: 'user-login.login.message-invalid-credentials' }),
-              )}
             <UserName
               name="username"
               placeholder={formatMessage({ id: 'user-login.login.username' })}
@@ -129,12 +135,6 @@ class Login extends Component<LoginProps, LoginState> {
             />
           </Tab>
           <Tab key="mobile" tab={formatMessage({ id: 'user-login.login.tab-login-mobile' })}>
-            {status === 'error' &&
-              loginType === 'mobile' &&
-              !submitting &&
-              this.renderMessage(
-                formatMessage({ id: 'user-login.login.message-invalid-verification-code' }),
-              )}
             <Mobile
               name="phoneNumber"
               placeholder={formatMessage({ id: 'user-login.phone-number.placeholder' })}
@@ -176,10 +176,10 @@ class Login extends Component<LoginProps, LoginState> {
             {/* <FormattedMessage id="user-login.login.sign-in-with" />
             <Icon type="alipay-circle" className={styles.icon} theme="outlined" />
             <Icon type="taobao-circle" className={styles.icon} theme="outlined" />
-            <Icon type="weibo-circle" className={styles.icon} theme="outlined" /> */}
+            <Icon type="weibo-circle" className={styles.icon} theme="outlined" />
             <Link className={styles.register} to="/user/register">
               <FormattedMessage id="user-login.login.signup" />
-            </Link>
+            </Link> */}
           </div>
         </LoginComponents>
       </div>

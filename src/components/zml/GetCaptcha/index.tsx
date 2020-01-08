@@ -1,3 +1,4 @@
+// 获取验证码
 import React, { useState, useEffect } from 'react'
 import { Button, notification } from 'antd'
 import { Dispatch } from 'redux';
@@ -27,15 +28,22 @@ const getCaptcha: React.FC<getCaptchaProp> = (props) => {
         });
         return;
       }
-      dispatch({
+      await dispatch({
         type: 'global/getCaptcha',
         payload: {
           phoneNumber,
           type
         }
       })
+      await dispatch({  
+        type: 'global/setBtnTime'
+      })
     } catch (e) {
       console.log(e)
+      notification.error({
+        description: e.errorMsg,
+        message: formatMessage({ id: 'component.error' }),
+      });
     }
   }
   return (

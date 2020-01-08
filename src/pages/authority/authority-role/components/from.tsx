@@ -10,12 +10,12 @@ import {
   TreeSelect,
 } from 'antd'
 const { SHOW_ALL } = TreeSelect;
+
+import { Auth } from '@/pages/authority/authority-auth/data'
 import { Role } from '../data.d'
 
 interface RoleFormState {
-  actionTag: Role, // 点击修改的对象
   tree?: TreeCreate[], // 下拉框内数据
-  newActionTag: NewActionTag // 不能直接修改actionTag 拷贝一份修改
 }
 
 interface TreeCreate {
@@ -28,109 +28,90 @@ interface TreeCreate {
 interface RoleFormProp extends FormComponentProps {
   actionTag: Role,
   actionType: 'add' | 'edit' | 'delete' | null,
-  allAuthList: IRoute[],
-  originalAuthList: IRoute[],
+  authList: Auth[],
   upDataLoading: boolean,
   onClose: () => void,
   onSubmit: (from: Role) => void
 }
 
-interface NewTreeValue { label: string, value: any }
-
-interface NewActionTag extends Role {
-  newAuth?: NewTreeValue[] | null
-}
-
 class RoleForm extends Component<RoleFormProp, RoleFormState>{
-  state: RoleFormState = {
-    actionTag: {
-      roleId: null,
-      roleName: '',
-      roleDescription: '',
-      resourceIds: []
-    },
-    newActionTag: {}
-  }
+  state: RoleFormState = {}
+
   constructor(props: RoleFormProp) {
     super(props)
-    const { actionTag } = this.state
-    let newActionTag: NewActionTag = {}
-    newActionTag = Object.assign(newActionTag, actionTag, props.actionTag)
-    newActionTag.newAuth = this.createTreeValue()
-    console.log(newActionTag)
-    this.state.newActionTag = newActionTag
-    this.createTree()
-  }
+    const { actionTag } = props
+    console.log(actionTag)
 
-  // 将要修改的auth字段的number[] 变成 {label:string,value:number}[]
-  createTreeValue = () => {
-    const { originalAuthList, actionTag } = this.props
-    const { resourceIds = [] } = actionTag
-    return resourceIds!.map(item => {
-      for (let i = 0; i < originalAuthList.length; i++) {
-        if (originalAuthList[i].id === item) {
-          return { label: originalAuthList[i].type === 'PAGE' ? formatMessage({ id: `menu.${originalAuthList[i].name}`, defaultMessage: originalAuthList[i].name }) : originalAuthList[i].name, value: originalAuthList[i].id }
-        }
-      }
-      return { label: null, value: null }
-    })
+    this.createTree()
   }
 
   // 创建树形结构
   createTree = () => {
-    const { allAuthList } = this.props;
-    function _create(allAuthList: IRoute[]): TreeCreate[] {
-      return allAuthList.map((item, index) => ({
-        title: item.type === 'PAGE' ? formatMessage({ id: `menu.${item.name}`, defaultMessage: item.name }) + '页面' : item.name,
-        value: item.id,
-        key: item.id,
-        children: item.children && item.children.length > 0 ? _create(item.children) : null,
-      }))
+    const { authList } = this.props;
+    console.log(authList)
+    function _create(authList: IRoute[]): TreeCreate[] {
+      let tree = []
+      for (let i = 0; i < authList.length; i++) {
+        // 如果是生产环境就跳过这两个页面
+        if (process.env.NODE_ENV === 'production' && (authList[i].htmlId == 28 || authList[i].htmlId === 29)) continue;
+        const newItem = {
+          title: authList[i].htmlType === 'PAGE' ? formatMessage({ id: `menu.${authList[i].alias}`, defaultMessage: authList[i].alias }) + '页面' : authList[i].htmlName,
+          value: authList[i].htmlId!.toString(),
+          key: authList[i].htmlId!.toString(),
+          children: authList[i].children && authList[i].children.length > 0 ? _create(authList[i].children) : null,
+        }
+        tree.push(newItem)
+      }
+      return tree
+      // return authList.map((item, index) => ({
+      //   title: item.htmlType === 'PAGE' ? formatMessage({ id: `menu.${item.alias}`, defaultMessage: item.alias }) + '页面' : item.htmlName,
+      //   value: item.htmlId!.toString(),
+      //   key: item.htmlId!.toString(),
+      //   children: item.children && item.children.length > 0 ? _create(item.children) : null,
+      // }))
     }
-    this.state.tree = _create(allAuthList)
+    this.state.tree = _create(authList)
   }
 
   handleSubmit = () => {
     const { form, onSubmit, actionTag } = this.props;
     form.validateFields(err => {
       if (!err) {
-        let formData: NewActionTag = { ...form.getFieldsValue(), roleId: actionTag.roleId }
-        formData.resourceIds = (formData.newAuth as NewTreeValue[]).map(item => item.value)
+        let formData: Role = { ...form.getFieldsValue(), roleId: actionTag.roleId }
         onSubmit(formData)
       }
     })
   }
 
   render() {
-    const { newActionTag, tree } = this.state
-    const { form, onClose, upDataLoading } = this.props;
+    const { tree } = this.state
+    const { form, onClose, upDataLoading, actionTag } = this.props;
     const { getFieldDecorator } = form;
     return (
       <Form layout="vertical">
         <Form.Item label={formatMessage({ id: 'authority-role.form.name' })}>
           {getFieldDecorator('roleName', {
-            initialValue: newActionTag.roleName,
+            initialValue: actionTag.roleName,
             rules: [{ required: true, message: formatMessage({ id: 'authority-role.form.rule.name' }) }],
           })(<Input />)}
         </Form.Item>
         <Form.Item label={formatMessage({ id: 'authority-role.form.desc' })}>
           {getFieldDecorator('roleDescription', {
-            initialValue: newActionTag.roleDescription,
+            initialValue: actionTag.roleDescription,
             rules: [{ required: true, message: formatMessage({ id: 'authority-role.form.rule.desc' }) }],
           })(<Input />)}
         </Form.Item>
         <Form.Item label={formatMessage({ id: 'authority-role.form.auth' })}>
-          {getFieldDecorator('newAuth', {
-            initialValue: newActionTag.newAuth,
+          {getFieldDecorator('htmlIds', {
+            initialValue: actionTag.htmlIds,
             rules: [{ required: true, message: formatMessage({ id: 'authority-role.form.rule.auth' }) }],
           })(
             <TreeSelect
               allowClear={true}
               treeCheckable={true}
-              treeCheckStrictly={true}
               showCheckedStrategy={SHOW_ALL}
               treeData={tree as unknown as TreeCreate[]}
-              placeholder="Please select"
+              placeholder=""
               treeDefaultExpandAll
             />
           )}
