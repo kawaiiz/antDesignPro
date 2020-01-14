@@ -62,6 +62,8 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
           id: `menu.${item.name}`,
           defaultMessage: item.name
         })
+      } else {
+        localItem.name = item.htmlName
       }
       return Authorized.check(item.authority, localItem, null) as MenuDataItem;
     });

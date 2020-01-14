@@ -44,7 +44,9 @@ const UserLayout: React.SFC<UserLayoutProps> = props => {
     >
       <div className={styles.container}>
         <div className={styles.lang}>
-          <SelectLang />
+          {
+            MyConfig.menuType === 'i18n' ? <SelectLang /> : ''
+          }
         </div>
         <div className={styles.content}>
           <div className={styles.top}>

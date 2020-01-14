@@ -136,7 +136,6 @@ const SecurityLayoutFunc: React.FC<SecurityLayoutProps> = props => {
       // 原本这里是 router.push(location.pathName) 发现总是跳 location.pathName=/  打印了location 发现有hash值 所以 直接截取hash值放进去 
       // router.push(location.hash.slice(1));
       // 因为在不打开调试情况下 newInitialRoutes第一次运行是空数组
-      console.log(route.routes[0].routes)
       if (newInitialRoutes.length > 0) {
         route.routes[0].routes = newInitialRoutes
         setIsReady(true)
