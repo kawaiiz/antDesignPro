@@ -9,6 +9,7 @@ export default {
   'account-settings.reset-password.newPassword-message': '請輸入新密碼', 'account-settings.reset-password.confirmPassword': '確認密碼',
   'account-settings.reset-password.confirmPassword-message': '請輸入確認密碼',
   'account-settings.reset-password.confirmPassword-message2': '新密碼与確認密碼不一致',
+  'account-settings.reset-password.password-length': '密碼長度不得小於6',
   'account-settings.basic.avatar': '頭像',
   'account-settings.basic.change-avatar': '更換頭像',
   'account-settings.basic.email': '郵箱',

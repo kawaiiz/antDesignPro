@@ -11,6 +11,7 @@ export default {
   'account-settings.reset-password.confirmPassword': 'Confirm password',
   'account-settings.reset-password.confirmPassword-message': 'Please input confirm password',
   'account-settings.reset-password.confirmPassword-message2': 'Inconsistency between new password and confirmation password',
+  'account-settings.reset-password.password-length': 'Password length must not be less than 6',
   'account-settings.basic.avatar': 'Avatar',
   'account-settings.basic.change-avatar': 'Change avatar',
   'account-settings.basic.email': 'Email',

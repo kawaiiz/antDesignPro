@@ -11,6 +11,7 @@ export default {
   'account-settings.reset-password.confirmPassword': '确认密码',
   'account-settings.reset-password.confirmPassword-message': '请输入确认密码',
   'account-settings.reset-password.confirmPassword-message2': '新密码与确认密码不一致',
+  'account-settings.reset-password.password-length': '密码长度不得小于6',
   'account-settings.basic.avatar': '头像',
   'account-settings.basic.change-avatar': '更换头像',
   'account-settings.basic.email': '邮箱',

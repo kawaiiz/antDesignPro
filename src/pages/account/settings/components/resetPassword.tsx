@@ -12,17 +12,13 @@ interface ResetPasswordProps extends FormComponentProps {
 const resetPassword: React.FC<ResetPasswordProps> = (props) => {
   const { form, onSubmit, upDataLoading } = props;
   const { getFieldDecorator } = form
-  const [help, setHelp] = useState('')
 
   const checkPassword = (rule: any, value: string, callback: (messgae?: string) => void) => {
-
     if (!value) {
-      setHelp(formatMessage({ id: 'account-settings.reset-password.newPassword-message' }))
-      callback();
+      callback("");
     } else {
-      setHelp('')
       if (value.length < 6) {
-        callback('error');
+        callback(formatMessage({ id: 'account-settings.reset-password.password-length' }));
       } else {
         callback();
       }
@@ -33,7 +29,7 @@ const resetPassword: React.FC<ResetPasswordProps> = (props) => {
     if (value && value !== form.getFieldValue('newPassword')) {
       callback(formatMessage({ id: 'account-settings.reset-password.confirmPassword-message2' }));
     } else if (!value && form.getFieldValue('newPassword')) {
-      callback();
+      callback("");
     } else {
       callback();
     }
@@ -69,7 +65,7 @@ const resetPassword: React.FC<ResetPasswordProps> = (props) => {
               type="password"
             />)}
           </Form.Item>
-          <Form.Item help={help} label={formatMessage({ id: 'account-settings.reset-password.newPassword' })}>
+          <Form.Item label={formatMessage({ id: 'account-settings.reset-password.newPassword' })}>
             {getFieldDecorator('newPassword', {
               rules: [
                 {

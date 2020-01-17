@@ -13,11 +13,6 @@ export interface GlobalModelState {
   collapsed?: boolean; // 是否菜单折叠
   captchaTime?: number;// 请求短信的倒计时时间
   captchaDisable?: boolean; // 是否允许请求短信
-  layoutTypeList?: any[],// 布局类型列表
-  columnTypeList?: any[],// 栏目类型列表
-  channelTypeList?: any[],// 频道类型列表
-  jumpWayList?: any[],// 跳转方式列表
-  authTypeList?: any[],// 鉴权方式列表
 }
 
 export interface GlobalModelType {
@@ -26,11 +21,6 @@ export interface GlobalModelType {
   effects: {
     getCaptcha: Effect;
     setBtnTime: Effect;
-    getLayoutType: Effect;
-    getColumnType: Effect;
-    getChannelType: Effect;
-    getJumpWayList: Effect;
-    getAuthTypeList: Effect;
   };
   reducers: {
     changeLayoutCollapsedReducers: Reducer<GlobalModelState>;
@@ -48,11 +38,6 @@ const GlobalModel: GlobalModelType = {
     collapsed: false,
     captchaTime: 5,
     captchaDisable: false,
-    layoutTypeList: [],
-    columnTypeList: [],
-    channelTypeList: [],
-    jumpWayList: [],
-    authTypeList: [],
   },
 
   effects: {
@@ -91,52 +76,7 @@ const GlobalModel: GlobalModelType = {
           break
         }
       }
-    },
-    *getLayoutType(_, { call, put }) {
-      try {
-        const res = yield call(getLayoutType)
-        yield put({ type: 'setStateAttrReducers', payload: { layoutTypeList: res.data } })
-        return Promise.resolve(res.data)
-      } catch (e) {
-        return Promise.reject(e)
-      }
-    },
-    *getColumnType(_, { call, put }) {
-      try {
-        const res = yield call(getColumnType)
-        yield put({ type: 'setStateAttrReducers', payload: { columnTypeList: res.data } })
-        return Promise.resolve(res.data)
-      } catch (e) {
-        return Promise.reject(e)
-      }
-    },
-    *getChannelType(_, { call, put }) {
-      try {
-        const res = yield call(getChannelType)
-        yield put({ type: 'setStateAttrReducers', payload: { channelTypeList: res.data } })
-        return Promise.resolve(res.data)
-      } catch (e) {
-        return Promise.reject(e)
-      }
-    },
-    *getJumpWayList(_, { call, put }) {
-      try {
-        const res = yield call(getLinkType)
-        yield put({ type: 'setStateAttrReducers', payload: { jumpWayList: res.data } })
-        return Promise.resolve(res.data)
-      } catch (e) {
-        return Promise.reject(e)
-      }
-    },
-    *getAuthTypeList(_, { call, put }) {
-      try {
-        const res = yield call(getAuthType)
-        yield put({ type: 'setStateAttrReducers', payload: { authTypeList: res.data } })
-        return Promise.resolve(res.data)
-      } catch (e) {
-        return Promise.reject(e)
-      }
-    },
+    }
   },
   reducers: {
     setCaptchaTime(state, { payload }): GlobalModelState {
