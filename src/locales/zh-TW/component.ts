@@ -7,6 +7,7 @@ export default {
   'component.error': '錯誤',
   'component.success': '成功',
   'component.add': '新增',
+  'component.edit': '修改',
   'component.delete': '删除',
   'component.not-role': '沒有權限',
   'component.action-error': '操作失敗',

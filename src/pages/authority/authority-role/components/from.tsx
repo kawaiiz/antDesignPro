@@ -9,20 +9,15 @@ import {
   Button,
   TreeSelect,
 } from 'antd'
+import { TreeNode } from 'antd/lib/tree-select/interface'
+
 const { SHOW_ALL } = TreeSelect;
 
 import { Auth } from '@/pages/authority/authority-auth/data'
 import { Role } from '../data.d'
 
 interface RoleFormState {
-  tree?: TreeCreate[], // 下拉框内数据
-}
-
-interface TreeCreate {
-  title?: string,
-  value: string,
-  key: string,
-  Children?: TreeCreate[] | null
+  tree?: TreeNode[], // 下拉框内数据
 }
 
 interface RoleFormProp extends FormComponentProps {
@@ -49,7 +44,7 @@ class RoleForm extends Component<RoleFormProp, RoleFormState>{
   createTree = () => {
     const { authList } = this.props;
     console.log(authList)
-    function _create(authList: IRoute[]): TreeCreate[] {
+    function _create(authList: IRoute[]): TreeNode[] {
       let tree = []
       for (let i = 0; i < authList.length; i++) {
         // 如果是生产环境就跳过这两个页面
@@ -63,12 +58,6 @@ class RoleForm extends Component<RoleFormProp, RoleFormState>{
         tree.push(newItem)
       }
       return tree
-      // return authList.map((item, index) => ({
-      //   title: item.htmlType === 'PAGE' ? formatMessage({ id: `menu.${item.alias}`, defaultMessage: item.alias }) + '页面' : item.htmlName,
-      //   value: item.htmlId!.toString(),
-      //   key: item.htmlId!.toString(),
-      //   children: item.children && item.children.length > 0 ? _create(item.children) : null,
-      // }))
     }
     this.state.tree = _create(authList)
   }
@@ -110,7 +99,7 @@ class RoleForm extends Component<RoleFormProp, RoleFormState>{
               allowClear={true}
               treeCheckable={true}
               showCheckedStrategy={SHOW_ALL}
-              treeData={tree as unknown as TreeCreate[]}
+              treeData={tree}
               placeholder=""
               treeDefaultExpandAll
             />
