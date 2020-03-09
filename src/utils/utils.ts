@@ -34,9 +34,17 @@ export const delToken = (tokanName?: string) => {
   sessionStorage.removeItem(tokanName ? tokanName : TOKEN);
 }
 
+/**
+ * @description 判断当前环境是否是开发环境
+ */
+export const isDevelopment = () => {
+  // production是生产环境
+  return process.env.NODE_ENV !== 'production'
+}
+
 // 获取请求地址
 export const getBaseUrl = (): string => {
-  return process.env.NODE_ENV !== 'production' ? MyConfig.baseUrl.dev : MyConfig.baseUrl.pro
+  return isDevelopment() ? MyConfig.baseUrl.dev : MyConfig.baseUrl.pro
 }
 
 // 判断是否拥有某个资源的权限  传入参数是资源的id
@@ -85,4 +93,45 @@ export const toTree = (arr: any[], pID: number) => {
       }))
   // 这里 pID=0是因为后台设置一级页面的父id都是0
   return _(arr, pID).concat(arrNotParent)
+}
+
+/**
+ * @param {Number} num 数值
+ * @returns {String} 处理后的字符串
+ * @description 如果传入的数值小于10，即位数只有1位，则在前面补充0
+ */
+
+export function getHandledValue(num: number) {
+  return num < 10 ? "0" + num : num.toString();
+} // 处理日期数据
+
+/**
+ * @param {Number} timeStamp 传入的时间戳
+ * @param {Number} startType 要返回的时间字符串的格式类型，不传则返回年开头的完整时间
+ */
+export function getDate(data: Date | string | number, startType?: "yyyy-mm-dd" | "yyyy-mm-dd hh:mm:ss" | "yyyymmddhh hhmm" | "hh:mm") {
+  // 传 时间或时间戳
+  let d: Date
+  if (typeof data === "object") {
+    d = data
+  } else {
+    d = new Date(data);
+  }
+  let year = d.getFullYear();
+  let month = getHandledValue(d.getMonth() + 1);
+  let date = getHandledValue(d.getDate());
+  let hours = getHandledValue(d.getHours());
+  let minutes = getHandledValue(d.getMinutes());
+  let second = getHandledValue(d.getSeconds());
+  let resStr = "";
+  if (startType === "yyyy-mm-dd") resStr = year + "-" + month + "-" + date; else if (startType === "yyyy-mm-dd hh:mm:ss") resStr = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + second; else if (startType === "yyyymmddhh hhmm") resStr = year + month + date + " " + hours + minutes; else if (startType === "hh:mm") resStr = hours + ":" + minutes; else resStr = month + "-" + date + " " + hours + ":" + minutes;
+  return {
+    time: resStr,
+    year: year,
+    month: month,
+    date: date,
+    hours: hours,
+    minutes: minutes,
+    second: second
+  };
 }

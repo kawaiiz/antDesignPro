@@ -25,12 +25,12 @@ import { SetMethod } from '@/utils/axios'
 import RoleTable from './components/table'
 import RoleForm from './components/from'
 import styles from './style.less'
-import { getResourcesAuthById } from '@/utils/utils'
+import { getResourcesAuthById, isDevelopment } from '@/utils/utils'
 
 interface RoleState {
   roleList: Role[],
   authList: Auth[],
-  authority: string,
+  authority: string[],
   actionTag: Role,
   drawerVisible: boolean,
   actionType: 'add' | 'edit' | 'delete' | null,
@@ -44,7 +44,7 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
   state: RoleState = {
     roleList: [],
     authList: [],
-    authority: '',
+    authority: [],
     actionTag: {}, // 当前表单内容
     drawerVisible: false, // 是否打开表单
     actionType: null, // 点击按钮操作的类型
@@ -54,11 +54,14 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
 
   constructor(props: RoleProps) {
     super(props)
-    const authority = getAuthority()
-    this.state.authority = typeof authority === 'string' ? authority : authority[0]
+    // const authority = getAuthority()
+    // this.state.authority = typeof authority === 'string' ? authority : authority[0]
   }
 
   componentDidMount() {
+    this.setState({
+      authority: getAuthority() as string[]
+    })
     this.getList()
   }
 
@@ -130,12 +133,13 @@ class AuthorityRole extends PureComponent<RoleProps, RoleState> {
 
   handleBtnClickAdd = () => {
     function _create(authList: Auth[], htmlIds: number[]) {
-      authList.forEach(item => {
-        htmlIds.push(item.htmlId!)
-        if (item.children! && item.children!.length > 0) {
-          _create(item.children!, htmlIds)
+      for (let i = 0; i < authList.length; i++) {
+        if (!isDevelopment() && (authList[i].htmlId == 28 || authList[i].htmlId === 29)) continue;
+        htmlIds.push(authList[i].htmlId!)
+        if (authList[i].children! && authList[i].children!.length > 0) {
+          _create(authList[i].children!, htmlIds)
         }
-      })
+      }
     }
 
     const { actionTag, authList } = this.state

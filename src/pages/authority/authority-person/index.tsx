@@ -23,7 +23,7 @@ import { getResourcesAuthById } from '@/utils/utils'
 
 interface PersonState {
   roleList: Role[],
-  authority: string,
+  authority: string[],
   personList: Person[],
   actionTag: Person,
   drawerVisible: boolean,
@@ -47,7 +47,7 @@ interface PersonProps {
 class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
   state: PersonState = {
     roleList: [],
-    authority: '',
+    authority: [],
     personList: [],
     actionTag: {}, // 当前表单内容
     drawerVisible: false, // 是否打开表单
@@ -61,11 +61,14 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
 
   constructor(props: PersonProps) {
     super(props)
-    const authority = getAuthority()
-    this.state.authority = typeof authority === 'string' ? authority : authority[0]
+    // const authority = getAuthority()
+    // this.state.authority = typeof authority === 'string' ? authority : authority[0]
   }
 
   componentDidMount() {
+    this.setState({
+      authority: getAuthority() as string[]
+    })
     this.getList()
   }
 
@@ -194,6 +197,7 @@ class AuthorityPerson extends PureComponent<PersonProps, PersonState>{
       this.setState({
         upDataLoading: true
       })
+      // form.roleIds = [form.roleId!]
       if (actionType === 'edit') {
         res = await setPerson({ data: form, method: SetMethod['edit'] })
         this.getPersonList()

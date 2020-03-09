@@ -12,7 +12,7 @@ import { formatMessage } from 'umi-plugin-react/locale';
 import { MyConfig } from 'config'
 
 interface TreeTableProp {
-  authority: string,
+  authority: string[],
   resourcesList: ResourcesTag[],
   pageSize: number,
   pageIndex: number,
@@ -32,17 +32,19 @@ const TreeTable: React.FC<TreeTableProp> = (props) => {
       title: formatMessage({ id: 'authority-resources.table.name' }),
       dataIndex: 'resourceName',
       key: 'resourceName',
+      width: '30%',
     },
     {
       title: formatMessage({ id: 'authority-resources.table.id' }),
       dataIndex: 'id',
       key: 'id',
+      width: '10%',
     },
     {
       title: formatMessage({ id: 'authority-resources.table.path' }),
       dataIndex: 'resourceUrl',
       key: 'resourceUrl',
-      width: '20%',
+      width: '30%',
     },
     {
       title: formatMessage({ id: 'authority-resources.table.operation' }),
@@ -53,12 +55,11 @@ const TreeTable: React.FC<TreeTableProp> = (props) => {
     {
       title: formatMessage({ id: 'authority-resources.table.operation' }),
       key: 'action',
-      width: '15%',
       render: (text: ResourcesTag, record: ResourcesTag, index: number) => {
         return (
           <ButtonGroup>
             {
-              authority === MyConfig.SUPER_ADMIN && (
+              authority.includes(MyConfig.SUPER_ADMIN) && (
                 <>
                   <Button onClick={() => handleBtnClickEdit(record)}>
                     {formatMessage({ id: 'authority-resources.table.edit' })}

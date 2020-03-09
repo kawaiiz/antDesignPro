@@ -26,7 +26,7 @@ import AuthTable from './components/table'
 import AuthForm from './components/from'
 
 interface AuthState {
-  authority: string,
+  authority: string[],
   authList: Auth[],
   resourcesList: ResourcesTag[],
   actionTag: Auth,
@@ -48,7 +48,7 @@ interface AuthProps {
 )
 class AuthoritySet extends PureComponent<AuthProps, AuthState>{
   state: AuthState = {
-    authority: '',
+    authority: [],
     authList: [],
     resourcesList: [],
     actionTag: {}, // 当前表单内容
@@ -60,11 +60,14 @@ class AuthoritySet extends PureComponent<AuthProps, AuthState>{
 
   constructor(props: AuthProps) {
     super(props)
-    const authority = getAuthority()
-    this.state.authority = typeof authority === 'string' ? authority : authority[0]
+    // const authority = getAuthority()
+    // this.state.authority = typeof authority === 'string' ? authority : authority[0]
   }
 
   componentDidMount() {
+    this.setState({
+      authority: getAuthority() as string[]
+    })
     this.getList()
   }
 
@@ -220,7 +223,7 @@ class AuthoritySet extends PureComponent<AuthProps, AuthState>{
         <Card loading={loading}>
           <Alert className={styles['authority-auth-warning']} message={formatMessage({ id: 'authority-auth.warning' })} type="warning" />
           {
-            authority === MyConfig.SUPER_ADMIN && <div className='box box-row-end btn-mb'>
+            authority.includes(MyConfig.SUPER_ADMIN) && <div className='box box-row-end btn-mb'>
               <Button size="large" type="primary" style={{ float: 'right' }} onClick={this.handleBtnClickAdd}>
                 <FormattedMessage id='component.add'></FormattedMessage>
               </Button>

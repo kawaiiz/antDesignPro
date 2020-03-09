@@ -136,8 +136,8 @@ const AuthForm: React.FC<AuthFormProp> = (props) => {
             allowClear={true}
             dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
             treeData={selectTree as unknown as TreeCreate[]}
-            // placeholder="Please select"
-            treeDefaultExpandAll
+          // placeholder="Please select"
+          // treeDefaultExpandAll
           />
         )}
       </Form.Item>

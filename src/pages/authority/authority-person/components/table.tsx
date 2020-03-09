@@ -9,11 +9,10 @@ const ButtonGroup = Button.Group;
 import { formatMessage } from 'umi-plugin-react/locale';
 import { Person } from '../data.d'
 import { getBaseUrl, getResourcesAuthById } from '@/utils/utils'
-
-
+import { Role } from '../../authority-role/data';
 interface PersonTableProp {
   personList: Person[],
-  authority: string,
+  authority: string[],
   pageSize: number,
   pageIndex: number,
   dataTotal: number,
@@ -25,7 +24,7 @@ interface PersonTableProp {
 }
 
 const PersonTable: React.FC<PersonTableProp> = (props) => {
-  const { personList, pageSize, pageIndex, dataTotal, getListLoading, upDataLoading, handleTableOnChange, handleBtnClickDeleteUpData, handleBtnClickEdit } = props
+  const { personList, pageSize, pageIndex, dataTotal, getListLoading, upDataLoading, handleTableOnChange, handleBtnClickDeleteUpData, handleBtnClickEdit, authority } = props
   const columns = [
     {
       title: formatMessage({ id: 'authority-person.table.id' }),
@@ -50,7 +49,8 @@ const PersonTable: React.FC<PersonTableProp> = (props) => {
       key: 'roles',
       // width: '15%',
       render: (text: Person, record: Person, index: number) => {
-        return Array.isArray(record.roles) && record.roles.length > 0 ? record.roles![0].roleName : ''
+        // return Array.isArray(record.roles) && record.roles.length > 0 ? (record.roles as Role[])![0].roleName : ''
+        return Array.isArray(record.roles) && (record.roles as Role[]).reduce((value, item, index) => `${value} ${item.roleName}`, '')
       }
     },
     {

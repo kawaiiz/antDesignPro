@@ -3,7 +3,7 @@ import { ResourcesTag } from './data.d'
 import { AxiosRequestConfig, Method } from 'axios'
 import { setOptions } from '@/utils/utils'
 
-export async function setResources({ data, method }: { data: ResourcesTag | { pageIndex: number, pageSize: number }, method: Method }): Promise<any> {
+export async function setResources({ data, method }: { data: ResourcesTag | { pageIndex: number, pageSize: number, resourceUrl: string }, method: Method }): Promise<any> {
   const options: AxiosRequestConfig = setOptions({
     url: '/api/web/resources',
   }, data, method)

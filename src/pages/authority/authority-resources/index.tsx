@@ -10,7 +10,8 @@ import {
   Alert,
   Drawer,
   Button,
-  notification
+  notification,
+  Input,
 } from 'antd';
 
 import { SetMethod } from '@/utils/axios'
@@ -23,7 +24,7 @@ import TreeForm from './components/from'
 import { MyConfig } from 'config';
 
 interface AuthState {
-  authority: string,
+  authority: string[],
   resourcesList: ResourcesTag[],
   actionTag: ResourcesTag,
   drawerVisible: boolean,
@@ -31,6 +32,7 @@ interface AuthState {
   pageIndex: number,
   pageSize: number,
   dataTotal: number,
+  resourceUrl: string,// 资源路径
   getListLoading: boolean,
   upDataLoading: boolean,
 }
@@ -45,7 +47,7 @@ interface Authprops {
 }))
 class AuthorityResources extends PureComponent<Authprops, AuthState> {
   state: AuthState = {
-    authority: '',
+    authority: [],
     resourcesList: [],
     actionTag: {
       id: undefined, // 资源id
@@ -58,17 +60,22 @@ class AuthorityResources extends PureComponent<Authprops, AuthState> {
     pageIndex: 1, // 分页
     pageSize: 6,//
     dataTotal: 0,
+    resourceUrl: '',
     getListLoading: false,
     upDataLoading: false,
   }
 
   constructor(props: Authprops) {
     super(props)
-    const authority = getAuthority()
-    this.state.authority = typeof authority === 'string' ? authority : authority[0]
+    // const authority = getAuthority()
+    // console.log(getAuthority())
+    // this.state.authority = typeof authority === 'string' ? authority : authority[0]
   }
 
   componentDidMount() {
+    this.setState({
+      authority: getAuthority() as string[]
+    })
     this.getResourcesList()
   }
 
@@ -76,13 +83,13 @@ class AuthorityResources extends PureComponent<Authprops, AuthState> {
   // 获取 权限数组
   getResourcesList = async () => {
     try {
-      const { pageIndex, pageSize } = this.state
+      const { pageIndex, pageSize, resourceUrl } = this.state
       this.setState({
         getListLoading: true
       })
       const res = await setResources({
         data: {
-          pageIndex: pageIndex - 1, pageSize
+          pageIndex: pageIndex - 1, pageSize, resourceUrl
         }, method: SetMethod['get']
       })
       this.setState({
@@ -159,6 +166,18 @@ class AuthorityResources extends PureComponent<Authprops, AuthState> {
     }
   }
 
+
+  // 点击查询需要更新页码为第一页
+  handleClickSearch = () => {
+    this.setState(
+      {
+        pageIndex: 1,
+      },
+      this.getResourcesList
+    );
+  };
+
+
   // 表单提交事件
   handleFormSubmit = async (form: ResourcesTag) => {
     try {
@@ -207,12 +226,27 @@ class AuthorityResources extends PureComponent<Authprops, AuthState> {
       <Card loading={loading}>
         <Alert className={styles['authority-resources-warning']} message={formatMessage({ id: 'authority-resources.warning' })} type="warning" />
         {
-          authority === MyConfig.SUPER_ADMIN && <div className='box box-row-end btn-mb'>
-            <Button size="large" type="primary" style={{ float: 'right' }} onClick={this.handleBtnClickAdd}>
+          authority.includes(MyConfig.SUPER_ADMIN) && <div className='box box-row-end btn-mb'>
+            <div>资源URL：</div>
+            <div className="ml-2">
+              <Input
+                placeholder="修改人员名称"
+                onChange={e => {
+                  this.setState({
+                    resourceUrl: e.target.value,
+                  });
+                }}
+              />
+            </div>
+            <Button className="ml-2" onClick={this.handleClickSearch}>
+              查询
+            </Button>
+            <Button className="ml-2" type="primary" style={{ float: 'right' }} onClick={this.handleBtnClickAdd}>
               <FormattedMessage id='component.add'></FormattedMessage>
             </Button>
           </div>
         }
+
         <TreeTable
           authority={authority}
           resourcesList={resourcesList}

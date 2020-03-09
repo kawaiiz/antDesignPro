@@ -9,6 +9,7 @@ import lodash from 'lodash'
 import { getAuthority } from '@/utils/authority';
 import { Route } from '@ant-design/pro-layout/lib/typings'
 import { Auth } from '@/pages/authority/authority-auth/data'
+import { isDevelopment } from '@/utils/utils'
 
 export interface AuthModelState {
   globalAuth?: Auth[], // 权限数组
@@ -46,7 +47,7 @@ const createAuthRoute = (globalAuth: Auth[]): IRoute => {
   let authRoutes = []
   for (let i = 0; i < globalAuth.length; i++) {
     // 如果是生产环境就跳过这两个页面
-    if (process.env.NODE_ENV === 'production' && (globalAuth[i].htmlId == 28 || globalAuth[i].htmlId === 29)) continue;
+    if (!isDevelopment() && (globalAuth[i].htmlId == 28 || globalAuth[i].htmlId === 29)) continue;
 
     if (globalAuth[i].htmlType === 'PAGE') {
       const newItem = {
@@ -59,7 +60,6 @@ const createAuthRoute = (globalAuth: Auth[]): IRoute => {
         children: globalAuth[i].children && globalAuth[i].children!.length > 0 ? createAuthRoute(globalAuth[i].children!) : [],
         hideInMenu: false,
         authority: globalAuth[i].own ? roles : [],
-        // authority: true ? roles : [],
         own: globalAuth[i].own,
       }
       authRoutes.push(newItem)

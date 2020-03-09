@@ -12,7 +12,7 @@ import { getResourcesAuthById } from '@/utils/utils'
 
 interface RoleTableProp {
   roleList: Role[],
-  authority: string,
+  authority: string[],
   getListLoading: boolean,
   handleBtnClickEdit: (role: Role) => void,
   handleBtnClickDeleteUpData: (role: Role) => void,
@@ -58,16 +58,16 @@ const RoleTable: React.FC<RoleTableProp> = (props) => {
             {
               getResourcesAuthById(35) && <Button onClick={() => handleBtnClickEdit(record)}>
                 {formatMessage({ id: 'authority-role.table.edit' })}
-              </Button> 
+              </Button>
             }
             {
-              getResourcesAuthById(36) &&<Popconfirm
+              getResourcesAuthById(36) && <Popconfirm
                 title={`${formatMessage({ id: 'authority-role.table.delete' })} ${record.roleName}?`}
                 okText={formatMessage({ id: 'component.confirm' })}
                 cancelText={formatMessage({ id: 'component.cancel' })}
                 onConfirm={() => handleBtnClickDeleteUpData(record)}>
                 <Button type="danger">{formatMessage({ id: 'authority-role.table.delete' })}</Button>
-              </Popconfirm> 
+              </Popconfirm>
             }
 
           </ButtonGroup >

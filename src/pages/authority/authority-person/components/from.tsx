@@ -194,11 +194,12 @@ const PersonForm: React.FC<PersonFormProp> = (props) => {
         })(<Input />)}
       </Form.Item>
       <Form.Item label={formatMessage({ id: 'authority-person.form.role' })}>
-        {getFieldDecorator('roleId', {
-          initialValue: actionTag.roles && (actionTag.roles as Role[]).length > 0 ? actionTag.roles[0].roleId : undefined,
+        {getFieldDecorator('roleIds', {
+          // initialValue: actionTag.roles && actionTag.roles.length > 0 ? (actionTag.roles[0] as Role).roleId : undefined,
+          initialValue: actionTag.roles && actionTag.roles.length > 0 ? (actionTag.roles as Role[]).map(item => item.roleId) : undefined,
           rules: [{ required: true, message: formatMessage({ id: 'authority-person.form.rule.role' }) }],
         })(
-          <Select>
+          <Select mode="multiple">
             {
               roleList.map(item => <Option value={item.roleId!} key={item.roleId!}>{item.roleName}</Option>)
             }

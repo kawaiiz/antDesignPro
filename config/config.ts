@@ -100,7 +100,7 @@ interface MyConfigInterFace {
 export const MyConfig: MyConfigInterFace = {
   // 请求的域名
   baseUrl: {
-    dev: 'http://36.155.115.191:8000',
+    dev: 'http://192.168.1.217:8080',
     // dev: 'http://192.168.1.74:3001',
     // dev: '',
     pro: 'http://36.155.115.191:8000',

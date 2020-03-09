@@ -30,16 +30,21 @@ const checkPermissions = <T, K>(
   if (!authority) {
     return target;
   }
-  if (currentAuthority === MyConfig.SUPER_ADMIN) {
+  // 超级管理员 全部可看 原来这里只是简单的等于 事实上个人角色字段是数组
+  // if (currentAuthority === MyConfig.SUPER_ADMIN) {
+  if (currentAuthority.includes(MyConfig.SUPER_ADMIN)) {
     return target
   }
+  // 
   // 数组处理
   if (Array.isArray(authority)) {
     if (Array.isArray(currentAuthority)) {
+      // 当个人角色是数组
       if (currentAuthority.some(item => authority.includes(item))) {
         return target;
       }
     } else if (authority.includes(currentAuthority)) {
+      // 当人员角色是字符串
       return target;
     }
     return Exception;

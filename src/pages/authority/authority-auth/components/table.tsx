@@ -12,7 +12,7 @@ import { MyConfig } from 'config';
 
 interface AuthTableProp {
   authList: Auth[],
-  authority: string,
+  authority: string[],
   getListLoading: boolean,
   upDataLoading: boolean,
   handleBtnClickEdit: (person: Auth) => void,
@@ -67,13 +67,13 @@ const AuthTable: React.FC<AuthTableProp> = (props) => {
     {
       title: formatMessage({ id: 'authority-auth.table.operation' }),
       key: 'action',
-      width: '20%',
+      width: '25%',
       render: (text: Auth, record: Auth, index: number) => {
 
         return (
           <ButtonGroup>
             {
-              authority === MyConfig.SUPER_ADMIN && (
+              authority.includes(MyConfig.SUPER_ADMIN) && (
                 <>
                   <Button onClick={() => handleBtnClickEdit(record)}>
                     {formatMessage({ id: 'authority-auth.table.edit' })}
