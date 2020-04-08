@@ -103,7 +103,7 @@ export const MyConfig: MyConfigInterFace = {
     dev: 'http://192.168.1.217:8080',
     // dev: 'http://192.168.1.74:3001',
     // dev: '',
-    pro: 'http://36.155.115.191:8000',
+    pro: '',
   },
   // 底部的文字
   footerContent: {
