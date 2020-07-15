@@ -15,7 +15,7 @@ const generateId = (() => {
 })();
 
 interface LoginTabProps extends TabPaneProps {
-  tabUtil: LoginContextProps['tabUtil'];
+  tabUtil?: LoginContextProps['tabUtil'];
 }
 
 class LoginTab extends Component<LoginTabProps> {
@@ -39,13 +39,25 @@ class LoginTab extends Component<LoginTabProps> {
   }
 }
 
-const WrapContext: React.FC<TabPaneProps> & {
-  typeName: string;
-} = props => (
-  <LoginContext.Consumer>
-    {value => <LoginTab tabUtil={value.tabUtil} {...props} />}
-  </LoginContext.Consumer>
-);
+// const WrapContext: React.FC<TabPaneProps> & {
+//   typeName: string;
+// } = props => (
+//   <LoginContext.Consumer>
+//     {value => <LoginTab tabUtil={value.tabUtil} {...props} />}
+//   </LoginContext.Consumer>
+// );
+
+class WrapContext extends Component<LoginTabProps> {
+  static typeName = 'LoginTab';
+  render() {
+    const { props } = this;
+    return (
+      <LoginContext.Consumer>
+        {value => <LoginTab tabUtil={value.tabUtil} {...props} />}
+      </LoginContext.Consumer>
+    );
+  }
+}
 
 // 标志位 用来判断是不是自定义组件
 WrapContext.typeName = 'LoginTab';

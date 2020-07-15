@@ -15,16 +15,16 @@ import Link from 'umi/link';
 import { Dispatch } from 'redux';
 import { connect } from 'dva';
 import { formatMessage } from 'umi-plugin-react/locale';
-import { IRoute } from 'umi-types/config'
+import { IRoute } from 'umi-types/config';
 
 import Authorized from '@/utils/Authorized';
 import RightContent from '@/components/GlobalHeader/RightContent';
 import { ConnectState } from '@/models/connect';
 
-import { MyConfig } from 'config'
+import { MyConfig } from 'config';
 // import logo from '../assets/logo.svg';
 import logo from '@/assets/logo.png';
-import { router } from 'umi';
+// import { router } from 'umi';
 
 export interface BasicLayoutProps extends ProLayoutProps {
   breadcrumbNameMap: {
@@ -42,14 +42,14 @@ export type BasicLayoutContext = { [K in 'location']: BasicLayoutProps[K] } & {
 };
 
 const footerRender: BasicLayoutProps['footerRender'] = (_, defaultDom) => {
-  return React.cloneElement(defaultDom as React.ReactElement, MyConfig.footerContent)
-}
+  return React.cloneElement(defaultDom as React.ReactElement, MyConfig.footerContent);
+};
 
 const BasicLayout: React.FC<BasicLayoutProps> = props => {
   const { dispatch, children, settings, authRoutes } = props;
   /**
- * use Authorized check all menu item
- */
+   * use Authorized check all menu item
+   */
   const menuDataRender = (menuList: MenuDataItem[]): MenuDataItem[] => {
     return menuList.map(item => {
       const localItem = {
@@ -60,14 +60,14 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
       if (MyConfig.menuType === 'i18n') {
         localItem.name = formatMessage({
           id: `menu.${item.name}`,
-          defaultMessage: item.name
-        })
+          defaultMessage: item.name,
+        });
       } else {
-        localItem.name = item.htmlName
+        localItem.name = item.htmlName;
       }
       return Authorized.check(item.authority, localItem, null) as MenuDataItem;
     });
-  }
+  };
 
   useState(() => {
     if (dispatch) {
@@ -94,31 +94,32 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
       <ProLayout
         logo={logo}
         onCollapse={handleMenuCollapse}
+        onMenuHeaderClick={e => {
+          e.preventDefault();
+        }}
         menuItemRender={(menuItemProps, defaultDom) => {
           if (menuItemProps.isUrl) {
             return defaultDom;
           }
           return <Link to={menuItemProps.path}>{defaultDom}</Link>;
         }}
-        breadcrumbRender={(routers = []) =>
-          [
-            // {
-            //   path: '/',
-            //   breadcrumbName: formatMessage({
-            //     id: 'menu.home',
-            //     defaultMessage: 'Home',
-            //   }),
-            // },
-            // ...routers,
-          ]
-        }
+        breadcrumbRender={(routers = []) => [
+          // {
+          //   path: '/',
+          //   breadcrumbName: formatMessage({
+          //     id: 'menu.home',
+          //     defaultMessage: 'Home',
+          //   }),
+          // },
+          // ...routers,
+        ]}
         itemRender={(route, params, routes, paths) => {
           const first = routes.indexOf(route) === 0;
           return first ? (
             <Link to={paths.join('/')}>{route.breadcrumbName}</Link>
           ) : (
-              <span>{route.breadcrumbName}</span>
-            );
+            <span>{route.breadcrumbName}</span>
+          );
         }}
         footerRender={footerRender}
         menuDataRender={() => menuDataRender(authRoutes as MenuDataItem[])}

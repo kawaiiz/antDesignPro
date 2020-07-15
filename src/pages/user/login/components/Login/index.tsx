@@ -43,8 +43,8 @@ class Login extends Component<LoginProps, LoginState> {
   static defaultProps = {
     className: '',
     defaultActiveKey: '',
-    onTabChange: () => { },
-    onSubmit: () => { },
+    onTabChange: () => {},
+    onSubmit: () => {},
   };
 
   constructor(props: LoginProps) {
@@ -125,16 +125,16 @@ class Login extends Component<LoginProps, LoginState> {
   render() {
     const { className, children } = this.props;
     const { type, tabs = [] } = this.state;
-    const TabChildren: React.ReactComponentElement<LoginTab>[] = [];
+    const TabChildren: React.ReactElement<LoginTab>[] = [];
     const otherChildren: React.ReactElement<unknown>[] = [];
     React.Children.forEach(
       children,
-      (child: React.ReactComponentElement<LoginTab> | React.ReactElement<unknown>) => {
+      (child: React.ReactElement<LoginTab> | React.ReactElement<unknown>) => {
         if (!child) {
           return;
         }
-        if (child.type.typeName === 'LoginTab') {
-          TabChildren.push(child as React.ReactComponentElement<LoginTab>);
+        if ((child.type as any).typeName === 'LoginTab') {
+          TabChildren.push(child as React.ReactElement<LoginTab>);
         } else {
           otherChildren.push(child);
         }
@@ -157,8 +157,8 @@ class Login extends Component<LoginProps, LoginState> {
                 {otherChildren}
               </>
             ) : (
-                children
-              )}
+              children
+            )}
           </Form>
         </div>
       </LoginContext.Provider>
